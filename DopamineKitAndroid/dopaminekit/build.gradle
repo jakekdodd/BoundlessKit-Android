@@ -27,7 +27,6 @@ ext {
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
-
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 24
@@ -43,13 +42,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    lintOptions {
-        abortOnError false
-    }
+
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:24.0.0'
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
@@ -61,6 +58,7 @@ dependencies {
     compile 'com.android.support:design:24.0.0'
 }
 
+
 // taken from https://inthecheesefactory.com/blog/how-to-upload-library-to-jcenter-maven-central-as-dependency/en
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+apply from: 'https://raw.githubusercontent.com/cuddergambino/JCenter/dev-cuddergambino/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/cuddergambino/JCenter/dev-cuddergambino/bintrayv1.gradle'

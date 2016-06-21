@@ -1,5 +1,9 @@
 package com.usedopamine.dopaminekit;
 
+/**
+ * Created by cuddergambino on 6/1/16.
+ */
+
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,10 +12,6 @@ import android.text.style.RelativeSizeSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
-
-/**
- * Created by cuddergambino on 6/1/16.
- */
 
 public final class CandyBar {
     public enum Candy{
