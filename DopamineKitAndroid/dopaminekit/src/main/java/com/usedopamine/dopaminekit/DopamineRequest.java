@@ -44,6 +44,7 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
 
     private Context context = null;
     private RequestType type = null;
+    private DopamineKit.ReinforcementCallback callback = null;
 
     final String DopamineAPIURL = "https://api.usedopamine.com/v3/app/";
     private JSONObject requestData = null;
@@ -53,9 +54,10 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
     private String key_PROSECRET = "productionSecret";
     private String key_INPRO = "inProduction";
 
-    DopamineRequest(Context c, RequestType type){
+    DopamineRequest(Context c, RequestType type, DopamineKit.ReinforcementCallback callback){
         this.context = c;
         this.type = type;
+        this.callback = callback;
         setBaseRequestData();
     }
 
@@ -99,6 +101,21 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
      * Prints the {@code requestData} to be sent
      */
     public void printData(){ try { Log.v("DopamineKit requestData", this.requestData.toString(4)); } catch(JSONException e){ }
+    }
+
+    /**
+     * Addes the local and UTC time to {@code requestData}
+     */
+    void addTime(){
+        try {
+            long utcTime = System.currentTimeMillis();
+            long localTime = utcTime + TimeZone.getDefault().getOffset(utcTime);
+            requestData.put("UTC", utcTime);
+            requestData.put("localTime", localTime);
+        } catch(JSONException e){
+            e.printStackTrace();
+            Log.v("DopamineKit", "Error - cannot add time to requestData");
+        }
     }
 
     private void setBaseRequestData(){
@@ -205,24 +222,13 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
         return resultData;
     }
 
-    /**
-     * Addes the local and UTC time to {@code requestData}
-     */
-    void addTime(){
-        try {
-            long utcTime = System.currentTimeMillis();
-            long localTime = utcTime + TimeZone.getDefault().getOffset(utcTime);
-            requestData.put("UTC", utcTime);
-            requestData.put("localTime", localTime);
-        } catch(JSONException e){
-            e.printStackTrace();
-            Log.v("DopamineKit", "Error - cannot add time to requestData");
-        }
-    }
-
     @Override
-    protected void onPostExecute(String o) {
-        super.onPostExecute(o);
+    protected void onPostExecute(String response) {
+        super.onPostExecute(response);
+
+        if(callback != null){
+            callback.onReinforcement(response);
+        }
     }
 
 

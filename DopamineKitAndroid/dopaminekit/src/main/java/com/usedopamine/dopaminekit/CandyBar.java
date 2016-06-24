@@ -14,6 +14,13 @@ import android.view.View;
 import android.widget.TextView;
 
 public final class CandyBar {
+    /**
+     * Represents a set of Icons to be used in a {@link CandyBar}.
+     * <p>
+     * <code>
+     *  CERTIFICATE CROWN CROWN2 MEDALSTAR RIBBONSTAR STARS STOPWATCH THUMBSUP TROPHYHAND TROPHYSTAR WREATHSTAR
+     * </code>
+     */
     public enum Candy{
         CERTIFICATE(R.drawable.certificate),
         CROWN(R.drawable.crown),
