@@ -1,5 +1,9 @@
 package com.usedopamine.dopaminekit;
 
+/**
+ * Created by cuddergambino on 6/1/16.
+ */
+
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,11 +13,14 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
-/**
- * Created by cuddergambino on 6/1/16.
- */
-
 public final class CandyBar {
+    /**
+     * Represents a set of Icons to be used in a {@link CandyBar}.
+     * <p>
+     * <code>
+     *  CERTIFICATE CROWN CROWN2 MEDALSTAR RIBBONSTAR STARS STOPWATCH THUMBSUP TROPHYHAND TROPHYSTAR WREATHSTAR
+     * </code>
+     */
     public enum Candy{
         CERTIFICATE(R.drawable.certificate),
         CROWN(R.drawable.crown),
