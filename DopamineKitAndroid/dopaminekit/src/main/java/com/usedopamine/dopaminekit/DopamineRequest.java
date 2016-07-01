@@ -151,8 +151,6 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
             e.printStackTrace();
         }
 
-        if(DopamineKit.debugMode) Log.v("DopamineKit", "property file" + byteArrayOutputStream.toString());
-
         try{
             // Data independent of json file but in here because throws JSONException
             requestData.put("clientOS", "Android");
