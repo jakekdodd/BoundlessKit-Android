@@ -100,7 +100,10 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
     /**
      * Prints the {@code requestData} to be sent
      */
-    public void printData(){ try { Log.v("DopamineKit requestData", this.requestData.toString(4)); } catch(JSONException e){ }
+    public void printData(){
+        try {
+            Log.v("DopamineKit requestData", this.requestData.toString(4));
+        } catch(JSONException e){ }
     }
 
     /**
@@ -144,7 +147,7 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
             }
             inputStream.close();
         } catch (IOException e){
-            System.out.println("DopamineKit: Error - cannot find dopamineproperties.json");
+            Log.v("DopamineKit","Error - cannot find dopamineproperties.json");
             e.printStackTrace();
         }
 
@@ -199,7 +202,7 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
             Response response = client.newCall(request).execute();
 
             JSONObject rawData = new JSONObject( response.body().string() );
-            if(DopamineKit.debugMode) Log.v("DopamineKit Request Response", rawData.toString());
+            if(DopamineKit.debugMode) Log.v("DopamineKit", "Request Response - " + rawData.toString());
             if(type == RequestType.REINFORCE) {
                 status = rawData.getInt("status");
                 resultData = rawData.getString("reinforcementDecision");
@@ -211,10 +214,10 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
             }
         } catch (IOException e){
             e.printStackTrace();
-            Log.v("DopamineKit Network Error", e.getMessage());
+            Log.v("DopamineKit", "Network Error - " + e.getMessage());
         } catch (JSONException e){
             e.printStackTrace();
-            Log.v("DopamineKit Parse Error", e.getMessage());
+            Log.v("DopamineKit", "Parse Error - " + e.getMessage());
         }
 
 
