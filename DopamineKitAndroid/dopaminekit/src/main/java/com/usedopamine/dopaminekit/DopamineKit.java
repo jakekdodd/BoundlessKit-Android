@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 
@@ -27,7 +28,17 @@ public class DopamineKit {
         void onReinforcement(String reinforcement);
     }
 
-    public static boolean debugMode = true;
+    public static boolean debugMode = false;
+    /**
+     * By default debug mode is set to `false`.
+     * When debug mode is enabled, the data sent to and received from
+     * the DopamineAPI will be logged.
+     *
+     * @param enable Used to set debug mode. `true` will enable, `false` will disable.
+     */
+    public static void enableDebugMode(boolean enable){
+        debugMode = enable;
+    }
 
     static Context context = null;
 
@@ -104,7 +115,7 @@ public class DopamineKit {
             e.printStackTrace();
         }
 
-        System.out.println("DopmineKit: Result - " + resultFunction);
+        Log.v("DopmineKit", "Reinforcement Decision - " + resultFunction);
 //        return resultFunction;
     }
 
