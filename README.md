@@ -1,5 +1,8 @@
 # What is DopamineKit?
 
+[![Bintray](https://img.shields.io/bintray/v/cuddergambino/maven/dopaminekit.svg?maxAge=2592000?style=plastic)]()
+
+
 DopamineKit provides wrappers for accessing the DopamineAPI and expressive UI reinforcements for your app.
 
 Get your free API key at [http://dashboard.usedopamine.com/](http://dashboard.usedopamine.com/)
