@@ -1,6 +1,10 @@
 # What is DopamineKit?
 
-[![Bintray](https://img.shields.io/bintray/v/cuddergambino/maven/dopaminekit.svg?maxAge=2592000?style=plastic)]()
+[![Bintray](https://img.shields.io/bintray/v/cuddergambino/maven/dopaminekit.svg?maxAge=2592000?style=plastic)](https://bintray.com/cuddergambino/maven/dopaminekit)
+
+[![Maven Central](https://img.shields.io/maven-central/v/com.usedopamine/dopaminekit.svg?maxAge=2592000)](https://bintray.com/cuddergambino/maven/dopaminekit)
+
+[![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)](mailto:team@usedopamine.com)
 
 
 DopamineKit provides wrappers for accessing the DopamineAPI and expressive UI reinforcements for your app.
