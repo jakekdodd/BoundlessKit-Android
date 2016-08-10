@@ -15,7 +15,16 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DopamineDB.db";
 
-    public SQLiteDataStore(Context context) {
+    private static SQLiteDataStore instance = null;
+
+    protected static SQLiteDataStore getInstance(Context context) {
+        if (instance == null) {
+            instance = new SQLiteDataStore(context);
+        }
+        return instance;
+    }
+
+    private SQLiteDataStore(Context context) {
         super (context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

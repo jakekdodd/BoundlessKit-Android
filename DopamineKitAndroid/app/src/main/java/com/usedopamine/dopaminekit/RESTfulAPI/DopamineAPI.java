@@ -23,7 +23,7 @@ import java.util.TimeZone;
  * Created by cuddergambino on 7/17/16.
  */
 
-public class DopamineAPI{ 
+public class DopamineAPI{
 
     static int PreferredTrackLength = 5;
     static int PreferredReportLength = 5;
@@ -37,8 +37,6 @@ public class DopamineAPI{
 
 
     private static JSONObject configurationData = new JSONObject();
-
-//    static Dictionary<String, >
 
     private static DopamineAPI instance = null;
     private DopamineAPI(Context context) {
@@ -119,19 +117,4 @@ public class DopamineAPI{
 
     }
 
-
-    @Override
-    protected Void doInBackground(DopeAction[]... actions) {
-        return null;
-    }
-
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);
-    }
-
-    @Override
-    protected void onPostExecute(DopamineAPIRequestCallback callback) {
-        callback.onDopamineAPIRequestPostExecute();
-    }
 }

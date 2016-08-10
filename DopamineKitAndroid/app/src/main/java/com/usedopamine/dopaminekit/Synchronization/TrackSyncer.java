@@ -113,6 +113,7 @@ public class TrackSyncer extends AsyncTask<Void, Void, Integer> {
         }
 
 
+
         int count = urls.length;
         long totalSize = 0;
         for (int i = 0; i < count; i++) {

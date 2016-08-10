@@ -16,17 +16,17 @@ public class DopeAction extends JSONObject{
 
     public String actionID;
     public String reinforcementDecision;
-    public HashMap<String, String> metaData;
+    public JSONObject metaData;
     public long utc;
 
-    public DopeAction(String actionID, String reinforcementDecision, HashMap<String, String> metaData, long utc){
+    public DopeAction(String actionID, String reinforcementDecision, JSONObject metaData, long utc){
         this.actionID = actionID;
         this.reinforcementDecision = reinforcementDecision;
         this.metaData = metaData;
         this.utc = utc;
     }
 
-    public DopeAction(String actionID, HashMap<String, String> metaData){
+    public DopeAction(String actionID, JSONObject metaData){
         this(actionID, null , metaData, System.currentTimeMillis());
     }
 
@@ -43,7 +43,7 @@ public class DopeAction extends JSONObject{
             json.put("time", timeArray);
             json.put("actionID", actionID);
             json.put("reinforcement", reinforcementDecision);
-            json.put("metaData", new JSONObject(metaData));
+            json.put("metaData", metaData);
 
         } catch (JSONException e) {
             e.printStackTrace();
