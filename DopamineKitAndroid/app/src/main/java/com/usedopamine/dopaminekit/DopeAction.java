@@ -1,5 +1,7 @@
 package com.usedopamine.dopaminekit;
 
+import android.support.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,36 +17,34 @@ import java.util.TimeZone;
 public class DopeAction extends JSONObject{
 
     public String actionID;
-    public String reinforcementDecision;
-    public JSONObject metaData;
+    public @Nullable String reinforcementDecision = null;
+    public @Nullable JSONObject metaData = null;
     public long utc;
+    public long timezoneOffset;
 
-    public DopeAction(String actionID, String reinforcementDecision, JSONObject metaData, long utc){
+    public DopeAction(String actionID, @Nullable String reinforcementDecision, @Nullable JSONObject metaData, long utc, long timezoneOffset){
         this.actionID = actionID;
         this.reinforcementDecision = reinforcementDecision;
         this.metaData = metaData;
         this.utc = utc;
+        this.timezoneOffset = timezoneOffset;
     }
 
-    public DopeAction(String actionID, JSONObject metaData){
-        this(actionID, null , metaData, System.currentTimeMillis());
-    }
-
-    public DopeAction(String actionID){
-        this(actionID, null);
+    public DopeAction(String actionID, @Nullable String reinforcementDecision, @Nullable  JSONObject metaData){
+        this(actionID, reinforcementDecision , metaData, System.currentTimeMillis(), TimeZone.getDefault().getOffset(System.currentTimeMillis()));
     }
 
     public JSONObject toJSON(){
         JSONObject json = new JSONObject();
 
         try {
-            JSONObject utcObject = new JSONObject().put("timeType", "utc").put("value", utc);
-            JSONArray timeArray = new JSONArray().put(utcObject);
-            json.put("time", timeArray);
             json.put("actionID", actionID);
-            json.put("reinforcement", reinforcementDecision);
+            json.put("reinforcementDecision", reinforcementDecision);
             json.put("metaData", metaData);
-
+            json.put("time", new JSONArray()
+                    .put( new JSONObject().put("timeType", "utc").put("value", utc) )
+                    .put( new JSONObject().put("timeType", "deviceTimezoneOffset").put("value", timezoneOffset) )
+            );
         } catch (JSONException e) {
             e.printStackTrace();
         }

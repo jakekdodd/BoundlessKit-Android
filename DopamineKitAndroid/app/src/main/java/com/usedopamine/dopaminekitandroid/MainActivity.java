@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,17 +19,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import com.usedopamine.dopaminekitandroid.;
-import com.usedopamine.dopaminekitandroid.Candy.CandyBar;
-import com.usedopamine.dopaminekitandroid.db.TaskContract;
-import com.usedopamine.dopaminekitandroid.db.TaskDbHelper;
 import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
+import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
+import com.usedopamine.dopaminekit.DataStore.SQLTrackedActionDataHelper;
+import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
+import com.usedopamine.dopaminekit.DopamineKit;
+import com.usedopamine.dopaminekit.Synchronization.TrackSyncer;
+import com.usedopamine.dopaminekitandroid.db.TaskContract;
+import com.usedopamine.dopaminekitandroid.db.TaskDbHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.usedopamine.dopaminekit.DopamineKit;
+//import com.usedopamine.dopaminekitandroid.;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -97,6 +99,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addDemoTasks(){
+        TrackSyncer.getInstance(getApplicationContext()).sync(getApplicationContext(), null);
+
+
         String demoTasks[] = {"Feed the kitties", "Feed the mice", "Feed the snakes the mice", "Feed the mongoose the snakes", "a", "b", "c"};
         SQLiteDatabase db = mHelper.getWritableDatabase();
         for(String taskText : demoTasks){
@@ -207,13 +212,13 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                                    HashMap<String, String> metaData = new HashMap<String, String>();
-                                    metaData.put("calories", "400");
-                                    DopamineKit.track(getApplicationContext(), "foodItemAdded", metaData);
+//                                    HashMap<String, String> metaData = new HashMap<String, String>();
+//                                    metaData.put("calories", "400");
+                                    DopamineKit.track(getApplicationContext(), "foodItemAdded", null);
 
                                 }
                             });
-// Dismiss the item automatically after 3 seconds
+// Dismiss the item automatically after 3 secondsj
             touchListener.setDismissDelay(0);
 
             mTaskListView.setOnTouchListener(touchListener);

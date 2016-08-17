@@ -12,16 +12,16 @@ import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
 
 public class SQLiteDataStore extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "DopamineDB.db";
 
-    private static SQLiteDataStore instance = null;
+    private static SQLiteDataStore sharedInstance = null;
 
-    protected static SQLiteDataStore getInstance(Context context) {
-        if (instance == null) {
-            instance = new SQLiteDataStore(context);
+    public static SQLiteDataStore getInstance(Context context) {
+        if (sharedInstance == null) {
+            sharedInstance = new SQLiteDataStore(context);
         }
-        return instance;
+        return sharedInstance;
     }
 
     private SQLiteDataStore(Context context) {
@@ -29,11 +29,12 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TrackedActionContract.SQL_CREATE_TABLE);
+        SQLTrackedActionDataHelper.createTable(db);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(TrackedActionContract.SQL_DROP_TABLE);
+        SQLTrackedActionDataHelper.dropTable(db);
+
         onCreate(db);
     }
 

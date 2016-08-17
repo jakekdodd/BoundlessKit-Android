@@ -4,15 +4,19 @@ package com.usedopamine.dopaminekit;
  * Created by cuddergambino on 6/1/16.
  */
 
+import android.content.Context;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
+import com.usedopamine.dopaminekit.Synchronization.SyncCoordinator;
+import com.usedopamine.dopaminekit.Synchronization.TrackSyncer;
+
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import android.content.Context;
-import android.util.Log;
-
-import com.usedopamine.dopaminekit.RESTfulAPI.DopamineRequest;
-import com.usedopamine.dopaminekit.Synchronization.TrackSyncer;
 
 public class DopamineKit {
     /**
@@ -30,14 +34,20 @@ public class DopamineKit {
         void onReinforcement(String reinforcement);
     }
 
-    private static DopamineKit sharedInstance = new DopamineKit();
+    private static DopamineKit sharedInstance = null;
 
-    static Context context = null;
-    private TrackSyncer trackSyncer = TrackSyncer.getInstance();
+    private TrackSyncer trackSyncer;
 
-    private DopamineKit() { }
+    private DopamineKit(Context context) {
+        trackSyncer = TrackSyncer.getInstance(context);
+    }
 
-    public static DopamineKit getInstance() { return sharedInstance; }
+    public static DopamineKit getInstance(Context context) {
+        if (sharedInstance == null) {
+            sharedInstance = new DopamineKit(context);
+        }
+        return sharedInstance;
+    }
 
     /**
      * This method sends a reinforcement request for the specified actionID to the DopamineAPI.
@@ -59,41 +69,42 @@ public class DopamineKit {
      * @param callback          The callback to trigger when the reinforcement decision has been made
      */
     public static void reinforce(Context context, String actionID, Map<String, String> metaData, ReinforcementCallback callback) {
-        DopamineKit.context = context;
-        DopamineRequest dr = new DopamineRequest(context, DopamineRequest.RequestType.REINFORCE, callback);
-
-        // add reinforce specific data
-        if(actionID != null) dr.addData("actionID", actionID);
-        if(metaData != null) dr.addData("metaData", metaData);
-
-
-        String resultFunction = null;
-        try {
-            if(DopamineKit.debugMode) dr.printData();
-            dr.execute();
-            dr.get();
-
-            resultFunction = dr.resultData;
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        Log.v("DopmineKit", "Reinforcement Decision - " + resultFunction);
-//        return resultFunction;
+////        DopamineKit.context = context;
+////        DopamineAPIRequest dr = new DopamineAPIRequest(context, DopamineAPIRequest.RequestType.REPORT, callback);
+//
+//
+//        DopamineAPI.track(context, );
+//        // add reinforce specific data
+//        if(actionID != null) dr.addData("actionID", actionID);
+//        if(metaData != null) dr.addData("metaData", metaData);
+//
+//
+//        String resultFunction = null;
+//        try {
+//            dr.execute();
+//            dr.get();
+//
+//            resultFunction = dr.resultData;
+//
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+//
+//        Log.v("DopmineKit", "Reinforcement Decision - " + resultFunction);
+////        return resultFunction;
     }
 
-    /**
-     * This method sends a tracking request for the specified actionID to the DopamineAPI.
-     *
-     * @param context			Context to retrieve api key from file res/raw/dopamineproperties.json
-     * @param actionID			The name of an action
-     */
-    public static void track(Context context, String actionID) {
-        DopamineKit.track(context, actionID, null);
-    }
+//    /**
+//     * This method sends a tracking request for the specified actionID to the DopamineAPI.
+//     *
+//     * @param context			Context to retrieve api key from file res/raw/dopamineproperties.json
+//     * @param actionID			The name of an action
+//     */
+//    public static void track(Context context, String actionID) {
+//        DopamineKit.track(context, actionID, null);
+//    }
 
     /**
      * This method sends a tracking request for the specified actionID to the DopamineAPI.
@@ -102,29 +113,11 @@ public class DopamineKit {
      * @param actionID			The name of an action
      * @param metaData			Optional metadata for better analytics
      */
-    public static void track(Context context, String actionID, HashMap<String, String> metaData) {
-        DopamineKit.context = context;
-//        DopamineRequest dr = new DopamineRequest(context, DopamineRequest.RequestType.TRACK, null);
-//
-//        // add reinforce specific data
-//        if(actionID != null) dr.addData("actionID", actionID);
-//        if(metaData != null) dr.addData("metaData", metaData);
-//
-//
-//        try {
-//            if(DopamineKit.debugMode) dr.printData();
-//            dr.execute();
-//            dr.get();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        }
-        debugLog("test", "here");
-
-        DopeAction action = new DopeAction(actionID, metaData);
-
-        sharedInstance.trackSyncer.store(context, action);
+    public static void track(Context context, String actionID, @Nullable HashMap<String, String> metaData) {
+        JSONObject jsonMetaData = (metaData==null) ? null : new JSONObject(metaData);
+        DopeAction action = new DopeAction(actionID, null, jsonMetaData);
+        getInstance(context).trackSyncer.store(context, action);
+        SyncCoordinator.sync(context);
     }
 
 
