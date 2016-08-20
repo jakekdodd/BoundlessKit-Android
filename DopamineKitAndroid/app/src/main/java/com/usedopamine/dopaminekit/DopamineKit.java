@@ -8,15 +8,11 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
 import com.usedopamine.dopaminekit.Synchronization.SyncCoordinator;
-import com.usedopamine.dopaminekit.Synchronization.TrackSyncer;
 
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class DopamineKit {
     /**
@@ -36,10 +32,10 @@ public class DopamineKit {
 
     private static DopamineKit sharedInstance = null;
 
-    private TrackSyncer trackSyncer;
+    private SyncCoordinator syncCoordinator;
 
     private DopamineKit(Context context) {
-        trackSyncer = TrackSyncer.getInstance(context);
+        syncCoordinator = SyncCoordinator.getInstance(context);
     }
 
     public static DopamineKit getInstance(Context context) {
@@ -94,6 +90,10 @@ public class DopamineKit {
 //
 //        Log.v("DopmineKit", "Reinforcement Decision - " + resultFunction);
 ////        return resultFunction;
+
+        JSONObject jsonMetaData = (metaData==null) ? null : new JSONObject(metaData);
+        DopeAction action = new DopeAction(actionID, "neutralResponse", jsonMetaData);
+//        getInstance(context).syncCoordinator.storeReportedAction(context, action);
     }
 
 //    /**
@@ -113,11 +113,11 @@ public class DopamineKit {
      * @param actionID			The name of an action
      * @param metaData			Optional metadata for better analytics
      */
-    public static void track(Context context, String actionID, @Nullable HashMap<String, String> metaData) {
-        JSONObject jsonMetaData = (metaData==null) ? null : new JSONObject(metaData);
-        DopeAction action = new DopeAction(actionID, null, jsonMetaData);
-        getInstance(context).trackSyncer.store(context, action);
-        SyncCoordinator.sync(context);
+    public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
+        DopamineKit dopamineKit = getInstance(context);
+
+        DopeAction action = new DopeAction(actionID, null, metaData);
+        dopamineKit.syncCoordinator.storeTrackedAction(action);
     }
 
 

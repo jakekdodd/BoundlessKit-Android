@@ -5,6 +5,7 @@ package com.usedopamine.dopaminekit.RESTfulAPI;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.usedopamine.dopaminekit.*;
@@ -17,6 +18,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -28,17 +35,17 @@ import okhttp3.Response;
  * Created by cuddergambino on 7/17/16.
  */
 
-public class DopamineAPI{
+public class DopamineAPI {
 
     private static DopamineAPI sharedInstance = null;
 
-    protected static final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/";
-//    protected static final String DopamineAPIURL = "https://api.usedopamine.com/v3/app/";
-    private static final String clientSDKVersion = "4.0.0.beta";
-    private static final String clientOS = "Android";
-    private static final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
+    protected final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/";
+    private final String clientSDKVersion = "4.0.0.beta";
+    private final String clientOS = "Android";
+    private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
 
-    private JSONObject configurationData = new JSONObject();
+    private JSONObject configurationData = new JSONObject();;
+    private final ExecutorService threadpool = Executors.newFixedThreadPool(3);
 
     private DopamineAPI(Context context) {
         // Basic configuration
@@ -47,43 +54,45 @@ public class DopamineAPI{
             configurationData.put("clientOSVersion", clientOSVersion);
             configurationData.put("clientSDKVersion", clientSDKVersion);
             configurationData.put("primaryIdentity", Settings.Secure.ANDROID_ID);
-        } catch (JSONException e) { e.printStackTrace(); }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         // Read credentials from ("res/raw/dopamineproperties.json")
         int credentialRes = context.getResources().getIdentifier("dopamineproperties", "raw", context.getPackageName());
-        if(credentialRes != 0){
+        if (credentialRes != 0) {
             DopamineKit.debugLog("DopamineAPIRequest", "Found dopamineproperties.json");
-        } else{
+        } else {
             DopamineKit.debugLog("DopamineAPIRequest", "Couldn't find dopamineproperties.json");
             return;
         }
 
         String credentialsFile;
-        try{
+        try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             InputStream inputStream = context.getResources().openRawResource(credentialRes);
-            for (int character = inputStream.read(); character != -1; character = inputStream.read()){
+            for (int character = inputStream.read(); character != -1; character = inputStream.read()) {
                 byteArrayOutputStream.write(character);
             }
             credentialsFile = byteArrayOutputStream.toString();
             inputStream.close();
             byteArrayOutputStream.close();
-        } catch (IOException e){
-            DopamineKit.debugLog("DopamineAPI","Error - cannot find dopamineproperties.json");
+        } catch (IOException e) {
+            DopamineKit.debugLog("DopamineAPI", "Error - cannot find dopamineproperties.json");
             e.printStackTrace();
             return;
         }
 
-        try{
-            JSONObject credentials = new JSONObject( credentialsFile );
+        try {
+            JSONObject credentials = new JSONObject(credentialsFile);
             configurationData.put("appID", credentials.getString("appID"));
             configurationData.put("versionID", credentials.getString("versionID"));
-            if( credentials.getBoolean("inProduction") ){
+            if (credentials.getBoolean("inProduction")) {
                 configurationData.put("secret", credentials.getString("productionSecret"));
-            } else{
+            } else {
                 configurationData.put("secret", credentials.getString("developmentSecret"));
             }
-        } catch (JSONException e){
+        } catch (JSONException e) {
             DopamineKit.debugLog("DopamineAPI", "Error - dopamineproperties.json not configured properly");
             e.printStackTrace();
         }
@@ -96,7 +105,28 @@ public class DopamineAPI{
         return sharedInstance;
     }
 
-    public static void track(Context context, DopeAction[] actions, DopamineAPIRequestCallback callback) {
+    public @Nullable JSONObject track(DopeAction[] actions) {
+        try {
+            JSONObject payload = new JSONObject(configurationData.toString());
+
+            long utc = System.currentTimeMillis();
+            payload.put("utc", utc);
+            payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
+
+            JSONArray trackedActions = new JSONArray();
+            for (int i = 0; i < actions.length; i++) {
+                trackedActions.put(actions[i].toJSON());
+            }
+            payload.put("actions", trackedActions);
+            JSONObject response = send(CallType.TRACK, payload);
+            return response;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void report(Context context, DopeAction[] actions) {
         DopamineAPI api = getInstance(context);
         try {
             JSONObject payload = new JSONObject(api.configurationData.toString());
@@ -105,13 +135,13 @@ public class DopamineAPI{
             payload.put("utc", utc);
             payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
 
-            JSONArray trackedActions = new JSONArray();
-            for (int i = 0; i < actions.length; i++ ) {
-                trackedActions.put(actions[i].toJSON());
+            JSONArray reportedActions = new JSONArray();
+            for (int i = 0; i < actions.length; i++) {
+                reportedActions.put(actions[i].toJSON());
             }
-            payload.put("actions", trackedActions);
+            payload.put("actions", reportedActions);
 
-            api.send(CallType.TRACK, payload, callback);
+            api.send(CallType.REPORT, payload);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -119,64 +149,47 @@ public class DopamineAPI{
 
     }
 
-    private enum CallType{
+
+    private enum CallType {
         TRACK("track"),
         REPORT("report"),
-        REFRESH("refresh")
-        ;
+        REFRESH("refresh");
 
         private final String pathExtension;
-        private CallType(final String value){
+
+        private CallType(final String value) {
             this.pathExtension = value;
         }
     }
 
-    private void send(final CallType type, JSONObject payload, final DopamineAPIRequestCallback callback) {
-        final String url = DopamineAPIURL + type.pathExtension;
+    private @Nullable JSONObject send(final CallType type, JSONObject payload) {
         try {
-            DopamineKit.debugLog("DopamineAPI", "Preparing api call to " + url + " with payload:\n" + payload.toString(2));
-        } catch (JSONException e) {}
-
-        AsyncTask<JSONObject, Void, JSONObject> task = new AsyncTask<JSONObject, Void, JSONObject>() {
-            @Override
-            protected JSONObject doInBackground(JSONObject... payload) {
-                try {
-                    OkHttpClient client = new OkHttpClient();
-                    RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), payload[0].toString(2));
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .post(body)
-                            .build();
-                    Response response = client.newCall(request).execute();
-
-                    JSONObject result = new JSONObject( response.body().string() );
-                    DopamineKit.debugLog("DopamineAPIRequest", "Request resulted in - " + result.toString());
-                    return result;
-                } catch (IOException e){
-                    e.printStackTrace();
-                    Log.v("DopamineKit", "Network Error - " + e.getMessage());
-                    return new JSONObject();
-                } catch (JSONException e){
-                    e.printStackTrace();
-                    Log.v("DopamineKit", "Parse Error - " + e.getMessage());
-                    return new JSONObject();
-                }
+            String url = DopamineAPIURL + type.pathExtension;
+            try {
+                DopamineKit.debugLog("DopamineAPI", "Preparing api call to " + url + " with payload:\n" + payload.toString(2));
+            } catch (JSONException e) {
             }
 
-            @Override
-            protected void onPostExecute(JSONObject response) {
-                super.onPostExecute(response);
+            OkHttpClient client = new OkHttpClient();
+            RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), payload.toString(2));
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .build();
+            Response response = client.newCall(request).execute();
 
-                if(callback != null){
-                    callback.onDopamineAPIRequestPostExecute(response);
-                }
-            }
-
-
-        };
-
-        task.execute(payload);
-
+            JSONObject result = new JSONObject(response.body().string());
+            DopamineKit.debugLog("DopamineAPIRequest", "Request resulted in - " + result.toString());
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.v("DopamineKit", "Network Error - " + e.getMessage());
+            return null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.v("DopamineKit", "Parse Error - " + e.getMessage());
+            return null;
+        }
     }
 
 }

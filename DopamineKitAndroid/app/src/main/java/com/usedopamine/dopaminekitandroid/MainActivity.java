@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import com.usedopamine.dopaminekit.DataStore.SQLTrackedActionDataHelper;
 import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
 import com.usedopamine.dopaminekit.Synchronization.TrackSyncer;
+import com.usedopamine.dopaminekitandroid.Candy.CandyBar;
 import com.usedopamine.dopaminekitandroid.db.TaskContract;
 import com.usedopamine.dopaminekitandroid.db.TaskDbHelper;
 
@@ -99,8 +101,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addDemoTasks(){
-        TrackSyncer.getInstance(getApplicationContext()).sync(getApplicationContext(), null);
-
+        DopamineKit.track(getApplicationContext(), "addedDemoTasks", null);
 
         String demoTasks[] = {"Feed the kitties", "Feed the mice", "Feed the snakes the mice", "Feed the mongoose the snakes", "a", "b", "c"};
         SQLiteDatabase db = mHelper.getWritableDatabase();
@@ -179,34 +180,34 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onDismiss(ListViewAdapter view, int position) {
                                     deleteTask(mTaskListView.getChildAt(position));
-
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
-//                                    DopamineKit.reinforce(getApplicationContext(), "action1", new DopamineKit.ReinforcementCallback() {
-//
-//                                        @Override
-//                                        public void onReinforcement(String reinforcement) {
-//                                            // Show some candy and make them feel good!
-//                                            CandyBar candyBar = null;
-//                                            if(reinforcement.equals("stars")){
-//                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
-//                                            }
-//                                            else if(reinforcement.equals("medalStar")){
-//                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
-//                                            }
-//                                            else if(reinforcement.equals("thumbsUp")){
-//                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
-//                                            }
-//                                            else {
-//                                                // Show nothing! This is called a neutral response,
-//                                                // and builds up the good feelings for the next surprise!
-//                                            }
-//                                            if (candyBar != null) {
-//                                                candyBar.show();
-//                                            }
-//                                        }
-//
-//                                    });
+                                    DopamineKit.track(getApplicationContext(), "completed task", null);
+                                    DopamineKit.reinforce(getApplicationContext(), "action1", new DopamineKit.ReinforcementCallback() {
+
+                                        @Override
+                                        public void onReinforcement(String reinforcement) {
+                                            // Show some candy and make them feel good!
+                                            CandyBar candyBar = null;
+                                            if(reinforcement.equals("stars")){
+                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
+                                            }
+                                            else if(reinforcement.equals("medalStar")){
+                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
+                                            }
+                                            else if(reinforcement.equals("thumbsUp")){
+                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
+                                            }
+                                            else {
+                                                // Show nothing! This is called a neutral response,
+                                                // and builds up the good feelings for the next surprise!
+                                            }
+                                            if (candyBar != null) {
+                                                candyBar.show();
+                                            }
+                                        }
+
+                                    });
 
 
 
@@ -214,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
 //                                    HashMap<String, String> metaData = new HashMap<String, String>();
 //                                    metaData.put("calories", "400");
-                                    DopamineKit.track(getApplicationContext(), "foodItemAdded", null);
+//                                    DopamineKit.track(getApplicationContext(), "foodItemAdded", null);
 
                                 }
                             });
