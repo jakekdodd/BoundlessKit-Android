@@ -12,7 +12,7 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
 
 ## Set up DopamineKit
 
-  1. First, make sure you have received your API key and other credentials, which are in the configuration file __dopamineproperties.json__ automatically generated from the [Dopamine Developer Dashboard](http://dashboard.usedopamine.com). 
+  1. First, make sure you have received your API key and other credentials, which are in the configuration file __dopamineproperties.json__ automatically generated from the [Dopamine Developer Dashboard](http://dashboard.usedopamine.com).
 
   2. Import the DopamineKit framework by using JCenter or Maven using the following line
 
@@ -27,17 +27,17 @@ https://github.com/DopamineLabs/DopamineKit-Android-binary/) the library.
   ```java
   import com.usedopamine.dopaminekit.DopamineKit;
   ```
-    
+
   4. Move __dopamineproperties.json__ into the directory _`app/src/main/res/raw`_
 
     ![Workspace snapshot](readme/TestApp with DopamineKit and dopamineproperties.png)
-    *Shown from left to right: 
-    `app/src/main/res/rawdopamineproperties.json`, 
-    gradle import of DopamineKit 3.1.01, 
+    *Shown from left to right:
+    `app/src/main/res/rawdopamineproperties.json`,
+    gradle import of DopamineKit 3.1.01,
     java import of DopamineKit*
-  
+
   5. Start using Dopamine! The main features of DopamineAPI are the `reinforce()` and `track()` functions. These should be added into the response functions of any _action_ to be reinforced or tracked.
-  
+
 
 ###### DopamineKit.reinforce()
 
@@ -45,15 +45,15 @@ https://github.com/DopamineLabs/DopamineKit-Android-binary/) the library.
 
   ```java
 
-    DopamineKit.reinforce(getBaseContext(), 
-                          "some_action", 
+    DopamineKit.reinforce(getBaseContext(),
+                          "some_action",
                           new DopamineKit.ReinforcementCallback() {
 
         @Override
         public void onReinforcement(String reinforcement) {
-                                        
+
             // Multiple reinforcements can help increase the surprise factor!
-            
+
             // DopamineKit provides a standard reinforcement View called Candybar
             // but you can also use any UI components you made like
             // this.showInspirationalQuote() or this.showFunnyMeme()
@@ -68,31 +68,31 @@ https://github.com/DopamineLabs/DopamineKit-Android-binary/) the library.
                 DopamineKit.showCandyBar(getCurrentFocus(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
             }
             else {
-                // Show nothing! This is called a neutral response, 
+                // Show nothing! This is called a neutral response,
                 // and builds up the good feelings for the next surprise!
             }
         }
-                                        
+
     });
-                      
+
   ```  
 
 ###### DopamineKit.track()
 
-  - The `track()` function is used to track other user actions. Using `track()` calls gives Dopamine a better understanding of user behavior, and will make your optimization and analytics better. 
+  - The `track()` function is used to track other user actions. Using `track()` calls gives Dopamine a better understanding of user behavior, and will make your optimization and analytics better.
   - Continuing the example, you could use the `track()` function to record when the user adds new tasks in your AddTaskActivity's `onCreate()` method for the  "To Do List" app, or  record `userCheckedDietHistory()` in the "Fitness" app.
 
-  
+
   Let's track when a user adds a food item in a "Fitness" app. We will also add the calories for the item in the `metaData` field to gather richer information about user engagement in my app.
-  
+
   ```java
-    HashMap<String, String> metaData = new HashMap<String, String>();
+    Map<String, String> metaData = new HashMap<>();
     metaData.put("calories", "400");
     DopamineKit.track(getBaseContext(), "foodItemAdded", metaData);
    ```
 
-  
-  
+
+
 ## Super Users
 
 There are additional parameters for the `track()` and `reinforce()` functions that are used to gather rich information from your app and better create a user story of better engagement.
@@ -112,7 +112,7 @@ Dopamine.track(context, actionID, metaData, secondaryIdentity)
 ######Parameters:
 
  - `context: Context` - is used to get API credentials from `res/raw/dopamineproperties.json` of the context's package
- 
+
  - `actionID: String` - is a unique name for the action that the user has performed
 
  - `metaData: Map<String, String>` - (optional) is any additional data to be sent to the API
@@ -134,7 +134,7 @@ Dopamine.reinforce(context, actionID, metaData, secondaryIdentity, callback)
 ######Parameters:
 
  - `context: Context` - is used to get API credentials from `res/raw/dopamineproperties.json` of the context's package
- 
+
  - `actionID: String` - is a unique name for the action that the user has performed
 
  - `metaData: Map<String, String>` - (optional) is any additional data to be sent to the API
