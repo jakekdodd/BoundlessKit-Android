@@ -24,8 +24,6 @@ public abstract class Syncer implements Callable<JSONObject> {
     protected static SQLiteDatabase sqlDB = null;
     protected static DopamineAPI dopamineAPI = null;
 
-    protected Boolean syncInProgress = false;
-
     public Syncer(Context context) {
         if(sqlDB == null) {
             sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();

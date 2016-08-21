@@ -65,35 +65,11 @@ public class DopamineKit {
      * @param callback          The callback to trigger when the reinforcement decision has been made
      */
     public static void reinforce(Context context, String actionID, Map<String, String> metaData, ReinforcementCallback callback) {
-////        DopamineKit.context = context;
-////        DopamineAPIRequest dr = new DopamineAPIRequest(context, DopamineAPIRequest.RequestType.REPORT, callback);
-//
-//
-//        DopamineAPI.track(context, );
-//        // add reinforce specific data
-//        if(actionID != null) dr.addData("actionID", actionID);
-//        if(metaData != null) dr.addData("metaData", metaData);
-//
-//
-//        String resultFunction = null;
-//        try {
-//            dr.execute();
-//            dr.get();
-//
-//            resultFunction = dr.resultData;
-//
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        } catch (ExecutionException e) {
-//            e.printStackTrace();
-//        }
-//
-//        Log.v("DopmineKit", "Reinforcement Decision - " + resultFunction);
-////        return resultFunction;
+        DopamineKit dopamineKit = getInstance(context);
 
         JSONObject jsonMetaData = (metaData==null) ? null : new JSONObject(metaData);
         DopeAction action = new DopeAction(actionID, "neutralResponse", jsonMetaData);
-//        getInstance(context).syncCoordinator.storeReportedAction(context, action);
+        dopamineKit.syncCoordinator.storeReportedAction(context, action);
     }
 
 //    /**

@@ -33,7 +33,7 @@ public class SyncCoordinator {
 
     private ExecutorService apiSyncThreadpool = Executors.newFixedThreadPool(3);
     private TrackSyncer trackSyncer;
-//    private ReportSyncer reportSyncer;
+    private ReportSyncer reportSyncer;
 
     protected SQLiteDatabase sqlDB;
     protected DopamineAPI dopamineAPI;
@@ -41,9 +41,8 @@ public class SyncCoordinator {
     private Boolean syncInProgress = false;
 
     private SyncCoordinator(Context context) {
-//        dataStore = SQLiteDataStore.getInstance(context);
         trackSyncer = TrackSyncer.getInstance(context);
-//        reportSyncer = ReportSyncer.getInstance(context);
+        reportSyncer = ReportSyncer.getInstance(context);
 
         sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
         dopamineAPI = DopamineAPI.getInstance(context);
@@ -63,63 +62,91 @@ public class SyncCoordinator {
         sync();
     }
 
-//    public void storeReportedAction(Context context, DopeAction action) {
-//        reportSyncer.store(context, action);
-//        sync(context);
-//    }
+    public void storeReportedAction(Context context, DopeAction action) {
+        reportSyncer.store(action);
+        sync();
+    }
 
+    // This is not a blocking method!!
     public void sync() {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 if (syncInProgress) {
                     DopamineKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
+                    return null;
                 } else {
                     synchronized (syncInProgress) {
                         if (syncInProgress) {
                             DopamineKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
+                            return null;
                         } else {
                             try {
                                 syncInProgress = true;
 
-                                boolean trackerShouldSync = trackSyncer.isTriggered();
+                                //////
+                                // Begin syncing logic
+                                //////
+
+                                boolean reporterShouldSync = reportSyncer.isTriggered();
+                                boolean trackerShouldSync = reporterShouldSync || trackSyncer.isTriggered();
+
+                                Future<JSONObject> apiCall = null;
+                                JSONObject apiResponse = null;
 
                                 if (trackerShouldSync) {
-
-                                    Future<JSONObject> futureTrack = apiSyncThreadpool.submit(trackSyncer); // apiSyncThreadpool.schedule(trackSyncer, 1000, TimeUnit.MILLISECONDS);
-                                    apiSyncThreadpool.submit(trackSyncer);
-                                    while (!futureTrack.isDone()) {
+                                    apiCall = apiSyncThreadpool.submit(trackSyncer); // apiSyncThreadpool.schedule(trackSyncer, 1000, TimeUnit.MILLISECONDS);
+                                    while (!apiCall.isDone()) {
                                         Log.v("SyncCoordinator", "Waiting for track syncer to be done...");
-                                        try {
-                                            Thread.sleep(1000);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
+                                        Thread.sleep(1000);
                                     }
-                                    Log.v("SyncCoordinator", "Track Syncer is done!");
 
-
-                                    JSONObject response = futureTrack.get();
-                                    if (response == null) {
-                                        Log.v("TrackSyncResponse", "null");
+                                    apiResponse = apiCall.get();
+                                    Log.v("TrackSyncResponse", apiResponse==null ? "null" : apiResponse.toString());
+                                    if( apiResponse == null || apiResponse.optInt("status", 404) == 404 ) {
+                                        DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing tracker... Halting early.");
+                                        return null;
                                     } else {
-                                        Log.v("TrackSyncResponse", response.toString());
+                                        Log.v("SyncCoordinator", "Track Syncer is done!");
+                                        Thread.sleep(1000);
                                     }
 
                                 }
-                            } catch (InterruptedException e) {
+
+                                if (reporterShouldSync) {
+                                    apiCall = apiSyncThreadpool.submit(reportSyncer);
+                                    while (!apiCall.isDone()) {
+                                        Log.v("SyncCoordinator", "Waiting for report syncer to be done...");
+                                        Thread.sleep(1000);
+                                    }
+
+                                    apiResponse = apiCall.get();
+                                    Log.v("ReportSyncResponse", apiResponse==null ? "null" : apiResponse.toString());
+                                    if( apiResponse == null || apiResponse.optInt("status", 404) == 404 ) {
+                                        DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing reporter... Halting early.");
+                                        return null;
+                                    } else {
+                                        Log.v("SyncCoordinator", "Report Syncer is done!");
+                                        Thread.sleep(5000);
+                                    }
+                                }
+
+
+                            }
+                                catch (InterruptedException e) {
                                 e.printStackTrace();
                             } catch (ExecutionException e) {
                                 e.printStackTrace();
                             } finally {
                                 syncInProgress = false;
+                                return null;
                             }
                         }
 
                     }
 
                 }
-                return null;
+
             }
         }.execute();
     }

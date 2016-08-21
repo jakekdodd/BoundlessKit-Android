@@ -39,7 +39,8 @@ public class DopamineAPI {
 
     private static DopamineAPI sharedInstance = null;
 
-    protected final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/";
+//    private final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/";
+    private final String DopamineAPIURL = "https://api.usedopamine.com/v4/app/";
     private final String clientSDKVersion = "4.0.0.beta";
     private final String clientOS = "Android";
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
@@ -126,10 +127,9 @@ public class DopamineAPI {
         }
     }
 
-    public static void report(Context context, DopeAction[] actions) {
-        DopamineAPI api = getInstance(context);
+    public @Nullable JSONObject report(DopeAction[] actions) {
         try {
-            JSONObject payload = new JSONObject(api.configurationData.toString());
+            JSONObject payload = new JSONObject(configurationData.toString());
 
             long utc = System.currentTimeMillis();
             payload.put("utc", utc);
@@ -140,13 +140,12 @@ public class DopamineAPI {
                 reportedActions.put(actions[i].toJSON());
             }
             payload.put("actions", reportedActions);
-
-            api.send(CallType.REPORT, payload);
+            JSONObject response = send(CallType.REPORT, payload);
+            return response;
         } catch (JSONException e) {
             e.printStackTrace();
+            return null;
         }
-
-
     }
 
 

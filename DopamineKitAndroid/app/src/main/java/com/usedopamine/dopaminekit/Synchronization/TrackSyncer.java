@@ -38,6 +38,7 @@ public class TrackSyncer extends Syncer {
 
     private final Object storelock = new Object();
     private final Object apisynclock = new Object();
+    private Boolean syncInProgress = false;
 
     private TrackSyncer(Context context) {
         super(context);
@@ -101,7 +102,6 @@ public class TrackSyncer extends Syncer {
                         DopamineKit.debugLog("TrackSyncer", "Beginning tracker sync!");
                         syncInProgress = true;
 
-
                         final ArrayList<TrackedActionContract> sqlActions = SQLTrackedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
                             DopamineKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
@@ -127,10 +127,10 @@ public class TrackSyncer extends Syncer {
                             DopamineKit.debugLog("TrackSyncer", "Something went wrong during the call...");
                         } else {
                             if (apiResponse.optInt("status", 404) == 200) {
+                                DopamineKit.debugLog("TrackSyncer", "Deleting synced actions...");
                                 for (int i = 0; i < sqlActions.size(); i++) {
                                     SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                                 }
-                                DopamineKit.debugLog("TrackSyncer", "Synced and deleted all tracked actions!");
                                 updateTriggers(null, null, null);
                             } else {
                                 DopamineKit.debugLog("TrackSyncer", "Something went wrong while syncing... Leaving tracked actions in sqlite db");
@@ -144,9 +144,4 @@ public class TrackSyncer extends Syncer {
             }
         }
     }
-//
-//        }
-//
-//    }
-
 }

@@ -182,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
                                     deleteTask(mTaskListView.getChildAt(position));
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
-                                    DopamineKit.track(getApplicationContext(), "completed task", null);
                                     DopamineKit.reinforce(getApplicationContext(), "action1", new DopamineKit.ReinforcementCallback() {
 
                                         @Override
