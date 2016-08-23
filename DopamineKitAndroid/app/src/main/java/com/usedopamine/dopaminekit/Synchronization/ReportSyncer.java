@@ -118,7 +118,7 @@ public class ReportSyncer extends Syncer {
                         if (apiResponse == null) {
                             DopamineKit.debugLog("ReportSyncer", "Something went wrong during the call...");
                         } else if (apiResponse.optInt("status", 404) == 200) {
-                            DopamineKit.debugLog("ReportSyncer", "Deleting reported actions...");
+                            DopamineKit.debugLog("ReportSyncer", "Deleting " + sqlActions.size() + " reported actions...");
                             for (int i = 0; i < sqlActions.size(); i++) {
                                 SQLReportedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                             }

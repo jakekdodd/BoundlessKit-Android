@@ -74,6 +74,8 @@ public class CartridgeSyncer extends Syncer {
             SQLCartridgeDataHelper.createTable(sqlDB, actionID);
 
             cartridgeSyncers.put(actionID, syncer);
+
+            DopamineKit.debugLog("CartridgeSyncer", "Created the first cartridge for " + actionID + "!");
         }
 
         return syncer;
@@ -94,7 +96,7 @@ public class CartridgeSyncer extends Syncer {
         HashMap<String, CartridgeSyncer> cartridgesToSync = new HashMap<>();
         for(Map.Entry<String, CartridgeSyncer> entry : cartridgeSyncers.entrySet()) {
             if (entry.getValue().isTriggered()) {
-                DopamineKit.debugLog("CartridgeSyncer", "Cartridge for action " + entry.getKey() + " needs to sync..");
+                DopamineKit.debugLog("CartridgeSyncer", entry.getKey() + " cartridge needs to sync..");
                 cartridgesToSync.put(entry.getKey(), entry.getValue());
             }
         }
@@ -106,7 +108,7 @@ public class CartridgeSyncer extends Syncer {
         int count = SQLCartridgeDataHelper.count(sqlDB, actionID);
         boolean isSizeToSync = count < minimumCount || (double)count/initialSize <= capacityToSync;
         boolean isExpired = System.currentTimeMillis() >= timerMarker+timerLength;
-        DopamineKit.debugLog("CartridgeSyncer", "Cartridge has " + count + "/" + initialSize + " decisions. Cartridge " + (isSizeToSync? "needs" : "has") + " at least " + capacityToSync + "% decisions and is " + (isExpired? "" : "not") + " expired." );
+        DopamineKit.debugLog("CartridgeSyncer", actionID + " cartridge has " + count + "/" + initialSize + " decisions. The cartridge " + (isSizeToSync? "is" : "isnt't") + " below the "+ capacityToSync*100 +"% lower capacity limit and the timer " + (isExpired? "is" : "isn't") + " expired." );
         return isSizeToSync || isExpired;
     }
 

@@ -118,7 +118,7 @@ public class TrackSyncer extends Syncer {
                         if (apiResponse == null) {
                             DopamineKit.debugLog("TrackSyncer", "Something went wrong during the call...");
                         } else if (apiResponse.optInt("status", 404) == 200) {
-                            DopamineKit.debugLog("TrackSyncer", "Deleting tracked actions...");
+                            DopamineKit.debugLog("TrackSyncer", "Deleting " + sqlActions.size() + " tracked actions...");
                             for (int i = 0; i < sqlActions.size(); i++) {
                                 SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                             }
