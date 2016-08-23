@@ -5,6 +5,7 @@ package com.usedopamine.dopaminekit;
  */
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -13,7 +14,7 @@ import com.usedopamine.dopaminekit.Synchronization.SyncCoordinator;
 
 import org.json.JSONObject;
 
-public class DopamineKit {
+public class DopamineKit extends ContextWrapper {
     /**
      * The callback interface used by {@link DopamineKit} to inform its client
      * about a successful reinforcement decision.
@@ -33,8 +34,9 @@ public class DopamineKit {
 
     private SyncCoordinator syncCoordinator;
 
-    private DopamineKit(Context context) {
-        syncCoordinator = SyncCoordinator.getInstance(context);
+    private DopamineKit(Context base) {
+        super(base);
+        syncCoordinator = SyncCoordinator.getInstance(this);
     }
 
     public static DopamineKit getInstance(Context context) {
@@ -52,10 +54,11 @@ public class DopamineKit {
      * @param metaData			Optional metadata for better analytics
      */
     public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
-        DopamineKit instance = getInstance(context);
+        SyncCoordinator coordinator = getInstance(context).syncCoordinator;
 
         DopeAction action = new DopeAction(actionID, null, metaData);
-        instance.syncCoordinator.storeTrackedAction(action);
+        coordinator.storeTrackedAction(action);
+        coordinator.sync();
     }
 
     /**
@@ -67,20 +70,24 @@ public class DopamineKit {
      * @param callback          The callback to trigger when the reinforcement decision has been made
      */
     public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
+        AsyncTask<Void, Void, String> reinforcementVisual = new AsyncTask<Void, Void, String>() {
+            SyncCoordinator coordinator = getInstance(context).syncCoordinator;;
 
-        DopamineKit instance = getInstance(context);
-
-        final String reinforcementDecision = instance.syncCoordinator.removeReinforcementDecision(context, actionID);
-        AsyncTask<Void, Void, Void> reinforcementVisual = new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Void doInBackground(Void... voids) {
-                callback.onReinforcement(reinforcementDecision);
-                return null;
+            protected String doInBackground(Void... voids) {
+                String reinforcementDecision = coordinator.removeReinforcementDecisionFor(context, actionID);
+                return reinforcementDecision;
             }
-        }.execute();
-        DopeAction action = new DopeAction(actionID, reinforcementDecision, metaData);
-        instance.syncCoordinator.storeReportedAction(action);
 
+            @Override
+            protected void onPostExecute(String reinforcementDecision) {
+                callback.onReinforcement(reinforcementDecision);
+                DopeAction action = new DopeAction(actionID, reinforcementDecision, metaData);
+                coordinator.storeReportedAction(action);
+                coordinator.sync();
+            }
+
+        }.execute();
     }
 
 //    /**

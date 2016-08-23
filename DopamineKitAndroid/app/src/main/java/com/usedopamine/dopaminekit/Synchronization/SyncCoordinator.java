@@ -57,15 +57,13 @@ public class SyncCoordinator extends Syncer {
 
     public void storeTrackedAction(DopeAction action) {
         trackSyncer.store(action);
-        sync();
     }
 
     public void storeReportedAction(DopeAction action) {
         reportSyncer.store(action);
-        sync();
     }
 
-    public String removeReinforcementDecision(Context context, String actionID) {
+    public String removeReinforcementDecisionFor(Context context, String actionID) {
         return CartridgeSyncer.getCartridgeSyncerFor(context, actionID).unload();
     }
 

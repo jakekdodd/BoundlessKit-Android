@@ -1,14 +1,12 @@
 package com.usedopamine.dopaminekit.RESTfulAPI;
 
-
-
 import android.content.Context;
-import android.os.AsyncTask;
-import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.usedopamine.dopaminekit.*;
+import com.usedopamine.dopaminekit.DopamineKit;
+import com.usedopamine.dopaminekit.DopeAction;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,12 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.TimeZone;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -46,7 +38,6 @@ public class DopamineAPI {
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
 
     private JSONObject configurationData = new JSONObject();;
-    private final ExecutorService threadpool = Executors.newFixedThreadPool(3);
 
     private DopamineAPI(Context context) {
         // Basic configuration
@@ -54,7 +45,7 @@ public class DopamineAPI {
             configurationData.put("clientOS", clientOS);
             configurationData.put("clientOSVersion", clientOSVersion);
             configurationData.put("clientSDKVersion", clientSDKVersion);
-            configurationData.put("primaryIdentity", Settings.Secure.ANDROID_ID);
+            configurationData.put("primaryIdentity", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
         } catch (JSONException e) {
             e.printStackTrace();
         }

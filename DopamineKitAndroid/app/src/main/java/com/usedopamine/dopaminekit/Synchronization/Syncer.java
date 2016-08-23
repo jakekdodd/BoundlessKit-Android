@@ -2,19 +2,14 @@ package com.usedopamine.dopaminekit.Synchronization;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
 
 import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
-import com.usedopamine.dopaminekit.DopamineKit;
 import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
 
 import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by cuddergambino on 8/17/16.
