@@ -24,24 +24,23 @@ public class ReportSyncer extends Syncer {
 
     private SharedPreferences preferences;
     private static final String preferencesName = "DopamineReportSyncer";
-    private static final String preferencesSuggestedSize = "suggestedSize";
-    private static final String preferencesTimerMarker = "timerMarker";
-    private static final String preferencesTimerLength = "timerLength";
+    private static final String preferencessizeToSync = "sizeToSync";
+    private static final String preferencesTimerStartsAt = "timerStartsAt";
+    private static final String preferencesTimerExpiresIn = "timerExpiresIn";
 
-    private int suggestedSize;
-    private long timerMarker;
-    private long timerLength;
+    private int sizeToSync;
+    private long timerStartsAt;
+    private long timerExpiresIn;
 
-    private final Object storelock = new Object();
-    private final Object apisynclock = new Object();
+    private final Object apiSyncLock = new Object();
     private Boolean syncInProgress = false;
 
     private ReportSyncer(Context context) {
         super(context);
         preferences = context.getSharedPreferences(preferencesName, 0);
-        suggestedSize = preferences.getInt(preferencesSuggestedSize, 15);
-        timerMarker = preferences.getLong(preferencesTimerMarker, 0);
-        timerLength = preferences.getLong(preferencesTimerLength, 48 * 3600000);
+        sizeToSync = preferences.getInt(preferencessizeToSync, 15);
+        timerStartsAt = preferences.getLong(preferencesTimerStartsAt, 0);
+        timerExpiresIn = preferences.getLong(preferencesTimerExpiresIn, 48 * 3600000);
     }
 
     public static ReportSyncer getInstance(Context context) {
@@ -52,33 +51,31 @@ public class ReportSyncer extends Syncer {
     }
 
     public void store(DopeAction action) {
-        synchronized (storelock) {
-            String metaData = (action.metaData==null) ? null : action.metaData.toString();
-            long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
-                    0, action.actionID, action.reinforcementDecision, metaData, action.utc, action.timezoneOffset
-            ));
-            DopamineKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
-        }
+        String metaData = (action.metaData == null) ? null : action.metaData.toString();
+        long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
+                0, action.actionID, action.reinforcementDecision, metaData, action.utc, action.timezoneOffset
+        ));
+        DopamineKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
     }
 
     @Override
     public boolean isTriggered() {
         int actionsCount = SQLReportedActionDataHelper.count(sqlDB);
-        DopamineKit.debugLog("ReportSyncer", "Report has " + actionsCount + "/" + suggestedSize + " actions" );
-        return actionsCount >= suggestedSize || System.currentTimeMillis() > timerMarker + timerLength;
+        DopamineKit.debugLog("ReportSyncer", "Report has " + actionsCount + "/" + sizeToSync + " actions" );
+        return actionsCount >= sizeToSync || System.currentTimeMillis() > timerStartsAt + timerExpiresIn;
     }
 
-    public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long length) {
+    public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
 
-        if (size != null) { suggestedSize = size; }
-        if (startTime != null) { timerMarker = startTime; }
-        else { timerMarker = System.currentTimeMillis(); }
-        if (length != null) { timerLength = length; }
+        if (size != null) { sizeToSync = size; }
+        if (startTime != null) { timerStartsAt = startTime; }
+        else { timerStartsAt = System.currentTimeMillis(); }
+        if (expiresIn != null) { timerExpiresIn = expiresIn; }
 
         preferences.edit()
-                .putInt(preferencesSuggestedSize, suggestedSize)
-                .putLong(preferencesTimerMarker, timerMarker)
-                .putLong(preferencesTimerLength, timerLength)
+                .putInt(preferencessizeToSync, sizeToSync)
+                .putLong(preferencesTimerStartsAt, timerStartsAt)
+                .putLong(preferencesTimerExpiresIn, timerExpiresIn)
                 .apply();
     }
 
@@ -88,7 +85,7 @@ public class ReportSyncer extends Syncer {
             DopamineKit.debugLog("ReportSyncer", "Report sync already happening");
             return null;
         } else {
-            synchronized (apisynclock) {
+            synchronized (apiSyncLock) {
                 if (syncInProgress) {
                     DopamineKit.debugLog("ReportSyncer", "Report sync already happening");
                     return null;
@@ -103,7 +100,7 @@ public class ReportSyncer extends Syncer {
                         if (sqlActions.size() == 0) {
                             DopamineKit.debugLog("ReportSyncer", "No reported actions to be synced.");
                             updateTriggers(null, null, null);
-                            return null;
+                            return new JSONObject().put("status", 200);
                         }
 
                         DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
@@ -124,11 +121,11 @@ public class ReportSyncer extends Syncer {
                             DopamineKit.debugLog("ReportSyncer", "Something went wrong during the call...");
                         } else {
                             if (apiResponse.optInt("status", 404) == 200) {
-                                DopamineKit.debugLog("ReportSyncer", "Deleting synced actions...");
+                                DopamineKit.debugLog("ReportSyncer", "Deleting reported actions...");
                                 for (int i = 0; i < sqlActions.size(); i++) {
                                     SQLReportedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                                 }
-                                updateTriggers(3, null, null);
+                                updateTriggers(null, null, null);
                             } else {
                                 DopamineKit.debugLog("ReportSyncer", "Something went wrong while syncing... Leaving reported actions in sqlite db");
                             }

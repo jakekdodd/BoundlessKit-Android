@@ -110,17 +110,13 @@ public class DopamineAPI {
         try {
             JSONObject payload = new JSONObject(configurationData.toString());
 
-            long utc = System.currentTimeMillis();
-            payload.put("utc", utc);
-            payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
-
             JSONArray trackedActions = new JSONArray();
             for (int i = 0; i < actions.length; i++) {
                 trackedActions.put(actions[i].toJSON());
             }
             payload.put("actions", trackedActions);
-            JSONObject response = send(CallType.TRACK, payload);
-            return response;
+
+            return send(CallType.TRACK, payload);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -131,17 +127,26 @@ public class DopamineAPI {
         try {
             JSONObject payload = new JSONObject(configurationData.toString());
 
-            long utc = System.currentTimeMillis();
-            payload.put("utc", utc);
-            payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
-
             JSONArray reportedActions = new JSONArray();
             for (int i = 0; i < actions.length; i++) {
                 reportedActions.put(actions[i].toJSON());
             }
             payload.put("actions", reportedActions);
-            JSONObject response = send(CallType.REPORT, payload);
-            return response;
+
+            return send(CallType.REPORT, payload);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public @Nullable JSONObject refresh(String actionID) {
+        try {
+            JSONObject payload = new JSONObject(configurationData.toString());
+
+            payload.put("actionID", actionID);
+
+            return send(CallType.REFRESH, payload);
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -165,6 +170,9 @@ public class DopamineAPI {
         try {
             String url = DopamineAPIURL + type.pathExtension;
             try {
+                long utc = System.currentTimeMillis();
+                payload.put("utc", utc);
+                payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
                 DopamineKit.debugLog("DopamineAPI", "Preparing api call to " + url + " with payload:\n" + payload.toString(2));
             } catch (JSONException e) {
             }

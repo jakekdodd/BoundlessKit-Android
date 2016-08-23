@@ -22,19 +22,12 @@ import android.widget.Toast;
 
 import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
-import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
-import com.usedopamine.dopaminekit.DataStore.SQLTrackedActionDataHelper;
-import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
-import com.usedopamine.dopaminekit.Synchronization.TrackSyncer;
 import com.usedopamine.dopaminekitandroid.Candy.CandyBar;
 import com.usedopamine.dopaminekitandroid.db.TaskContract;
 import com.usedopamine.dopaminekitandroid.db.TaskDbHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-//import com.usedopamine.dopaminekitandroid.;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -121,11 +114,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void printDB(SQLiteDatabase db){
-        Cursor rows = db.rawQuery("select * from "+ TaskContract.TaskEntry.TABLE, null);
-        rows.moveToFirst();
-        for(int i = 0; i < rows.getCount(); i++){
-            Log.v("DB row " + i, rows.getString(1));
-            rows.moveToNext();
+        Cursor rows = null;
+        try {
+            rows = db.rawQuery("select * from " + TaskContract.TaskEntry.TABLE, null);
+            rows.moveToFirst();
+            for (int i = 0; i < rows.getCount(); i++) {
+                Log.v("DB row " + i, rows.getString(1));
+                rows.moveToNext();
+            }
+        } finally {
+            if(rows != null) { rows.close(); }
         }
     }
 
@@ -147,100 +145,99 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI() {
         ArrayList<String> taskList = new ArrayList<>();
-        SQLiteDatabase db = mHelper.getReadableDatabase();
-        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.COL_TASK_TITLE},
-                null, null, null, null, null);
-        while (cursor.moveToNext()) {
-            int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
-            taskList.add(cursor.getString(idx));
-        }
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = mHelper.getReadableDatabase();
+            cursor = db.query(TaskContract.TaskEntry.TABLE,
+                    new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.COL_TASK_TITLE},
+                    null, null, null, null, null);
 
-        if (mAdapter == null) {
-            mAdapter = new ArrayAdapter<>(this,
-                    R.layout.item_todo,
-                    R.id.task_title,
-                    taskList);
-            mTaskListView.setAdapter(mAdapter);
+            while (cursor.moveToNext()) {
+                int idx = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
+                taskList.add(cursor.getString(idx));
+            }
 
-            final SwipeToDismissTouchListener<ListViewAdapter> touchListener =
-                    new SwipeToDismissTouchListener<>(
-                            new ListViewAdapter(mTaskListView),
-                            new SwipeToDismissTouchListener.DismissCallbacks<ListViewAdapter>() {
-                                @Override
-                                public boolean canDismiss(int position) {
-                                    return true;
-                                }
+            if (mAdapter == null) {
+                mAdapter = new ArrayAdapter<>(this,
+                        R.layout.item_todo,
+                        R.id.task_title,
+                        taskList);
+                mTaskListView.setAdapter(mAdapter);
 
-                                @Override
-                                public void onPendingDismiss(ListViewAdapter recyclerView, int position) {
+                final SwipeToDismissTouchListener<ListViewAdapter> touchListener =
+                        new SwipeToDismissTouchListener<>(
+                                new ListViewAdapter(mTaskListView),
+                                new SwipeToDismissTouchListener.DismissCallbacks<ListViewAdapter>() {
+                                    @Override
+                                    public boolean canDismiss(int position) {
+                                        return true;
+                                    }
 
-                                }
+                                    @Override
+                                    public void onPendingDismiss(ListViewAdapter recyclerView, int position) {
 
-                                @Override
-                                public void onDismiss(ListViewAdapter view, int position) {
-                                    deleteTask(mTaskListView.getChildAt(position));
+                                    }
+
+                                    @Override
+                                    public void onDismiss(ListViewAdapter view, int position) {
+                                        deleteTask(mTaskListView.getChildAt(position));
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
-                                    DopamineKit.reinforce(getApplicationContext(), "action1", new DopamineKit.ReinforcementCallback() {
+                                        DopamineKit.reinforce(getApplicationContext(), "action1", null, new DopamineKit.ReinforcementCallback() {
 
-                                        @Override
-                                        public void onReinforcement(String reinforcement) {
-                                            // Show some candy and make them feel good!
-                                            CandyBar candyBar = null;
-                                            if(reinforcement.equals("stars")){
-                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
+                                            @Override
+                                            public void onReinforcement(String reinforcement) {
+                                                // Show some candy and make them feel good!
+                                                CandyBar candyBar = null;
+                                                if (reinforcement.equals("stars")) {
+                                                    candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
+                                                } else if (reinforcement.equals("medalStar")) {
+                                                    candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
+                                                } else if (reinforcement.equals("thumbsUp")) {
+                                                    candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
+                                                } else {
+                                                    // Show nothing! This is called a neutral response,
+                                                    // and builds up the good feelings for the next surprise!
+                                                }
+                                                if (candyBar != null) {
+                                                    candyBar.show();
+                                                }
                                             }
-                                            else if(reinforcement.equals("medalStar")){
-                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
-                                            }
-                                            else if(reinforcement.equals("thumbsUp")){
-                                                candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
-                                            }
-                                            else {
-                                                // Show nothing! This is called a neutral response,
-                                                // and builds up the good feelings for the next surprise!
-                                            }
-                                            if (candyBar != null) {
-                                                candyBar.show();
-                                            }
-                                        }
 
-                                    });
-
-
-
+                                        });
 
 
 //                                    HashMap<String, String> metaData = new HashMap<String, String>();
 //                                    metaData.put("calories", "400");
 //                                    DopamineKit.track(getApplicationContext(), "foodItemAdded", null);
 
-                                }
-                            });
+                                    }
+                                });
 // Dismiss the item automatically after 3 secondsj
-            touchListener.setDismissDelay(0);
+                touchListener.setDismissDelay(0);
 
-            mTaskListView.setOnTouchListener(touchListener);
-            mTaskListView.setOnScrollListener((AbsListView.OnScrollListener) touchListener.makeScrollListener());
-            mTaskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (touchListener.existPendingDismisses()) {
-                        touchListener.undoPendingDismiss();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Position " + position, Toast.LENGTH_SHORT).show();
+                mTaskListView.setOnTouchListener(touchListener);
+                mTaskListView.setOnScrollListener((AbsListView.OnScrollListener) touchListener.makeScrollListener());
+                mTaskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        if (touchListener.existPendingDismisses()) {
+                            touchListener.undoPendingDismiss();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Position " + position, Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            });
+                });
 
-        } else {
-            mAdapter.clear();
-            mAdapter.addAll(taskList);
-            mAdapter.notifyDataSetChanged();
+            } else {
+                mAdapter.clear();
+                mAdapter.addAll(taskList);
+                mAdapter.notifyDataSetChanged();
+            }
+        } finally {
+            cursor.close();
+            db.close();
         }
-
-        cursor.close();
-        db.close();
     }
 }

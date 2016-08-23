@@ -2,21 +2,17 @@ package com.usedopamine.dopaminekit.Synchronization;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
 import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
 import com.usedopamine.dopaminekit.DataStore.SQLTrackedActionDataHelper;
-import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
 import com.usedopamine.dopaminekit.DopeAction;
-import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.concurrent.Future;
 
 /**
  * Created by cuddergambino on 8/4/16.
@@ -28,24 +24,23 @@ public class TrackSyncer extends Syncer {
 
     private SharedPreferences preferences;
     private static final String preferencesName = "DopamineTrackSyncer";
-    private static final String preferencesSuggestedSize = "suggestedSize";
-    private static final String preferencesTimerMarker = "timerMarker";
-    private static final String preferencesTimerLength = "timerLength";
+    private static final String preferencesSizeToSync = "sizeToSync";
+    private static final String preferencesTimerStartAt = "timerStartAt";
+    private static final String preferencesTimerExpiresIn = "timerExpiresIn";
 
-    private int suggestedSize;
-    private long timerMarker;
-    private long timerLength;
+    private int sizeToSync;
+    private long timerStartAt;
+    private long timerExpiresIn;
 
-    private final Object storelock = new Object();
     private final Object apisynclock = new Object();
     private Boolean syncInProgress = false;
 
     private TrackSyncer(Context context) {
         super(context);
         preferences = context.getSharedPreferences(preferencesName, 0);
-        suggestedSize = preferences.getInt(preferencesSuggestedSize, 15);
-        timerMarker = preferences.getLong(preferencesTimerMarker, 0);
-        timerLength = preferences.getLong(preferencesTimerLength, 48 * 3600000);
+        sizeToSync = preferences.getInt(preferencesSizeToSync, 15);
+        timerStartAt = preferences.getLong(preferencesTimerStartAt, 0);
+        timerExpiresIn = preferences.getLong(preferencesTimerExpiresIn, 48 * 3600000);
     }
 
     public static TrackSyncer getInstance(Context context) {
@@ -56,33 +51,31 @@ public class TrackSyncer extends Syncer {
     }
 
     public void store(DopeAction action) {
-        synchronized (storelock) {
-            String metaData = (action.metaData==null) ? null : action.metaData.toString();
-            long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
-                    0, action.actionID, metaData, action.utc, action.timezoneOffset
-            ));
-            DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
-        }
+        String metaData = (action.metaData == null) ? null : action.metaData.toString();
+        long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
+                0, action.actionID, metaData, action.utc, action.timezoneOffset
+        ));
+        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
     }
 
     @Override
     public boolean isTriggered() {
         int actionsCount = SQLTrackedActionDataHelper.count(sqlDB);
-        DopamineKit.debugLog("TrackSyncer", "Track has " + actionsCount + "/" + suggestedSize + " actions" );
-        return actionsCount >= suggestedSize || System.currentTimeMillis() > timerMarker + timerLength;
+        DopamineKit.debugLog("TrackSyncer", "Track has " + actionsCount + "/" + sizeToSync + " actions" );
+        return actionsCount >= sizeToSync || System.currentTimeMillis() > timerStartAt + timerExpiresIn;
     }
 
-    public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long length) {
+    public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
 
-        if (size != null) { suggestedSize = size; }
-        if (startTime != null) { timerMarker = startTime; }
-        else { timerMarker = System.currentTimeMillis(); }
-        if (length != null) { timerLength = length; }
+        if (size != null) { sizeToSync = size; }
+        if (startTime != null) { timerStartAt = startTime; }
+        else { timerStartAt = System.currentTimeMillis(); }
+        if (expiresIn != null) { timerExpiresIn = expiresIn; }
 
         preferences.edit()
-                .putInt(preferencesSuggestedSize, suggestedSize)
-                .putLong(preferencesTimerMarker, timerMarker)
-                .putLong(preferencesTimerLength, timerLength)
+                .putInt(preferencesSizeToSync, sizeToSync)
+                .putLong(preferencesTimerStartAt, timerStartAt)
+                .putLong(preferencesTimerExpiresIn, timerExpiresIn)
                 .apply();
     }
 
@@ -106,7 +99,7 @@ public class TrackSyncer extends Syncer {
                         if (sqlActions.size() == 0) {
                             DopamineKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
                             updateTriggers(null, null, null);
-                            return null;
+                            return new JSONObject().put("status", 200);
                         }
 
                         DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
@@ -127,7 +120,7 @@ public class TrackSyncer extends Syncer {
                             DopamineKit.debugLog("TrackSyncer", "Something went wrong during the call...");
                         } else {
                             if (apiResponse.optInt("status", 404) == 200) {
-                                DopamineKit.debugLog("TrackSyncer", "Deleting synced actions...");
+                                DopamineKit.debugLog("TrackSyncer", "Deleting tracked actions...");
                                 for (int i = 0; i < sqlActions.size(); i++) {
                                     SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                                 }

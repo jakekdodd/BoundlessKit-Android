@@ -42,8 +42,8 @@ public class SQLReportedActionDataHelper {
         db.delete(ReportedActionContract.TABLE_NAME, selection, args);
     }
 
-    @Nullable
-    public static ReportedActionContract find(SQLiteDatabase db, ReportedActionContract item) {
+    public static @Nullable ReportedActionContract find(SQLiteDatabase db, ReportedActionContract item) {
+        ReportedActionContract result = null;
         Cursor cursor = null;
         try {
             cursor = db.query(ReportedActionContract.TABLE_NAME,
@@ -51,15 +51,15 @@ public class SQLReportedActionDataHelper {
                     ReportedActionContract._ID + "=?",
                     new String[] {String.valueOf(item.id) }, null, null, null, null
             );
-            return cursor.moveToFirst() ? ReportedActionContract.fromCursor(cursor) : null;
+            result = cursor.moveToFirst() ? ReportedActionContract.fromCursor(cursor) : null;
         } finally {
             if(cursor != null) { cursor.close(); }
+            return result;
         }
     }
 
     public static ArrayList<ReportedActionContract> findAll(SQLiteDatabase db) {
         ArrayList<ReportedActionContract> actions = new ArrayList<>();
-
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("SELECT * FROM " + ReportedActionContract.TABLE_NAME, null);
@@ -70,19 +70,21 @@ public class SQLReportedActionDataHelper {
                     DopamineKit.debugLog("SQLReportedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " reinforcementDecision:" + action.reinforcementDecision + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
-            return actions;
         } finally {
             if(cursor != null) { cursor.close(); }
+            return actions;
         }
     }
 
     public static int count(SQLiteDatabase db) {
+        int result = 0;
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("SELECT COUNT(*) FROM " + ReportedActionContract.TABLE_NAME, null);
-            return cursor.moveToFirst() ? cursor.getInt(0) : 0;
+            if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
             if(cursor != null) { cursor.close(); }
+            return result;
         }
     }
 }

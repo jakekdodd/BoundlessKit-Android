@@ -5,14 +5,13 @@ package com.usedopamine.dopaminekit;
  */
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.usedopamine.dopaminekit.Synchronization.SyncCoordinator;
 
 import org.json.JSONObject;
-
-import java.util.Map;
 
 public class DopamineKit {
     /**
@@ -46,14 +45,17 @@ public class DopamineKit {
     }
 
     /**
-     * This method sends a reinforcement request for the specified actionID to the DopamineAPI.
+     * This method sends a tracking request for the specified actionID to the DopamineAPI.
      *
      * @param context			Context to retrieve api key from file res/raw/dopamineproperties.json
-     * @param actionID			The name of the registered action
-     * @param callback          The callback to trigger when the reinforcement decision has been made
+     * @param actionID			The name of an action
+     * @param metaData			Optional metadata for better analytics
      */
-    public static void reinforce(Context context, String actionID, ReinforcementCallback callback) {
-        DopamineKit.reinforce(context, actionID, null, callback);
+    public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
+        DopamineKit instance = getInstance(context);
+
+        DopeAction action = new DopeAction(actionID, null, metaData);
+        instance.syncCoordinator.storeTrackedAction(action);
     }
 
     /**
@@ -64,12 +66,21 @@ public class DopamineKit {
      * @param metaData			Optional metadata for better analytics
      * @param callback          The callback to trigger when the reinforcement decision has been made
      */
-    public static void reinforce(Context context, String actionID, Map<String, String> metaData, ReinforcementCallback callback) {
-        DopamineKit dopamineKit = getInstance(context);
+    public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
 
-        JSONObject jsonMetaData = (metaData==null) ? null : new JSONObject(metaData);
-        DopeAction action = new DopeAction(actionID, "neutralResponse", jsonMetaData);
-        dopamineKit.syncCoordinator.storeReportedAction(context, action);
+        DopamineKit instance = getInstance(context);
+
+        final String reinforcementDecision = instance.syncCoordinator.removeReinforcementDecision(context, actionID);
+        AsyncTask<Void, Void, Void> reinforcementVisual = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                callback.onReinforcement(reinforcementDecision);
+                return null;
+            }
+        }.execute();
+        DopeAction action = new DopeAction(actionID, reinforcementDecision, metaData);
+        instance.syncCoordinator.storeReportedAction(action);
+
     }
 
 //    /**
@@ -81,22 +92,6 @@ public class DopamineKit {
 //    public static void track(Context context, String actionID) {
 //        DopamineKit.track(context, actionID, null);
 //    }
-
-    /**
-     * This method sends a tracking request for the specified actionID to the DopamineAPI.
-     *
-     * @param context			Context to retrieve api key from file res/raw/dopamineproperties.json
-     * @param actionID			The name of an action
-     * @param metaData			Optional metadata for better analytics
-     */
-    public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
-        DopamineKit dopamineKit = getInstance(context);
-
-        DopeAction action = new DopeAction(actionID, null, metaData);
-        dopamineKit.syncCoordinator.storeTrackedAction(action);
-    }
-
-
 
 
     public static boolean debugMode = false;

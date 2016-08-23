@@ -1,6 +1,7 @@
 package com.usedopamine.dopaminekit.Synchronization;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
@@ -19,12 +20,13 @@ import java.util.concurrent.Executors;
  * Created by cuddergambino on 8/17/16.
  */
 
-public abstract class Syncer implements Callable<JSONObject> {
+public abstract class Syncer extends ContextWrapper implements Callable<JSONObject> {
 
     protected static SQLiteDatabase sqlDB = null;
     protected static DopamineAPI dopamineAPI = null;
 
     public Syncer(Context context) {
+        super(context);
         if(sqlDB == null) {
             sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
         }

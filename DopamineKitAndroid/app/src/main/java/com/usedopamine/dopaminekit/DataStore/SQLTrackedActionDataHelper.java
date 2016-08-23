@@ -46,6 +46,7 @@ public class SQLTrackedActionDataHelper {
 
     @Nullable
     public static TrackedActionContract find(SQLiteDatabase db, TrackedActionContract item) {
+        TrackedActionContract result = null;
         Cursor cursor = null;
         try {
             cursor = db.query(TrackedActionContract.TABLE_NAME,
@@ -53,15 +54,15 @@ public class SQLTrackedActionDataHelper {
                     TrackedActionContract._ID + "=?",
                     new String[] {String.valueOf(item.id) }, null, null, null, null
             );
-            return cursor.moveToFirst() ? TrackedActionContract.fromCursor(cursor) : null;
+            result = cursor.moveToFirst() ? TrackedActionContract.fromCursor(cursor) : null;
         } finally {
             if(cursor != null) { cursor.close(); }
+            return result;
         }
     }
 
     public static ArrayList<TrackedActionContract> findAll(SQLiteDatabase db) {
         ArrayList<TrackedActionContract> actions = new ArrayList<>();
-
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("SELECT * FROM " + TrackedActionContract.TABLE_NAME, null);
@@ -79,12 +80,14 @@ public class SQLTrackedActionDataHelper {
     }
 
     public static int count(SQLiteDatabase db) {
+        int result = 0;
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("SELECT COUNT(*) FROM " + TrackedActionContract.TABLE_NAME, null);
-            return cursor.moveToFirst() ? cursor.getInt(0) : 0;
+            if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
             if(cursor != null) { cursor.close(); }
+            return result;
         }
     }
 }
