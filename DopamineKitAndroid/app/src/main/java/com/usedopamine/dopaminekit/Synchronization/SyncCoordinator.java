@@ -27,7 +27,7 @@ public class SyncCoordinator extends Syncer {
 
     private static SyncCoordinator sharedInstance;
 
-    private ScheduledExecutorService apiThreadPool = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService apiThreadPool = Executors.newSingleThreadScheduledExecutor();
     private ExecutorService myExecutor = Executors.newFixedThreadPool(2);
     private TrackSyncer trackSyncer;
     private ReportSyncer reportSyncer;

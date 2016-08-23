@@ -91,6 +91,7 @@ public class TrackSyncer extends Syncer {
                     return null;
                 } else {
                     JSONObject apiResponse = null;
+
                     try {
                         DopamineKit.debugLog("TrackSyncer", "Beginning tracker sync!");
                         syncInProgress = true;
@@ -98,37 +99,35 @@ public class TrackSyncer extends Syncer {
                         final ArrayList<TrackedActionContract> sqlActions = SQLTrackedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
                             DopamineKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
-                            updateTriggers(null, null, null);
-                            return new JSONObject().put("status", 200);
-                        }
-
-                        DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
-
-                        for (int i = 0; i < sqlActions.size(); i++) {
-                            TrackedActionContract action = sqlActions.get(i);
-                            try {
-                                dopeActions[i] = new DopeAction(action.actionID, null, new JSONObject(action.metaData), action.utc, action.timezoneOffset);
-                            } catch (JSONException e) {
-                                dopeActions[i] = new DopeAction(action.actionID, null, null, action.utc, action.timezoneOffset);
-                            } catch (NullPointerException e) {
-                                dopeActions[i] = new DopeAction(action.actionID, null, null, action.utc, action.timezoneOffset);
+                            apiResponse = new JSONObject().put("status", 200);
+                        } else {
+                            DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
+                            for (int i = 0; i < sqlActions.size(); i++) {
+                                TrackedActionContract action = sqlActions.get(i);
+                                try {
+                                    dopeActions[i] = new DopeAction(action.actionID, null, new JSONObject(action.metaData), action.utc, action.timezoneOffset);
+                                } catch (JSONException e) {
+                                    dopeActions[i] = new DopeAction(action.actionID, null, null, action.utc, action.timezoneOffset);
+                                } catch (NullPointerException e) {
+                                    dopeActions[i] = new DopeAction(action.actionID, null, null, action.utc, action.timezoneOffset);
+                                }
                             }
+                            apiResponse = dopamineAPI.track(dopeActions);
                         }
 
-                        apiResponse = dopamineAPI.track(dopeActions);
                         if (apiResponse == null) {
                             DopamineKit.debugLog("TrackSyncer", "Something went wrong during the call...");
-                        } else {
-                            if (apiResponse.optInt("status", 404) == 200) {
-                                DopamineKit.debugLog("TrackSyncer", "Deleting tracked actions...");
-                                for (int i = 0; i < sqlActions.size(); i++) {
-                                    SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
-                                }
-                                updateTriggers(null, null, null);
-                            } else {
-                                DopamineKit.debugLog("TrackSyncer", "Something went wrong while syncing... Leaving tracked actions in sqlite db");
+                        } else if (apiResponse.optInt("status", 404) == 200) {
+                            DopamineKit.debugLog("TrackSyncer", "Deleting tracked actions...");
+                            for (int i = 0; i < sqlActions.size(); i++) {
+                                SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                             }
+                            updateTriggers(null, null, null);
+                        } else {
+                            DopamineKit.debugLog("TrackSyncer", "Something went wrong while syncing... Leaving tracked actions in sqlite db");
                         }
+
+                    } catch (JSONException e) {
                     } finally {
                         syncInProgress = false;
                         return apiResponse;

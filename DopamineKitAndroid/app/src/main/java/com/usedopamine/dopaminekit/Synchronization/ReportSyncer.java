@@ -99,37 +99,35 @@ public class ReportSyncer extends Syncer {
                         final ArrayList<ReportedActionContract> sqlActions = SQLReportedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
                             DopamineKit.debugLog("ReportSyncer", "No reported actions to be synced.");
-                            updateTriggers(null, null, null);
-                            return new JSONObject().put("status", 200);
-                        }
-
-                        DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
-
-                        for (int i = 0; i < sqlActions.size(); i++) {
-                            ReportedActionContract action = sqlActions.get(i);
-                            try {
-                                dopeActions[i] = new DopeAction(action.actionID, action.reinforcementDecision, new JSONObject(action.metaData), action.utc, action.timezoneOffset);
-                            } catch (JSONException e) {
-                                dopeActions[i] = new DopeAction(action.actionID, action.reinforcementDecision, null, action.utc, action.timezoneOffset);
-                            } catch (NullPointerException e) {
-                                dopeActions[i] = new DopeAction(action.actionID, action.reinforcementDecision, null, action.utc, action.timezoneOffset);
+                            apiResponse = new JSONObject().put("status", 200);
+                        } else {
+                            DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
+                            for (int i = 0; i < sqlActions.size(); i++) {
+                                ReportedActionContract action = sqlActions.get(i);
+                                try {
+                                    dopeActions[i] = new DopeAction(action.actionID, action.reinforcementDecision, new JSONObject(action.metaData), action.utc, action.timezoneOffset);
+                                } catch (JSONException e) {
+                                    dopeActions[i] = new DopeAction(action.actionID, action.reinforcementDecision, null, action.utc, action.timezoneOffset);
+                                } catch (NullPointerException e) {
+                                    dopeActions[i] = new DopeAction(action.actionID, action.reinforcementDecision, null, action.utc, action.timezoneOffset);
+                                }
                             }
+                            apiResponse = dopamineAPI.report(dopeActions);
                         }
 
-                        apiResponse = dopamineAPI.report(dopeActions);
                         if (apiResponse == null) {
                             DopamineKit.debugLog("ReportSyncer", "Something went wrong during the call...");
-                        } else {
-                            if (apiResponse.optInt("status", 404) == 200) {
-                                DopamineKit.debugLog("ReportSyncer", "Deleting reported actions...");
-                                for (int i = 0; i < sqlActions.size(); i++) {
-                                    SQLReportedActionDataHelper.delete(sqlDB, sqlActions.get(i));
-                                }
-                                updateTriggers(null, null, null);
-                            } else {
-                                DopamineKit.debugLog("ReportSyncer", "Something went wrong while syncing... Leaving reported actions in sqlite db");
+                        } else if (apiResponse.optInt("status", 404) == 200) {
+                            DopamineKit.debugLog("ReportSyncer", "Deleting reported actions...");
+                            for (int i = 0; i < sqlActions.size(); i++) {
+                                SQLReportedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                             }
+                            updateTriggers(null, null, null);
+                        } else {
+                            DopamineKit.debugLog("ReportSyncer", "Something went wrong while syncing... Leaving reported actions in sqlite db");
                         }
+
+                    } catch (JSONException e) {
                     } finally {
                         syncInProgress = false;
                         return apiResponse;
