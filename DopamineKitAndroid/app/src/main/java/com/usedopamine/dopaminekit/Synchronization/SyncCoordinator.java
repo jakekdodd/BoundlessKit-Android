@@ -27,13 +27,10 @@ public class SyncCoordinator extends Syncer {
 
     private static SyncCoordinator sharedInstance;
 
-    private ScheduledExecutorService apiThreadPool = Executors.newSingleThreadScheduledExecutor();
+    private ExecutorService syncerExecutor = Executors.newSingleThreadExecutor();
     private ExecutorService myExecutor = Executors.newFixedThreadPool(2);
     private TrackSyncer trackSyncer;
     private ReportSyncer reportSyncer;
-
-//    protected SQLiteDatabase sqlDB;
-//    protected DopamineAPI dopamineAPI;
 
     private Boolean syncInProgress = false;
 
@@ -103,10 +100,10 @@ public class SyncCoordinator extends Syncer {
                         JSONObject apiResponse = null;
 
                         if (trackerShouldSync) {
-                            apiCall = apiThreadPool.submit(trackSyncer); // apiThreadPool.schedule(trackSyncer, 1000, TimeUnit.MILLISECONDS);
+                            apiCall = syncerExecutor.submit(trackSyncer); // apiThreadPool.schedule(trackSyncer, 1000, TimeUnit.MILLISECONDS);
                             while (!apiCall.isDone()) {
                                 Log.v("SyncCoordinator", "Waiting for track syncer to be done...");
-                                Thread.sleep(1000);
+                                Thread.sleep(200);
                             }
 
                             apiResponse = apiCall.get();
@@ -122,10 +119,10 @@ public class SyncCoordinator extends Syncer {
                         }
 
                         if (reporterShouldSync) {
-                            apiCall = apiThreadPool.schedule(reportSyncer, 1, TimeUnit.SECONDS);
+                            apiCall = syncerExecutor.submit(reportSyncer);
                             while (!apiCall.isDone()) {
                                 Log.v("SyncCoordinator", "Waiting for report syncer to be done...");
-                                Thread.sleep(1000);
+                                Thread.sleep(200);
                             }
 
                             apiResponse = apiCall.get();
@@ -140,10 +137,10 @@ public class SyncCoordinator extends Syncer {
                         }
 
                         for (Map.Entry<String, CartridgeSyncer> cartridge : cartridgesToSync.entrySet()) {
-                            apiCall = apiThreadPool.submit(cartridge.getValue());
+                            apiCall = syncerExecutor.submit(cartridge.getValue());
                             while (!apiCall.isDone()) {
                                 Log.v("SyncCoordinator", "Waiting for " + cartridge.getKey() + " cartridge refresh to be done...");
-                                Thread.sleep(1000);
+                                Thread.sleep(200);
                             }
 
                             apiResponse = apiCall.get();
@@ -153,7 +150,7 @@ public class SyncCoordinator extends Syncer {
                                 return null;
                             } else {
                                 Log.v("SyncCoordinator", cartridge.getKey() + " cartridge syncer is done!");
-                                Thread.sleep(1000);
+//                                Thread.sleep(1000);
                             }
                         }
 
