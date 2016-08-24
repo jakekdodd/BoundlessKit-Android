@@ -43,7 +43,7 @@ public class DopamineKitInstrumentationTest {
     }
 
     @Test
-    public void testMultipleDopamineKitTracks() throws Exception {
+    public void testMultipleQuickDopamineKitTracks() throws Exception {
         for(int i = 0; i < 5; i++) {
             DopamineKit.track(appContext, "multipleTrackCallTest", null);
         }
@@ -60,16 +60,34 @@ public class DopamineKitInstrumentationTest {
     }
 
     @Test
-    public void testMultipleDopamineKitReinforces() throws Exception {
+    public void testMultipleQuickDopamineKitReinforces() throws Exception {
         JSONObject metaData;
         for(int i = 0; i < 10; i++) {
-            metaData = new JSONObject().put("unitTest", "testMultipleDopamineKitReinforces").put( "index", i);
-            DopamineKit.reinforce(appContext, "taskCompleted", metaData, new DopamineKit.ReinforcementCallback() {
+            metaData = new JSONObject().put("unitTest", "testMultipleQuickDopamineKitReinforces").put( "index", i);
+            DopamineKit.reinforce(appContext, "action1", metaData, new DopamineKit.ReinforcementCallback() {
                 @Override
                 public void onReinforcement(String reinforcement) {
                     Log.v("DKInstrumentationTest", "Dopaminekit Reinforce ended up with ("+reinforcement+")");
                 }
             });
+        }
+    }
+
+    @Test
+    public void testMultipleSlowDopamineKitReinforces() throws Exception {
+        long timeBetweenReinforces = 3000;
+
+        JSONObject metaData;
+        for(int i = 0; i < 5; i++) {
+            metaData = new JSONObject().put("unitTest", "testMultipleSlowDopamineKitReinforces").put( "index", i).put("timeBetweenReinforces", timeBetweenReinforces);
+            DopamineKit.reinforce(appContext, "action1", metaData, new DopamineKit.ReinforcementCallback() {
+                @Override
+                public void onReinforcement(String reinforcement) {
+                    Log.v("DKInstrumentationTest", "Dopaminekit Reinforce ended up with ("+reinforcement+")");
+                }
+            });
+            Log.v("DKInstrumentationTest", "Sleeping for " + timeBetweenReinforces + "ms...");
+            Thread.sleep(timeBetweenReinforces);
         }
     }
 
