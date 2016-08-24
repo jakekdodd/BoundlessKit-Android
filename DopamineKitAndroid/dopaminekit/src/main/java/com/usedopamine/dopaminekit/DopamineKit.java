@@ -99,12 +99,12 @@ public class DopamineKit extends ContextWrapper {
      *
      * @param enable Used to set debug mode. `true` will enable, `false` will disable.
      */
-    public static void enableDebugMode(boolean enable){
+    public static void enableDebugMode(boolean enable) {
         debugMode = enable;
     }
 
-    public static void debugLog(String tag, String msg){
-        if(debugMode) {
+    public static void debugLog(String tag, String msg) {
+        if (debugMode) {
             Log.v(tag, msg);
         }
     }

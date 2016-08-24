@@ -22,14 +22,14 @@ public abstract class Syncer extends ContextWrapper implements Callable<JSONObje
 
     public Syncer(Context context) {
         super(context);
-        if(sqlDB == null) {
+        if (sqlDB == null) {
             sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
         }
-        if(dopamineAPI == null) {
+        if (dopamineAPI == null) {
             dopamineAPI = DopamineAPI.getInstance(context);
         }
     }
 
-    abstract public boolean isTriggered();
+    public abstract boolean isTriggered();
 
 }

@@ -63,19 +63,19 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
                           new DopamineKit.ReinforcementCallback() {
 
         @Override
-        public void onReinforcement(String reinforcement) {
+        public void onReinforcement(String reinforcementDecision) {
                                         
             // Multiple reinforcements can help increase the surprise factor!
             // You can also use any UI components you made like
             // this.showInspirationalQuote() or this.showFunnyMeme()
 
-            if(reinforcement.equals("stars")){
+            if(reinforcementDecision.equals("stars")){
                 
             }
-            else if(reinforcement.equals("medalStar")){
+            else if(reinforcementDecision.equals("medalStar")){
                 
             }
-            else if(reinforcement.equals("thumbsUp")){
+            else if(reinforcementDecision.equals("thumbsUp")){
                             }
             else {
                 // Show nothing! This is called a neutral response, 

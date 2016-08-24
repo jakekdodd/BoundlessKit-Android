@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * Created by cuddergambino on 8/9/16.
  */
 
-public class SQLReportedActionDataHelper {
+public class SQLReportedActionDataHelper extends SQLDataHelper {
 
     public static void createTable(SQLiteDatabase db) {
         db.execSQL(ReportedActionContract.SQL_CREATE_TABLE);
@@ -53,7 +53,7 @@ public class SQLReportedActionDataHelper {
             );
             result = cursor.moveToFirst() ? ReportedActionContract.fromCursor(cursor) : null;
         } finally {
-            if(cursor != null) { cursor.close(); }
+            if (cursor != null) { cursor.close(); }
             return result;
         }
     }
@@ -71,7 +71,7 @@ public class SQLReportedActionDataHelper {
                 } while (cursor.moveToNext());
             }
         } finally {
-            if(cursor != null) { cursor.close(); }
+            if (cursor != null) { cursor.close(); }
             return actions;
         }
     }
@@ -83,7 +83,7 @@ public class SQLReportedActionDataHelper {
             cursor = db.rawQuery("SELECT COUNT(*) FROM " + ReportedActionContract.TABLE_NAME, null);
             if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
-            if(cursor != null) { cursor.close(); }
+            if (cursor != null) { cursor.close(); }
             return result;
         }
     }

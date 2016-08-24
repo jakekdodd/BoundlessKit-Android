@@ -32,7 +32,7 @@ public class CartridgeSyncer extends Syncer {
     private static final String preferencesTimerExpiresIn = "timerExpiresIn";
 
     private static final double capacityToSync = 0.25;
-    private static final int minimumCount = 15;
+    private static final int minimumCount = 2;
 
     private String actionID;
     private int initialSize;
@@ -121,8 +121,11 @@ public class CartridgeSyncer extends Syncer {
     public void updateTriggers(Integer size, @Nullable Long startTime, Long expiresIn) {
 
         initialSize = size;
-        if (startTime != null) { timerStartsAt = startTime; }
-        else { timerStartsAt = System.currentTimeMillis(); }
+        if (startTime != null) {
+            timerStartsAt = startTime;
+        } else {
+            timerStartsAt = System.currentTimeMillis();
+        }
         timerExpiresIn = expiresIn;
 
         preferences.edit()

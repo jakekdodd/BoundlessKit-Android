@@ -25,11 +25,11 @@ public class TrackSyncer extends Syncer {
     private SharedPreferences preferences;
     private static final String preferencesName = "DopamineTrackSyncer";
     private static final String preferencesSizeToSync = "sizeToSync";
-    private static final String preferencesTimerStartAt = "timerStartAt";
+    private static final String preferencesTimerStartsAt = "timerStartsAt";
     private static final String preferencesTimerExpiresIn = "timerExpiresIn";
 
     private int sizeToSync;
-    private long timerStartAt;
+    private long timerStartsAt;
     private long timerExpiresIn;
 
     private final Object apisynclock = new Object();
@@ -39,7 +39,7 @@ public class TrackSyncer extends Syncer {
         super(context);
         preferences = context.getSharedPreferences(preferencesName, 0);
         sizeToSync = preferences.getInt(preferencesSizeToSync, 15);
-        timerStartAt = preferences.getLong(preferencesTimerStartAt, 0);
+        timerStartsAt = preferences.getLong(preferencesTimerStartsAt, 0);
         timerExpiresIn = preferences.getLong(preferencesTimerExpiresIn, 48 * 3600000);
     }
 
@@ -61,20 +61,27 @@ public class TrackSyncer extends Syncer {
     @Override
     public boolean isTriggered() {
         int actionsCount = SQLTrackedActionDataHelper.count(sqlDB);
-        DopamineKit.debugLog("TrackSyncer", "Track has " + actionsCount + "/" + sizeToSync + " actions" );
-        return actionsCount >= sizeToSync || System.currentTimeMillis() > timerStartAt + timerExpiresIn;
+        DopamineKit.debugLog("TrackSyncer", "Track has " + actionsCount + "/" + sizeToSync + " actions");
+        return actionsCount >= sizeToSync || System.currentTimeMillis() > timerStartsAt + timerExpiresIn;
     }
 
     public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
 
-        if (size != null) { sizeToSync = size; }
-        if (startTime != null) { timerStartAt = startTime; }
-        else { timerStartAt = System.currentTimeMillis(); }
-        if (expiresIn != null) { timerExpiresIn = expiresIn; }
+        if (size != null) {
+            sizeToSync = size;
+        }
+        if (startTime != null) {
+            timerStartsAt = startTime;
+        } else {
+            timerStartsAt = System.currentTimeMillis();
+        }
+        if (expiresIn != null) {
+            timerExpiresIn = expiresIn;
+        }
 
         preferences.edit()
                 .putInt(preferencesSizeToSync, sizeToSync)
-                .putLong(preferencesTimerStartAt, timerStartAt)
+                .putLong(preferencesTimerStartsAt, timerStartsAt)
                 .putLong(preferencesTimerExpiresIn, timerExpiresIn)
                 .apply();
     }
@@ -101,7 +108,7 @@ public class TrackSyncer extends Syncer {
                             DopamineKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
                             apiResponse = new JSONObject().put("status", 200);
                         } else {
-                            DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
+                            DopeAction[] dopeActions = new DopeAction[sqlActions.size()];
                             for (int i = 0; i < sqlActions.size(); i++) {
                                 TrackedActionContract action = sqlActions.get(i);
                                 try {

@@ -3,9 +3,7 @@ package com.usedopamine.dopaminekit.DataStore;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.support.annotation.Nullable;
-import android.support.annotation.PluralsRes;
 
 import com.usedopamine.dopaminekit.DataStore.Contracts.ReinforcementDecisionContract;
 import com.usedopamine.dopaminekit.DopamineKit;
@@ -16,7 +14,7 @@ import java.util.ArrayList;
  * Created by cuddergambino on 8/21/16.
  */
 
-public class SQLCartridgeDataHelper {
+public class SQLCartridgeDataHelper extends SQLDataHelper {
 
     public static void createTable(SQLiteDatabase db, String actionID) {
         db.execSQL(ReinforcementDecisionContract.SQL_CREATE_TABLE(actionID));
@@ -73,7 +71,7 @@ public class SQLCartridgeDataHelper {
                 delete(db, result);
             }
         } finally {
-            if(cursor != null) { cursor.close(); }
+            if (cursor != null) { cursor.close(); }
             return result;
         }
     }
@@ -102,7 +100,7 @@ public class SQLCartridgeDataHelper {
             cursor = db.rawQuery("SELECT COUNT(*) FROM " + ReinforcementDecisionContract.TABLE_NAME(actionID), null);
             return cursor.moveToFirst() ? cursor.getInt(0) : 0;
         } finally {
-            if(cursor != null) { cursor.close(); }
+            if (cursor != null) { cursor.close(); }
         }
     }
 

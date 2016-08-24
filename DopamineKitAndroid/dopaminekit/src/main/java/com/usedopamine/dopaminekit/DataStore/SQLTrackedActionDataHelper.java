@@ -1,23 +1,20 @@
 package com.usedopamine.dopaminekit.DataStore;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
 import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
 import com.usedopamine.dopaminekit.DopamineKit;
-import com.usedopamine.dopaminekit.DopeAction;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by cuddergambino on 8/9/16.
  */
 
-public class SQLTrackedActionDataHelper {
+public class SQLTrackedActionDataHelper extends SQLDataHelper {
 
     public static void createTable(SQLiteDatabase db) {
         db.execSQL(TrackedActionContract.SQL_CREATE_TABLE);
@@ -56,7 +53,7 @@ public class SQLTrackedActionDataHelper {
             );
             result = cursor.moveToFirst() ? TrackedActionContract.fromCursor(cursor) : null;
         } finally {
-            if(cursor != null) { cursor.close(); }
+            if (cursor != null) { cursor.close(); }
             return result;
         }
     }
@@ -75,7 +72,7 @@ public class SQLTrackedActionDataHelper {
             }
             return actions;
         } finally {
-            if(cursor != null) { cursor.close(); }
+            if (cursor != null) { cursor.close(); }
         }
     }
 

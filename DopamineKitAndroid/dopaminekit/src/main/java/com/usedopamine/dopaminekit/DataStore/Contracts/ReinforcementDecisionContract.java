@@ -2,7 +2,8 @@ package com.usedopamine.dopaminekit.DataStore.Contracts;
 
 import android.database.Cursor;
 import android.provider.BaseColumns;
-import android.support.annotation.Nullable;
+
+import org.jetbrains.annotations.Contract;
 
 /**
  * Created by cuddergambino on 8/4/16.
@@ -10,7 +11,7 @@ import android.support.annotation.Nullable;
 
 public final class ReinforcementDecisionContract implements BaseColumns {
 
-    public static final String TABLE_NAME_PREFIX = "Reinforcement_Decisions_";
+    private static final String TABLE_NAME_PREFIX = "Reinforcement_Decisions_";
     public static final String COLUMNS_NAME_REINFORCEMENT_DECISION = "reinforcementdecision";
 
     public long id;
@@ -29,15 +30,16 @@ public final class ReinforcementDecisionContract implements BaseColumns {
         );
     }
 
-    public static final String TABLE_NAME(String actionID) {
+    @Contract(pure = true)
+    public static String TABLE_NAME(String actionID) {
         return TABLE_NAME_PREFIX + actionID;
     }
 
-    public static final String SQL_CREATE_TABLE(String actionID) {
-        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME(actionID) + " (" +
-                        _ID + " INTEGER PRIMARY KEY," +
-                        COLUMNS_NAME_REINFORCEMENT_DECISION + " TEXT" +
-                        " )";
+    public static String SQL_CREATE_TABLE(String actionID) {
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME(actionID) + " ("
+                + _ID + " INTEGER PRIMARY KEY,"
+                + COLUMNS_NAME_REINFORCEMENT_DECISION + " TEXT"
+                + " )";
     }
 
     public static final String SQL_DROP_TABLE(String actionID) {

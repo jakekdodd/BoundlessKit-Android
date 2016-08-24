@@ -1,9 +1,9 @@
 package com.usedopamine.dopaminekit.DataStore;
 
 /**
- * Created by cuddergambino on 8/9/16.
+ * Created by cuddergambino on 8/24/16.
  */
 
-public interface SQLDataHelper {
-
+abstract class SQLDataHelper {
+    protected SQLDataHelper() { }
 }

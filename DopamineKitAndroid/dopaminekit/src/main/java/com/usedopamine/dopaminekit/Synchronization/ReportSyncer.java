@@ -61,16 +61,23 @@ public class ReportSyncer extends Syncer {
     @Override
     public boolean isTriggered() {
         int actionsCount = SQLReportedActionDataHelper.count(sqlDB);
-        DopamineKit.debugLog("ReportSyncer", "Report has " + actionsCount + "/" + sizeToSync + " actions" );
+        DopamineKit.debugLog("ReportSyncer", "Report has " + actionsCount + "/" + sizeToSync + " actions");
         return actionsCount >= sizeToSync || System.currentTimeMillis() > timerStartsAt + timerExpiresIn;
     }
 
     public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
 
-        if (size != null) { sizeToSync = size; }
-        if (startTime != null) { timerStartsAt = startTime; }
-        else { timerStartsAt = System.currentTimeMillis(); }
-        if (expiresIn != null) { timerExpiresIn = expiresIn; }
+        if (size != null) {
+            sizeToSync = size;
+        }
+        if (startTime != null) {
+            timerStartsAt = startTime;
+        } else {
+            timerStartsAt = System.currentTimeMillis();
+        }
+        if (expiresIn != null) {
+            timerExpiresIn = expiresIn;
+        }
 
         preferences.edit()
                 .putInt(preferencessizeToSync, sizeToSync)
@@ -101,7 +108,7 @@ public class ReportSyncer extends Syncer {
                             DopamineKit.debugLog("ReportSyncer", "No reported actions to be synced.");
                             apiResponse = new JSONObject().put("status", 200);
                         } else {
-                            DopeAction dopeActions[] = new DopeAction[sqlActions.size()];
+                            DopeAction[] dopeActions = new DopeAction[sqlActions.size()];
                             for (int i = 0; i < sqlActions.size(); i++) {
                                 ReportedActionContract action = sqlActions.get(i);
                                 try {

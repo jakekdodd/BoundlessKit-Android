@@ -8,11 +8,11 @@ import android.support.annotation.Nullable;
  * Created by cuddergambino on 8/4/16.
  */
 
-public final class ReportedActionContract implements BaseColumns{
+public final class ReportedActionContract implements BaseColumns {
 
     public static final String TABLE_NAME = "Reported_Actions";
     public static final String COLUMNS_NAME_ACTIONID = "actionid";
-    public static final String COLUMNS_NAME_REINFORCEMENTDECISION= "reinforcementdecision";
+    public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementdecision";
     public static final String COLUMNS_NAME_METADATA = "metadata";
     public static final String COLUMNS_NAME_UTC = "utc";
     public static final String COLUMNS_NAME_TIMEZONEOFFSET = "timezoneoffset";
@@ -39,14 +39,14 @@ public final class ReportedActionContract implements BaseColumns{
         );
     }
 
-    public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-            _ID + " INTEGER PRIMARY KEY,"  +
-            COLUMNS_NAME_ACTIONID + " TEXT," +
-            COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT," +
-            COLUMNS_NAME_METADATA + " TEXT," +
-            COLUMNS_NAME_UTC + " INTEGER," +
-            COLUMNS_NAME_TIMEZONEOFFSET + " INTEGER" +
-            " )";
+    public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
+            + _ID + " INTEGER PRIMARY KEY,"
+            + COLUMNS_NAME_ACTIONID + " TEXT,"
+            + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT,"
+            + COLUMNS_NAME_METADATA + " TEXT,"
+            + COLUMNS_NAME_UTC + " INTEGER,"
+            + COLUMNS_NAME_TIMEZONEOFFSET + " INTEGER"
+            + " )";
 
     public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

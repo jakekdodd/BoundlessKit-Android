@@ -4,15 +4,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
-
 /**
  * Created by cuddergambino on 8/4/16.
  */
 
 public class SQLiteDataStore extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "DopamineDB.db";
 
     private static SQLiteDataStore sharedInstance = null;
@@ -25,7 +23,7 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
     }
 
     private SQLiteDataStore(Context context) {
-        super (context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public void onCreate(SQLiteDatabase db) {
