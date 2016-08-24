@@ -3,8 +3,6 @@ package com.usedopamine.dopaminekit.DataStore.Contracts;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
-import org.jetbrains.annotations.Contract;
-
 /**
  * Created by cuddergambino on 8/4/16.
  */
@@ -30,7 +28,6 @@ public final class ReinforcementDecisionContract implements BaseColumns {
         );
     }
 
-    @Contract(pure = true)
     public static String TABLE_NAME(String actionID) {
         return TABLE_NAME_PREFIX + actionID;
     }
