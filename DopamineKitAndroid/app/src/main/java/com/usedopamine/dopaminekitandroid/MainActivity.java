@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         mTaskListView = (ListView) findViewById(R.id.list_todo);
 
         updateUI();
-        DopamineKit.debugMode = true;
+        DopamineKit.debugMode = false;
     }
 
     @Override

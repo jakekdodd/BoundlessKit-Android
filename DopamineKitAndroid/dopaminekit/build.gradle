@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/DopamineLabs/DopamineKit-Android-Source'
     gitUrl = 'https://github.com/DopamineLabs/DopamineKit-Android-Source.git'
 
-    libraryVersion = '4.0.0.beta'
+    libraryVersion = '4.0.0'
 
     developerId = 'cuddergambino'
     developerName = 'Akash Desai'
@@ -63,5 +63,7 @@ dependencies {
 
 
 // taken from https://inthecheesefactory.com/blog/how-to-upload-library-to-jcenter-maven-central-as-dependency/en
-apply from: 'https://raw.githubusercontent.com/cuddergambino/JCenter/dev-cuddergambino/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/cuddergambino/JCenter/dev-cuddergambino/bintrayv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/cuddergambino/JCenter/dev-cuddergambino/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/cuddergambino/JCenter/dev-cuddergambino/bintrayv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

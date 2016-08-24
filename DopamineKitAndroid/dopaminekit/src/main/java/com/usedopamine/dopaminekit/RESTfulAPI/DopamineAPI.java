@@ -33,7 +33,7 @@ public class DopamineAPI {
 
 //    private final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/";
     private final String DopamineAPIURL = "https://api.usedopamine.com/v4/app/";
-    private final String clientSDKVersion = "4.0.0.beta";
+    private final String clientSDKVersion = "4.0.0";
     private final String clientOS = "Android";
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
 
@@ -97,6 +97,11 @@ public class DopamineAPI {
         return sharedInstance;
     }
 
+    /**
+     * This method sends a Track {@link CallType}.
+     *
+     * @param actions			The actions to send
+     */
     public @Nullable JSONObject track(DopeAction[] actions) {
         try {
             JSONObject payload = new JSONObject(configurationData.toString());
@@ -114,6 +119,11 @@ public class DopamineAPI {
         }
     }
 
+    /**
+     * This method sends a Report {@link CallType}.
+     *
+     * @param actions			The actions to send
+     */
     public @Nullable JSONObject report(DopeAction[] actions) {
         try {
             JSONObject payload = new JSONObject(configurationData.toString());
@@ -131,6 +141,11 @@ public class DopamineAPI {
         }
     }
 
+    /**
+     * This method sends a Refresh {@link CallType}.
+     *
+     * @param actionID			The actionID for the cartridge to reload
+     */
     public @Nullable JSONObject refresh(String actionID) {
         try {
             JSONObject payload = new JSONObject(configurationData.toString());
@@ -157,6 +172,12 @@ public class DopamineAPI {
         }
     }
 
+    /**
+     * This method sends a request to the DopamineAPI.
+     *
+     * @param type			    The {@link CallType} to send
+     * @param payload			JSON data to send
+     */
     private @Nullable JSONObject send(final CallType type, JSONObject payload) {
         try {
             String url = DopamineAPIURL + type.pathExtension;

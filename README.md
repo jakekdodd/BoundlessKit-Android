@@ -21,13 +21,17 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
 
   1. First, make sure you have received your API key and other credentials, which are in the configuration file __dopamineproperties.json__ automatically generated from the [Dopamine Developer Dashboard](http://dashboard.usedopamine.com). 
 
-  2. Import the DopamineKit framework by using JCenter or Maven using the following line
+  2. Import the DopamineKit framework into your app's `build.gradle` by using JCenter or Maven using the following line
 
+  ```groovy
+  repositories {
+        jcenter() // or if you prefer mavenCentral()
+    }
+    
+  dependencies {
+        compile 'com.usedopamine:dopaminekit:4.0.0'
+  	}
   ```
-  compile 'com.usedopamine:dopaminekit:3.1.01'
-  ```
-  , or by [directly downloading](
-https://github.com/DopamineLabs/DopamineKit-Android-binary/) the library.
 
   3. Import the DopamineKit library
 
@@ -38,10 +42,10 @@ https://github.com/DopamineLabs/DopamineKit-Android-binary/) the library.
   4. Move __dopamineproperties.json__ into the directory _`app/src/main/res/raw`_
 
     ![Workspace snapshot](readme/TestApp with DopamineKit and dopamineproperties.png)
-    *Shown from left to right: 
-    `app/src/main/res/rawdopamineproperties.json`, 
-    gradle import of DopamineKit 3.1.01, 
-    java import of DopamineKit*
+    *Shown from the left to right pane:
+    <br />left: `app/src/main/res/rawdopamineproperties.json`, 
+    <br />center: gradle import of DopamineKit 4.0.0, 
+    <br />right: java import of DopamineKit*
   
   5. Start using Dopamine! The main features of DopamineAPI are the `reinforce()` and `track()` functions. These should be added into the response functions of any _action_ to be reinforced or tracked.
   
@@ -52,28 +56,27 @@ https://github.com/DopamineLabs/DopamineKit-Android-binary/) the library.
 
   ```java
 
+	JSONObject metaData = new JSONObject().put("taskName", taskName);
     DopamineKit.reinforce(getBaseContext(), 
-                          "some_action", 
+                          "taskCompleted", 
+                          metaData,
                           new DopamineKit.ReinforcementCallback() {
 
         @Override
         public void onReinforcement(String reinforcement) {
                                         
             // Multiple reinforcements can help increase the surprise factor!
-            
-            // DopamineKit provides a standard reinforcement View called Candybar
-            // but you can also use any UI components you made like
+            // You can also use any UI components you made like
             // this.showInspirationalQuote() or this.showFunnyMeme()
 
             if(reinforcement.equals("stars")){
-                DopamineKit.showCandyBar(getCurrentFocus(), CandyBar.Candy.STARS, "Out of this world!", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
+                
             }
             else if(reinforcement.equals("medalStar")){
-                DopamineKit.showCandyBar(getCurrentFocus(), CandyBar.Candy.MEDALSTAR, "Great job!", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
+                
             }
             else if(reinforcement.equals("thumbsUp")){
-                DopamineKit.showCandyBar(getCurrentFocus(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
-            }
+                            }
             else {
                 // Show nothing! This is called a neutral response, 
                 // and builds up the good feelings for the next surprise!
@@ -93,8 +96,7 @@ https://github.com/DopamineLabs/DopamineKit-Android-binary/) the library.
   Let's track when a user adds a food item in a "Fitness" app. We will also add the calories for the item in the `metaData` field to gather richer information about user engagement in my app.
   
   ```java
-    HashMap<String, String> metaData = new HashMap<String, String>();
-    metaData.put("calories", "400");
+    JSONObject metaData = new JSONObject().put("calories", "400");
     DopamineKit.track(getBaseContext(), "foodItemAdded", metaData);
    ```
 
@@ -113,7 +115,7 @@ A tracking call should be used to record and communicate to DopamineAPI that a p
 ######General syntax
 
 ```
-Dopamine.track(context, actionID, metaData, secondaryIdentity)
+Dopamine.track(context, actionID, metaData)
 ```
 
 ######Parameters:
@@ -122,9 +124,7 @@ Dopamine.track(context, actionID, metaData, secondaryIdentity)
  
  - `actionID: String` - is a unique name for the action that the user has performed
 
- - `metaData: Map<String, String>` - (optional) is any additional data to be sent to the API
-
- - `secondaryIdentity: String` - (optional) is an extra identifier (like login credentials) used to identify a particular user
+ - `metaData: @Nullable JSONObject` - is any additional data to be sent to the API
 
 ========
 
@@ -135,7 +135,7 @@ A reinforcement call should be used when the user has performed a particular act
 ######General syntax
 
 ```
-Dopamine.reinforce(context, actionID, metaData, secondaryIdentity, callback)
+Dopamine.reinforce(context, actionID, metaData, callback)
 ```
 
 ######Parameters:
@@ -144,13 +144,9 @@ Dopamine.reinforce(context, actionID, metaData, secondaryIdentity, callback)
  
  - `actionID: String` - is a unique name for the action that the user has performed
 
- - `metaData: Map<String, String>` - (optional) is any additional data to be sent to the API
+ - `metaData: @Nullable JSONObject` - is any additional data to be sent to the API
 
- - `secondaryIdentity: String` - (optional) is an extra identifier (like login credentials) used to identify a particular user across apps
-
- - `callback: DopamineKit.ReinforcementCallback` - is an object on which `onReinforcement(String reinforcement)` is called when a response is received
-
-The reinforcement call itself takes the actionID as a required parameter, as well as a DopamineKit.ReinforcementCallback object, which is triggered as a callback for the reinforcement response.
+ - `callback: DopamineKit.ReinforcementCallback` - is an object on which `onReinforcement(String reinforcementDecision)` is called when a response is received
 
 ========
 

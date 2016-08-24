@@ -101,7 +101,7 @@ public class SyncCoordinator extends Syncer {
 
                         if (trackerShouldSync) {
                             apiCall = syncerExecutor.submit(trackSyncer); // apiThreadPool.schedule(trackSyncer, 1000, TimeUnit.MILLISECONDS);
-                            while (!apiCall.isDone()) {
+                            while (DopamineKit.debugMode && !apiCall.isDone()) {
                                 Log.v("SyncCoordinator", "Waiting for track syncer to be done...");
                                 Thread.sleep(200);
                             }
@@ -120,7 +120,7 @@ public class SyncCoordinator extends Syncer {
 
                         if (reporterShouldSync) {
                             apiCall = syncerExecutor.submit(reportSyncer);
-                            while (!apiCall.isDone()) {
+                            while (DopamineKit.debugMode && !apiCall.isDone()) {
                                 Log.v("SyncCoordinator", "Waiting for report syncer to be done...");
                                 Thread.sleep(200);
                             }
@@ -138,7 +138,7 @@ public class SyncCoordinator extends Syncer {
 
                         for (Map.Entry<String, CartridgeSyncer> cartridge : cartridgesToSync.entrySet()) {
                             apiCall = syncerExecutor.submit(cartridge.getValue());
-                            while (!apiCall.isDone()) {
+                            while (DopamineKit.debugMode && !apiCall.isDone()) {
                                 Log.v("SyncCoordinator", "Waiting for " + cartridge.getKey() + " cartridge refresh to be done...");
                                 Thread.sleep(200);
                             }
@@ -150,7 +150,6 @@ public class SyncCoordinator extends Syncer {
                                 return null;
                             } else {
                                 Log.v("SyncCoordinator", cartridge.getKey() + " cartridge syncer is done!");
-//                                Thread.sleep(1000);
                             }
                         }
 

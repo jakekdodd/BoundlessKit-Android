@@ -25,13 +25,14 @@ public class DopamineKit extends ContextWrapper {
          * Called when a response from the DopamineAPI has been received. The responses are configured
          * on the Dopamine Dashboard (@link http://dashboard.usedopamine.com)
          *
-         * @param reinforcement The reinforcement response string returned by DopamineAPI
+         * @param reinforcementDecision The reinforcement response string returned by DopamineAPI
          */
-        void onReinforcement(String reinforcement);
+        void onReinforcement(String reinforcementDecision);
     }
 
     private static DopamineKit sharedInstance = null;
 
+    // Manages local storage and api calls
     private SyncCoordinator syncCoordinator;
 
     private DopamineKit(Context base) {
@@ -70,7 +71,7 @@ public class DopamineKit extends ContextWrapper {
      * @param callback          The callback to trigger when the reinforcement decision has been made
      */
     public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
-        AsyncTask<Void, Void, String> reinforcementVisual = new AsyncTask<Void, Void, String>() {
+        AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
             SyncCoordinator coordinator = getInstance(context).syncCoordinator;;
 
             @Override
