@@ -28,16 +28,16 @@ public class CartridgeSyncer extends Syncer {
     private static final String preferencesName = "DopamineCartridgeSyncer";
     private static final String preferencesReinforceableActions = "reinforceableActions";
     private static final String preferencesInitialSize = "initialSize";
-    private static final String preferencesTimerMarker = "timerMarker";
-    private static final String preferencesTimerLength = "timerLength";
+    private static final String preferencesTimerStartsAt = "timerStartsAt";
+    private static final String preferencesTimerExpiresIn = "timerExpiresIn";
 
     private static final double capacityToSync = 0.25;
     private static final int minimumCount = 15;
 
     private String actionID;
     private int initialSize;
-    private long timerMarker;
-    private long timerLength;
+    private long timerStartsAt;
+    private long timerExpiresIn;
 
     private final Object apisynclock = new Object();
     private Boolean syncInProgress = false;
@@ -68,7 +68,7 @@ public class CartridgeSyncer extends Syncer {
                     .commit();
 
             // Store the triggers for the first time
-            syncer.updateTriggers(syncer.initialSize, syncer.timerMarker, syncer.timerLength);
+            syncer.updateTriggers(syncer.initialSize, syncer.timerStartsAt, syncer.timerExpiresIn);
 
             // Create the sql table
             SQLCartridgeDataHelper.createTable(sqlDB, actionID);
@@ -86,8 +86,8 @@ public class CartridgeSyncer extends Syncer {
         super(context);
         this.actionID = actionID;
         initialSize = preferences.getInt(preferencesInitialSize, 0);
-        timerMarker = preferences.getLong(preferencesTimerMarker, 0);
-        timerLength = preferences.getLong(preferencesTimerLength, 3600000);
+        timerStartsAt = preferences.getLong(preferencesTimerStartsAt, 0);
+        timerExpiresIn = preferences.getLong(preferencesTimerExpiresIn, 3600000);
     }
 
     public static HashMap<String, CartridgeSyncer> whichShouldSync(Context context) {
@@ -107,28 +107,28 @@ public class CartridgeSyncer extends Syncer {
     public boolean isTriggered() {
         int count = SQLCartridgeDataHelper.count(sqlDB, actionID);
         boolean isSizeToSync = count < minimumCount || (double)count/initialSize <= capacityToSync;
-        boolean isExpired = System.currentTimeMillis() >= timerMarker+timerLength;
+        boolean isExpired = System.currentTimeMillis() >= timerStartsAt+timerExpiresIn;
         DopamineKit.debugLog("CartridgeSyncer", actionID + " cartridge has " + count + "/" + initialSize + " decisions. The cartridge " + (isSizeToSync? "is" : "isnt't") + " below the "+ capacityToSync*100 +"% lower capacity limit and the timer " + (isExpired? "is" : "isn't") + " expired." );
         return isSizeToSync || isExpired;
     }
 
     public boolean isFresh() {
         int count = SQLCartridgeDataHelper.count(sqlDB, actionID);
-        boolean isExpired = System.currentTimeMillis() >= timerMarker+timerLength;
+        boolean isExpired = System.currentTimeMillis() >= timerStartsAt+timerExpiresIn;
         return count >= 1 && !isExpired;
     }
 
-    public void updateTriggers(Integer size, @Nullable Long startTime, Long length) {
+    public void updateTriggers(Integer size, @Nullable Long startTime, Long expiresIn) {
 
-        if (size != null) { initialSize = size; }
-        if (startTime != null) { timerMarker = startTime; }
-        else { timerMarker = System.currentTimeMillis(); }
-        if (length != null) { timerLength = length; }
+        initialSize = size;
+        if (startTime != null) { timerStartsAt = startTime; }
+        else { timerStartsAt = System.currentTimeMillis(); }
+        timerExpiresIn = expiresIn;
 
         preferences.edit()
                 .putInt(preferencesInitialSize, initialSize)
-                .putLong(preferencesTimerMarker, timerMarker)
-                .putLong(preferencesTimerLength, timerLength)
+                .putLong(preferencesTimerStartsAt, timerStartsAt)
+                .putLong(preferencesTimerExpiresIn, timerExpiresIn)
                 .apply();
     }
 

@@ -90,17 +90,6 @@ public class DopamineKit extends ContextWrapper {
         }.execute();
     }
 
-//    /**
-//     * This method sends a tracking request for the specified actionID to the DopamineAPI.
-//     *
-//     * @param context			Context to retrieve api key from file res/raw/dopamineproperties.json
-//     * @param actionID			The name of an action
-//     */
-//    public static void track(Context context, String actionID) {
-//        DopamineKit.track(context, actionID, null);
-//    }
-
-
     public static boolean debugMode = false;
     /**
      * By default debug mode is set to `false`.
