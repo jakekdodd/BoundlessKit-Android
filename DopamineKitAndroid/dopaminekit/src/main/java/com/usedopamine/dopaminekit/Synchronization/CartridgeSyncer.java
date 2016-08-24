@@ -181,7 +181,7 @@ public class CartridgeSyncer extends Syncer {
     }
 
     public String unload() {
-        String decision = "neutralFeedback";
+        String decision = "neutralResponse";
 
         if(isFresh()) {
             decision = SQLCartridgeDataHelper.pop(sqlDB, actionID).reinforcementDecision;

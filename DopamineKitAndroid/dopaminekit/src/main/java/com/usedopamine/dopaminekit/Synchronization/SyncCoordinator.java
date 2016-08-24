@@ -99,9 +99,11 @@ public class SyncCoordinator extends Syncer {
 
                         if (trackerShouldSync) {
                             apiCall = syncerExecutor.submit(trackSyncer); // apiThreadPool.schedule(trackSyncer, 1000, TimeUnit.MILLISECONDS);
-                            while (DopamineKit.debugMode && !apiCall.isDone()) {
-                                Log.v("SyncCoordinator", "Waiting for track syncer to be done...");
-                                Thread.sleep(200);
+                            if (DopamineKit.debugMode) {
+                                while (!apiCall.isDone()) {
+                                    DopamineKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
+                                    Thread.sleep(200);
+                                }
                             }
 
                             apiResponse = apiCall.get();
@@ -110,7 +112,7 @@ public class SyncCoordinator extends Syncer {
                                 DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing tracker... Halting early.");
                                 return null;
                             } else {
-                                Log.v("SyncCoordinator", "Track Syncer is done!");
+                                DopamineKit.debugLog("SyncCoordinator", "Track Syncer is done!");
                                 Thread.sleep(1000);
                             }
 
@@ -118,36 +120,40 @@ public class SyncCoordinator extends Syncer {
 
                         if (reporterShouldSync) {
                             apiCall = syncerExecutor.submit(reportSyncer);
-                            while (DopamineKit.debugMode && !apiCall.isDone()) {
-                                Log.v("SyncCoordinator", "Waiting for report syncer to be done...");
-                                Thread.sleep(200);
+                            if (DopamineKit.debugMode) {
+                                while (!apiCall.isDone()) {
+                                    DopamineKit.debugLog("SyncCoordinator", "Waiting for report syncer to be done...");
+                                    Thread.sleep(200);
+                                }
                             }
 
                             apiResponse = apiCall.get();
-                            Log.v("ReportSyncResponse", apiResponse == null ? "null" : apiResponse.toString());
+                            DopamineKit.debugLog("ReportSyncResponse", apiResponse == null ? "null" : apiResponse.toString());
                             if (apiResponse == null || apiResponse.optInt("status", 404) == 404) {
                                 DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing reporter... Halting early.");
                                 return null;
                             } else {
-                                Log.v("SyncCoordinator", "Report Syncer is done!");
+                                DopamineKit.debugLog("SyncCoordinator", "Report Syncer is done!");
                                 Thread.sleep(5000);
                             }
                         }
 
                         for (Map.Entry<String, CartridgeSyncer> cartridge : cartridgesToSync.entrySet()) {
                             apiCall = syncerExecutor.submit(cartridge.getValue());
-                            while (DopamineKit.debugMode && !apiCall.isDone()) {
-                                Log.v("SyncCoordinator", "Waiting for " + cartridge.getKey() + " cartridge refresh to be done...");
-                                Thread.sleep(200);
+                            if (DopamineKit.debugMode) {
+                                while (!apiCall.isDone()) {
+                                    DopamineKit.debugLog("SyncCoordinator", "Waiting for " + cartridge.getKey() + " cartridge refresh to be done...");
+                                    Thread.sleep(200);
+                                }
                             }
 
                             apiResponse = apiCall.get();
-                            Log.v("CartridgeSyncResponse", apiResponse == null ? "null" : apiResponse.toString());
+                            DopamineKit.debugLog("CartridgeSyncResponse", apiResponse == null ? "null" : apiResponse.toString());
                             if (apiResponse == null || apiResponse.optInt("status", 404) == 404) {
                                 DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing cartridge... Halting early.");
                                 return null;
                             } else {
-                                Log.v("SyncCoordinator", cartridge.getKey() + " cartridge syncer is done!");
+                                DopamineKit.debugLog("SyncCoordinator", cartridge.getKey() + " cartridge syncer is done!");
                             }
                         }
 
