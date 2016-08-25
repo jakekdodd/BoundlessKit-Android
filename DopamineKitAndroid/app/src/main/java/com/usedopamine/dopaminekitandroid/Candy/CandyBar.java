@@ -1,4 +1,4 @@
-package com.usedopamine.dopaminekit;
+package com.usedopamine.dopaminekitandroid.Candy;
 
 /**
  * Created by cuddergambino on 6/1/16.
@@ -12,6 +12,8 @@ import android.text.style.RelativeSizeSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
+
+import com.usedopamine.dopaminekitandroid.R;
 
 public final class CandyBar {
     /**
