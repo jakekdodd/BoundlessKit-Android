@@ -9,8 +9,9 @@ import android.provider.BaseColumns;
 
 public final class ReinforcementDecisionContract implements BaseColumns {
 
-    private static final String TABLE_NAME_PREFIX = "Reinforcement_Decisions_";
-    public static final String COLUMNS_NAME_REINFORCEMENT_DECISION = "reinforcementdecision";
+    public static final String TABLE_NAME = "Reinforcement_Decisions";
+    public static final String COLUMNS_NAME_ACTIONID = "actionid";
+    public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementdecision";
 
     public long id;
     public String actionID;
@@ -22,24 +23,18 @@ public final class ReinforcementDecisionContract implements BaseColumns {
         this.reinforcementDecision = reinforcementDecision;
     }
 
-    public static ReinforcementDecisionContract fromCursor(String actionID, Cursor cursor) {
+    public static ReinforcementDecisionContract fromCursor(Cursor cursor) {
         return new ReinforcementDecisionContract(
-                cursor.getLong(0), actionID, cursor.getString(1)
+                cursor.getLong(0), cursor.getString(1), cursor.getString(2)
         );
     }
 
-    public static String TABLE_NAME(String actionID) {
-        return TABLE_NAME_PREFIX + actionID;
-    }
+    public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
+            + _ID + " INTEGER PRIMARY KEY,"
+            + COLUMNS_NAME_ACTIONID + " TEXT,"
+            + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT"
+            + " )";
 
-    public static String SQL_CREATE_TABLE(String actionID) {
-        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME(actionID) + " ("
-                + _ID + " INTEGER PRIMARY KEY,"
-                + COLUMNS_NAME_REINFORCEMENT_DECISION + " TEXT"
-                + " )";
-    }
 
-    public static final String SQL_DROP_TABLE(String actionID) {
-        return "DROP TABLE IF EXISTS " + TABLE_NAME(actionID);
-    }
+    public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 }

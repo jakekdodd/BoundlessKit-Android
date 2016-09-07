@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
         mTaskListView = (ListView) findViewById(R.id.list_todo);
 
         updateUI();
-        DopamineKit.debugMode = false;
+        DopamineKit.debugMode = true;
+        DopamineKit dk = DopamineKit.getInstance(this);
     }
 
     @Override
@@ -77,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
                                         SQLiteDatabase.CONFLICT_REPLACE);
                                 db.close();
                                 updateUI();
+                                DopamineKit.reinforce(getApplicationContext(), "action1", null, new DopamineKit.ReinforcementCallback() {
+                                    @Override
+                                    public void onReinforcement(String reinforcementDecision) {
+
+                                    }
+                                });
                             }
                         })
                         .setNegativeButton("Cancel", null)
@@ -184,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                                         deleteTask(mTaskListView.getChildAt(position));
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
-                                        DopamineKit.reinforce(getApplicationContext(), "action1", null, new DopamineKit.ReinforcementCallback() {
+                                        DopamineKit.reinforce(getApplicationContext(), "taskCompleted", null, new DopamineKit.ReinforcementCallback() {
 
                                             @Override
                                             public void onReinforcement(String reinforcement) {

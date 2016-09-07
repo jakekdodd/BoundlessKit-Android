@@ -29,12 +29,13 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         SQLTrackedActionDataHelper.createTable(db);
         SQLReportedActionDataHelper.createTable(db);
+        SQLCartridgeDataHelper.createTable(db);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         SQLTrackedActionDataHelper.dropTable(db);
         SQLReportedActionDataHelper.dropTable(db);
-
+        SQLCartridgeDataHelper.dropTable(db);
         onCreate(db);
     }
 

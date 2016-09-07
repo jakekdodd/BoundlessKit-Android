@@ -55,11 +55,8 @@ public class DopamineKit extends ContextWrapper {
      * @param metaData			Optional metadata for better analytics
      */
     public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
-        SyncCoordinator coordinator = getInstance(context).syncCoordinator;
-
         DopeAction action = new DopeAction(actionID, null, metaData);
-        coordinator.storeTrackedAction(action);
-        coordinator.sync();
+        getInstance(context).syncCoordinator.storeTrackedAction(action);
     }
 
     /**
@@ -72,26 +69,23 @@ public class DopamineKit extends ContextWrapper {
      */
     public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
         AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
-            SyncCoordinator coordinator = getInstance(context).syncCoordinator;;
-
+            private DopamineKit dopamineKit = getInstance(context);
             @Override
             protected String doInBackground(Void... voids) {
-                String reinforcementDecision = coordinator.removeReinforcementDecisionFor(context, actionID);
-                return reinforcementDecision;
+                return dopamineKit.syncCoordinator.removeReinforcementDecisionFor(context, actionID);
             }
 
             @Override
             protected void onPostExecute(String reinforcementDecision) {
                 callback.onReinforcement(reinforcementDecision);
                 DopeAction action = new DopeAction(actionID, reinforcementDecision, metaData);
-                coordinator.storeReportedAction(action);
-                coordinator.sync();
+                dopamineKit.syncCoordinator.storeReportedAction(action);
             }
 
         }.execute();
     }
 
-    public static boolean debugMode = false;
+    public static boolean debugMode = true;
     /**
      * By default debug mode is set to `false`.
      * When debug mode is enabled, the data sent to and received from

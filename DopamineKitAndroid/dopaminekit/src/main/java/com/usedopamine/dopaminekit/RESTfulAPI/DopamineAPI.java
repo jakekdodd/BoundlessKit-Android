@@ -39,6 +39,13 @@ public class DopamineAPI {
 
     private JSONObject configurationData = new JSONObject();;
 
+    public static DopamineAPI getInstance(Context context) {
+        if (sharedInstance == null) {
+            sharedInstance = new DopamineAPI(context);
+        }
+        return sharedInstance;
+    }
+
     private DopamineAPI(Context context) {
         // Basic configuration
         try {
@@ -88,13 +95,6 @@ public class DopamineAPI {
             DopamineKit.debugLog("DopamineAPI", "Error - dopamineproperties.json not configured properly");
             e.printStackTrace();
         }
-    }
-
-    public static DopamineAPI getInstance(Context context) {
-        if (sharedInstance == null) {
-            sharedInstance = new DopamineAPI(context);
-        }
-        return sharedInstance;
     }
 
     /**

@@ -1,68 +1,66 @@
 package com.usedopamine.dopaminekit.Synchronization;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
 import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
 import com.usedopamine.dopaminekit.DataStore.SQLTrackedActionDataHelper;
+import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
 import com.usedopamine.dopaminekit.DopeAction;
+import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 /**
- * Created by cuddergambino on 8/4/16.
+ * Created by cuddergambino on 9/4/16.
  */
 
-public class TrackSyncer extends Syncer {
+public class Track extends ContextWrapper implements Callable<JSONObject> {
 
-    private static TrackSyncer sharedInstance;
+    private static Track sharedInstance;
 
+    private DopamineAPI dopamineAPI;
+    private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
-    private static final String preferencesName = "DopamineTrackSyncer";
-    private static final String preferencesSizeToSync = "sizeToSync";
-    private static final String preferencesTimerStartsAt = "timerStartsAt";
-    private static final String preferencesTimerExpiresIn = "timerExpiresIn";
+    private final String preferencesName = "com.usedopamine.synchronization.track";
+    private final String preferencesSizeToSync = "sizetosync";
+    private final String preferencesTimerStartsAt = "timerstartsat";
+    private final String preferencesTimerExpiresIn = "timerexpiresin";
 
     private int sizeToSync;
     private long timerStartsAt;
     private long timerExpiresIn;
 
-    private final Object apisynclock = new Object();
+    private final Object apiSyncLock = new Object();
     private Boolean syncInProgress = false;
 
-    private TrackSyncer(Context context) {
-        super(context);
-        preferences = context.getSharedPreferences(preferencesName, 0);
+    public static Track getSharedInstance(Context base) {
+        if (sharedInstance == null) {
+            sharedInstance = new Track(base);
+        }
+        return sharedInstance;
+    }
+
+    private Track(Context base) {
+        super(base);
+        dopamineAPI = DopamineAPI.getInstance(base);
+        sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
+        preferences = getSharedPreferences(preferencesName, 0);
         sizeToSync = preferences.getInt(preferencesSizeToSync, 15);
         timerStartsAt = preferences.getLong(preferencesTimerStartsAt, 0);
         timerExpiresIn = preferences.getLong(preferencesTimerExpiresIn, 48 * 3600000);
     }
 
-    public static TrackSyncer getInstance(Context context) {
-        if (sharedInstance == null) {
-            sharedInstance = new TrackSyncer(context);
-        }
-        return sharedInstance;
-    }
-
-    public void store(DopeAction action) {
-        String metaData = (action.metaData == null) ? null : action.metaData.toString();
-        long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
-                0, action.actionID, metaData, action.utc, action.timezoneOffset
-        ));
-        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
-    }
-
-    @Override
     public boolean isTriggered() {
-        int actionsCount = SQLTrackedActionDataHelper.count(sqlDB);
-        DopamineKit.debugLog("TrackSyncer", "Track has " + actionsCount + "/" + sizeToSync + " actions");
-        return actionsCount >= sizeToSync || System.currentTimeMillis() > timerStartsAt + timerExpiresIn;
+        return timerDidExpire() || isSizeToSync();
     }
 
     public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
@@ -86,22 +84,55 @@ public class TrackSyncer extends Syncer {
                 .apply();
     }
 
+    public void removeTriggers() {
+        sizeToSync = 15;
+        timerStartsAt = 0;
+        timerExpiresIn = 172800000;
+        preferences.edit().clear().commit();
+    }
+
+    private boolean timerDidExpire() {
+        long currentTime = System.currentTimeMillis();
+        boolean isExpired = currentTime >= (timerStartsAt + timerExpiresIn);
+        DopamineKit.debugLog("Track", "Track timer expires in "+(timerStartsAt + timerExpiresIn - currentTime)+"ms so "+(isExpired ? "does" : "doesn't")+" need to sync...");
+        return isExpired;
+    }
+
+    private boolean isSizeToSync() {
+        int count = SQLTrackedActionDataHelper.count(sqlDB);
+        boolean isSize = count >= sizeToSync;
+        DopamineKit.debugLog("Track", "Track has "+count+"/"+sizeToSync+" actions so "+(isSize ? "does" : "doesn't")+" need to sync...");
+        return isSize;
+    }
+
+    public void store(DopeAction action) {
+        String metaData = (action.metaData == null) ? null : action.metaData.toString();
+        long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
+                0, action.actionID, metaData, action.utc, action.timezoneOffset
+        ));
+        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+    }
+
+    public void remove(TrackedActionContract action) {
+        SQLTrackedActionDataHelper.delete(sqlDB, action);
+    }
+
     @Override
     public @Nullable JSONObject call() throws Exception {
         if (syncInProgress) {
             DopamineKit.debugLog("TrackSyncer", "Track sync already happening");
             return null;
         } else {
-            synchronized (apisynclock) {
+            synchronized (apiSyncLock) {
                 if (syncInProgress) {
                     DopamineKit.debugLog("TrackSyncer", "Track sync already happening");
                     return null;
                 } else {
                     JSONObject apiResponse = null;
-
                     try {
                         DopamineKit.debugLog("TrackSyncer", "Beginning tracker sync!");
                         syncInProgress = true;
+
 
                         final ArrayList<TrackedActionContract> sqlActions = SQLTrackedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
@@ -127,7 +158,7 @@ public class TrackSyncer extends Syncer {
                         } else if (apiResponse.optInt("status", 404) == 200) {
                             DopamineKit.debugLog("TrackSyncer", "Deleting " + sqlActions.size() + " tracked actions...");
                             for (int i = 0; i < sqlActions.size(); i++) {
-                                SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
+                                remove(sqlActions.get(i));
                             }
                             updateTriggers(null, null, null);
                         } else {
