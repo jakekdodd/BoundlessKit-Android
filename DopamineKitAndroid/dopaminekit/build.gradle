@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/DopamineLabs/DopamineKit-Android-Source'
     gitUrl = 'https://github.com/DopamineLabs/DopamineKit-Android-Source.git'
 
-    libraryVersion = '4.0.0'
+    libraryVersion = '4.0.1'
 
     developerId = 'cuddergambino'
     developerName = 'Akash Desai'
