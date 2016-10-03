@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class SQLiteDataStore extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "DopamineDB.db";
 
     private static SQLiteDataStore sharedInstance = null;
@@ -30,12 +30,16 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
         SQLTrackedActionDataHelper.createTable(db);
         SQLReportedActionDataHelper.createTable(db);
         SQLCartridgeDataHelper.createTable(db);
+        SQLSyncOverviewDataHelper.createTable(db);
+        SQLDopeExceptionDataHelper.createTable(db);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         SQLTrackedActionDataHelper.dropTable(db);
         SQLReportedActionDataHelper.dropTable(db);
         SQLCartridgeDataHelper.dropTable(db);
+        SQLSyncOverviewDataHelper.dropTable(db);
+        SQLDopeExceptionDataHelper.dropTable(db);
         onCreate(db);
     }
 

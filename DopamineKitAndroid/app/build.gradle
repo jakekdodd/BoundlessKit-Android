@@ -38,6 +38,6 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support:support-annotations:24.2.0'
 
-//    compile 'com.usedopamine:dopaminekit:4.0.0'
+//    compile 'com.usedopamine:dopaminekit:4.0.1'
     compile 'com.squareup.okhttp3:okhttp:3.3.1'
 }

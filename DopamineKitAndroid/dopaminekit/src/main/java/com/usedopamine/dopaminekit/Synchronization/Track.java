@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
  * Created by cuddergambino on 9/4/16.
  */
 
-public class Track extends ContextWrapper implements Callable<JSONObject> {
+class Track extends ContextWrapper implements Callable<JSONObject> {
 
     private static Track sharedInstance;
 
@@ -31,9 +31,10 @@ public class Track extends ContextWrapper implements Callable<JSONObject> {
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
     private final String preferencesName = "com.usedopamine.synchronization.track";
-    private final String preferencesSizeToSync = "sizetosync";
-    private final String preferencesTimerStartsAt = "timerstartsat";
-    private final String preferencesTimerExpiresIn = "timerexpiresin";
+    private final String sizeKey = "size";
+    private final String sizeToSyncKey = "sizeToSync";
+    private final String timerStartsAtKey = "timerStartsAt";
+    private final String timerExpiresInKey = "timerExpiresIn";
 
     private int sizeToSync;
     private long timerStartsAt;
@@ -54,9 +55,9 @@ public class Track extends ContextWrapper implements Callable<JSONObject> {
         dopamineAPI = DopamineAPI.getInstance(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
         preferences = getSharedPreferences(preferencesName, 0);
-        sizeToSync = preferences.getInt(preferencesSizeToSync, 15);
-        timerStartsAt = preferences.getLong(preferencesTimerStartsAt, 0);
-        timerExpiresIn = preferences.getLong(preferencesTimerExpiresIn, 48 * 3600000);
+        sizeToSync = preferences.getInt(sizeToSyncKey, 15);
+        timerStartsAt = preferences.getLong(timerStartsAtKey, System.currentTimeMillis());
+        timerExpiresIn = preferences.getLong(timerExpiresInKey, 48 * 3600000);
     }
 
     public boolean isTriggered() {
@@ -78,9 +79,9 @@ public class Track extends ContextWrapper implements Callable<JSONObject> {
         }
 
         preferences.edit()
-                .putInt(preferencesSizeToSync, sizeToSync)
-                .putLong(preferencesTimerStartsAt, timerStartsAt)
-                .putLong(preferencesTimerExpiresIn, timerExpiresIn)
+                .putInt(sizeToSyncKey, sizeToSync)
+                .putLong(timerStartsAtKey, timerStartsAt)
+                .putLong(timerExpiresInKey, timerExpiresIn)
                 .apply();
     }
 
@@ -89,6 +90,19 @@ public class Track extends ContextWrapper implements Callable<JSONObject> {
         timerStartsAt = 0;
         timerExpiresIn = 172800000;
         preferences.edit().clear().commit();
+    }
+
+    public JSONObject jsonForTriggers() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put(sizeKey, SQLTrackedActionDataHelper.count(sqlDB));
+            json.put(sizeToSyncKey, sizeToSync);
+            json.put(timerStartsAtKey, timerStartsAt);
+            json.put(timerExpiresInKey, timerExpiresIn);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 
     private boolean timerDidExpire() {
@@ -109,8 +123,8 @@ public class Track extends ContextWrapper implements Callable<JSONObject> {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
                 0, action.actionID, metaData, action.utc, action.timezoneOffset
-        ));
-        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+        ));DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+
     }
 
     public void remove(TrackedActionContract action) {
@@ -137,20 +151,10 @@ public class Track extends ContextWrapper implements Callable<JSONObject> {
                         final ArrayList<TrackedActionContract> sqlActions = SQLTrackedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
                             DopamineKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
-                            apiResponse = new JSONObject().put("status", 200);
+                            apiResponse = new JSONObject().put("status", 0);
                         } else {
-                            DopeAction[] dopeActions = new DopeAction[sqlActions.size()];
-                            for (int i = 0; i < sqlActions.size(); i++) {
-                                TrackedActionContract action = sqlActions.get(i);
-                                try {
-                                    dopeActions[i] = new DopeAction(action.actionID, null, new JSONObject(action.metaData), action.utc, action.timezoneOffset);
-                                } catch (JSONException e) {
-                                    dopeActions[i] = new DopeAction(action.actionID, null, null, action.utc, action.timezoneOffset);
-                                } catch (NullPointerException e) {
-                                    dopeActions[i] = new DopeAction(action.actionID, null, null, action.utc, action.timezoneOffset);
-                                }
-                            }
-                            apiResponse = dopamineAPI.track(dopeActions);
+                            DopamineKit.debugLog("TrackSyncer", sqlActions.size() + " tracked actions to be synced.");
+                            apiResponse = dopamineAPI.track(sqlActions);
                         }
 
                         if (apiResponse == null) {

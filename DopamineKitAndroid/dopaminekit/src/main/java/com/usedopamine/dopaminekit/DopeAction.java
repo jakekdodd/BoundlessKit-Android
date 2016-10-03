@@ -2,12 +2,8 @@ package com.usedopamine.dopaminekit;
 
 import android.support.annotation.Nullable;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.TimeZone;
 
 /**
@@ -34,21 +30,4 @@ public class DopeAction {
         this(actionID, reinforcementDecision, metaData, System.currentTimeMillis(), TimeZone.getDefault().getOffset(System.currentTimeMillis()));
     }
 
-    public JSONObject toJSON() {
-        JSONObject json = new JSONObject();
-
-        try {
-            json.put("actionID", actionID);
-            json.put("reinforcementDecision", reinforcementDecision);
-            json.put("metaData", metaData);
-            json.put("time", new JSONArray()
-                    .put( new JSONObject().put("timeType", "utc").put("value", utc) )
-                    .put( new JSONObject().put("timeType", "deviceTimezoneOffset").put("value", timezoneOffset) )
-            );
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return json;
-    }
 }

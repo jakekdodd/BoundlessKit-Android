@@ -13,6 +13,7 @@ import com.usedopamine.dopaminekit.DopamineKit;
 import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
@@ -27,9 +28,12 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
     private final String preferencesName() { return "com.usedopamine.synchronization.cartridge." + actionID; }
-    private static final String preferencesInitialSize = "initialsize";
-    private static final String preferencesTimerStartsAt = "timerstartsat";
-    private static final String preferencesTimerExpiresIn = "timerexpiresin";
+    private static final String actionIDKey = "actionID";
+    private static final String sizeKey = "size";
+    private static final String capacityToSyncKey = "capacityToSync";
+    private static final String initialSizeKey = "initialSize";
+    private static final String timerStartsAtKey = "timerStartsAt";
+    private static final String timerExpiresInKey = "timerExpiresIn";
 
     public String actionID;
     private int initialSize;
@@ -49,9 +53,9 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
         dopamineAPI = DopamineAPI.getInstance(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
         preferences = getSharedPreferences(preferencesName(), 0);
-        initialSize = preferences.getInt(preferencesInitialSize, 0);
-        timerStartsAt = preferences.getLong(preferencesTimerStartsAt, 0);
-        timerExpiresIn = preferences.getLong(preferencesTimerExpiresIn, 0);
+        initialSize = preferences.getInt(initialSizeKey, 0);
+        timerStartsAt = preferences.getLong(timerStartsAtKey, 0);
+        timerExpiresIn = preferences.getLong(timerExpiresInKey, 0);
     }
 
     public boolean isTriggered() {
@@ -72,9 +76,9 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
         timerExpiresIn = expiresIn;
 
         preferences.edit()
-                .putInt(preferencesInitialSize, initialSize)
-                .putLong(preferencesTimerStartsAt, timerStartsAt)
-                .putLong(preferencesTimerExpiresIn, timerExpiresIn)
+                .putInt(initialSizeKey, initialSize)
+                .putLong(timerStartsAtKey, timerStartsAt)
+                .putLong(timerExpiresInKey, timerExpiresIn)
                 .apply();
     }
 
@@ -83,6 +87,21 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
         timerStartsAt = 0;
         timerExpiresIn = 0;
         preferences.edit().clear().apply();
+    }
+
+    public JSONObject jsonForTriggers() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put(actionIDKey, actionID);
+            json.put(sizeKey, SQLCartridgeDataHelper.countFor(sqlDB, actionID));
+            json.put(initialSizeKey, initialSize);
+            json.put(capacityToSyncKey, capacityToSync);
+            json.put(timerStartsAtKey, timerStartsAt);
+            json.put(timerExpiresInKey, timerExpiresIn);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 
     private boolean timerDidExpire() {

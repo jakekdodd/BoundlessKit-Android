@@ -13,6 +13,15 @@ public final class ReinforcementDecisionContract implements BaseColumns {
     public static final String COLUMNS_NAME_ACTIONID = "actionid";
     public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementdecision";
 
+    public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
+            + _ID + " INTEGER PRIMARY KEY,"
+            + COLUMNS_NAME_ACTIONID + " TEXT,"
+            + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT"
+            + " )";
+
+
+    public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
     public long id;
     public String actionID;
     public String reinforcementDecision;
@@ -28,13 +37,4 @@ public final class ReinforcementDecisionContract implements BaseColumns {
                 cursor.getLong(0), cursor.getString(1), cursor.getString(2)
         );
     }
-
-    public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-            + _ID + " INTEGER PRIMARY KEY,"
-            + COLUMNS_NAME_ACTIONID + " TEXT,"
-            + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT"
-            + " )";
-
-
-    public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 }

@@ -123,8 +123,9 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
                         Future<JSONObject> apiCall = null;
                         JSONObject apiResponse = null;
-
+                        if (trackShouldSync) { Telemetry.getSharedInstance(this).startRecordingSync("test", track, report, cartridges); }
                         if (trackShouldSync) {
+
                             apiCall = syncerExecutor.submit(track); // apiThreadPool.schedule(track, 1000, TimeUnit.MILLISECONDS);
                             if (DopamineKit.debugMode) {
                                 while (!apiCall.isDone()) {
@@ -142,7 +143,6 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 DopamineKit.debugLog("SyncCoordinator", "Track Syncer is done!");
                                 Thread.sleep(1000);
                             }
-
                         }
 
                         if (reportShouldSync) {
@@ -186,6 +186,19 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                             }
                         }
 
+                        if (trackShouldSync) {
+                            Telemetry.getSharedInstance(this).stopRecordingSync();
+                            apiCall = syncerExecutor.submit(Telemetry.getSharedInstance(this));
+                            if (DopamineKit.debugMode) {
+                                while (!apiCall.isDone()) {
+                                    DopamineKit.debugLog("SyncCoordinator", "Waiting for sync overview to be sent...");
+                                    Thread.sleep(200);
+                                }
+                            }
+
+                            apiResponse = apiCall.get();
+                            DopamineKit.debugLog("SyncCoordinator", "Telemetry api response:" + apiResponse == null ? "null" : apiResponse.toString());
+                        }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {

@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             rows = db.rawQuery("select * from " + TaskContract.TaskEntry.TABLE, null);
             rows.moveToFirst();
             for (int i = 0; i < rows.getCount(); i++) {
-                Log.v("DB row " + i, rows.getString(1));
+//                Log.v("DB row " + i, rows.getString(1));
                 rows.moveToNext();
             }
         } finally {

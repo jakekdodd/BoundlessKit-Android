@@ -5,8 +5,11 @@ import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.usedopamine.dopaminekit.DataStore.Contracts.DopeExceptionContract;
+import com.usedopamine.dopaminekit.DataStore.Contracts.ReportedActionContract;
+import com.usedopamine.dopaminekit.DataStore.Contracts.SyncOverviewContract;
+import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
 import com.usedopamine.dopaminekit.DopamineKit;
-import com.usedopamine.dopaminekit.DopeAction;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +18,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.TimeZone;
 
 import okhttp3.MediaType;
@@ -31,11 +35,24 @@ public class DopamineAPI {
 
     private static DopamineAPI sharedInstance = null;
 
-//    private final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/app/";
-    private final String DopamineAPIURL = "https://api.usedopamine.com/v4/app/";
-    private final String clientSDKVersion = "4.0.0";
+    private final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/";
+//    private final String DopamineAPIURL = "https://api.usedopamine.com/v4/";
+    private final String clientSDKVersion = "4.0.1";
     private final String clientOS = "Android";
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
+
+    private enum CallType {
+        TRACK("app/track"),
+        REPORT("app/report"),
+        REFRESH("app/refresh"),
+        SYNC("telemetry/sync");
+
+        private final String pathExtension;
+
+        private CallType(final String value) {
+            this.pathExtension = value;
+        }
+    }
 
     private JSONObject configurationData = new JSONObject();;
 
@@ -102,13 +119,13 @@ public class DopamineAPI {
      *
      * @param actions			The actions to send
      */
-    public @Nullable JSONObject track(DopeAction[] actions) {
+    public @Nullable JSONObject track(ArrayList<TrackedActionContract> actions) {
         try {
             JSONObject payload = new JSONObject(configurationData.toString());
 
             JSONArray trackedActions = new JSONArray();
-            for (int i = 0; i < actions.length; i++) {
-                trackedActions.put(actions[i].toJSON());
+            for (int i = 0; i < actions.size(); i++) {
+                trackedActions.put(actions.get(i).toJSON());
             }
             payload.put("actions", trackedActions);
 
@@ -124,13 +141,13 @@ public class DopamineAPI {
      *
      * @param actions			The actions to send
      */
-    public @Nullable JSONObject report(DopeAction[] actions) {
+    public @Nullable JSONObject report(ArrayList<ReportedActionContract> actions) {
         try {
             JSONObject payload = new JSONObject(configurationData.toString());
 
             JSONArray reportedActions = new JSONArray();
-            for (int i = 0; i < actions.length; i++) {
-                reportedActions.put(actions[i].toJSON());
+            for (int i = 0; i < actions.size(); i++) {
+                reportedActions.put(actions.get(i).toJSON());
             }
             payload.put("actions", reportedActions);
 
@@ -159,16 +176,30 @@ public class DopamineAPI {
         }
     }
 
+    /**
+     * This method sends Telemetry Sync {@link CallType}.
+     *
+     * @param syncOverviews			The sync overviews to send
+     */
+    public @Nullable JSONObject sync(ArrayList<SyncOverviewContract> syncOverviews, ArrayList<DopeExceptionContract> dopeExceptions) {
+        try {
+            JSONObject payload = new JSONObject(configurationData.toString());
 
-    private enum CallType {
-        TRACK("track"),
-        REPORT("report"),
-        REFRESH("refresh");
+            JSONArray syncOverviewsInJSON = new JSONArray();
+            JSONArray dopeExceptionsInJSON = new JSONArray();
+            for (int i = 0; i < syncOverviews.size(); i++) {
+                syncOverviewsInJSON.put(syncOverviews.get(i).toJSON());
+            }
+            for (int i = 0; i < dopeExceptions.size(); i++) {
+                dopeExceptionsInJSON.put(dopeExceptions.get(i).toJSON());
+            }
+            payload.put("syncOverviews", syncOverviewsInJSON);
+            payload.put("exceptions", dopeExceptionsInJSON );
 
-        private final String pathExtension;
-
-        private CallType(final String value) {
-            this.pathExtension = value;
+            return send(CallType.SYNC, payload);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
