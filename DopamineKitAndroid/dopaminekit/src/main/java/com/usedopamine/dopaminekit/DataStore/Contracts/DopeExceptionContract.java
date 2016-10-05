@@ -3,6 +3,8 @@ package com.usedopamine.dopaminekit.DataStore.Contracts;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
+import com.usedopamine.dopaminekit.Synchronization.Telemetry;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,6 +65,7 @@ public class DopeExceptionContract implements BaseColumns {
             json.put(COLUMNS_NAME_STACKTRACE, stackTrace);
         } catch (JSONException e) {
             e.printStackTrace();
+            Telemetry.recordException(e);
         }
 
         return json;

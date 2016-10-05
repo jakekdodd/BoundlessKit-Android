@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
 
 import com.usedopamine.dopaminekit.DataStore.Contracts.ReinforcementDecisionContract;
 import com.usedopamine.dopaminekit.DataStore.SQLCartridgeDataHelper;
@@ -22,9 +21,8 @@ import java.util.concurrent.Callable;
  * Created by cuddergambino on 9/6/16.
  */
 
-public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
+public class Cartridge extends ContextWrapper implements Callable<Integer> {
 
-    private DopamineAPI dopamineAPI;
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
     private final String preferencesName() { return "com.usedopamine.synchronization.cartridge." + actionID; }
@@ -35,7 +33,7 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
     private static final String timerStartsAtKey = "timerStartsAt";
     private static final String timerExpiresInKey = "timerExpiresIn";
 
-    public String actionID;
+    public final String actionID;
     private int initialSize;
     private long timerStartsAt;
     private long timerExpiresIn;
@@ -50,7 +48,6 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
         super(base);
         this.actionID = actionID;
 
-        dopamineAPI = DopamineAPI.getInstance(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
         preferences = getSharedPreferences(preferencesName(), 0);
         initialSize = preferences.getInt(initialSizeKey, 0);
@@ -66,12 +63,10 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
         return !timerDidExpire() && SQLCartridgeDataHelper.countFor(sqlDB, actionID) >= 1;
     }
 
-    public void updateTriggers(Integer size, @Nullable Long startTime, Long expiresIn) {
+    public void updateTriggers(Integer size, Long startTime, Long expiresIn) {
         initialSize = size;
         if (startTime != null) {
             timerStartsAt = startTime;
-        } else {
-            timerStartsAt = System.currentTimeMillis();
         }
         timerExpiresIn = expiresIn;
 
@@ -100,6 +95,7 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
             json.put(timerExpiresInKey, timerExpiresIn);
         } catch (JSONException e) {
             e.printStackTrace();
+            Telemetry.recordException(e);
         }
         return json;
     }
@@ -144,44 +140,42 @@ public class Cartridge extends ContextWrapper implements Callable<JSONObject> {
     }
 
     @Override
-    public JSONObject call() throws Exception {
+    public Integer call() throws Exception {
         if (syncInProgress) {
             DopamineKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionID);
-            return null;
+            return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
                     DopamineKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionID);
-                    return null;
+                    return 0;
                 } else {
-                    JSONObject apiResponse = null;
                     try {
-                        DopamineKit.debugLog("Cartridge", "Beginning cartridge sync for " + actionID + "!");
                         syncInProgress = true;
+                        DopamineKit.debugLog("Cartridge", "Beginning cartridge sync for " + actionID + "!");
 
-                        apiResponse = dopamineAPI.refresh(actionID);
-                        if (apiResponse == null) {
-                            DopamineKit.debugLog("Cartridge", "Something went wrong during the call...");
-                        } else {
-                            if (apiResponse.optInt("status", 404) == 200) {
+                        JSONObject apiResponse = DopamineAPI.refresh(this, actionID);
+                        if (apiResponse != null) {
+                            int statusCode = apiResponse.optInt("status", 404);
+                            if (statusCode == 200) {
                                 DopamineKit.debugLog("Cartridge", "Replacing cartridge for " + actionID + "...");
 
                                 JSONArray reinforcementCartridge = apiResponse.getJSONArray("reinforcementCartridge");
                                 long expiresIn = apiResponse.getLong("expiresIn");
 
                                 SQLCartridgeDataHelper.deleteAllFor(sqlDB, actionID);
-                                for(int i = 0; i < reinforcementCartridge.length(); i++) {
-                                    SQLCartridgeDataHelper.insert(sqlDB, new ReinforcementDecisionContract( 0, actionID, reinforcementCartridge.getString(i) ));
+                                for (int i = 0; i < reinforcementCartridge.length(); i++) {
+                                    SQLCartridgeDataHelper.insert(sqlDB, new ReinforcementDecisionContract(0, actionID, reinforcementCartridge.getString(i)));
                                 }
-
-                                updateTriggers(reinforcementCartridge.length(), null, expiresIn);
-                            } else {
-                                DopamineKit.debugLog("Cartridge", "Something went wrong while syncing cartridge for " + actionID + "... Leaving decisions actions in sqlite db");
+                                updateTriggers(reinforcementCartridge.length(), System.currentTimeMillis(), expiresIn);
                             }
+                            return statusCode;
+                        } else {
+                            DopamineKit.debugLog("ReportSyncer", "Something went wrong making the call...");
+                            return -1;
                         }
                     } finally {
                         syncInProgress = false;
-                        return apiResponse;
                     }
                 }
             }

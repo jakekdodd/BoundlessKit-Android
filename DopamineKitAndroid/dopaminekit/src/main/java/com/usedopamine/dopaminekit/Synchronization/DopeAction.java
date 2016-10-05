@@ -1,4 +1,4 @@
-package com.usedopamine.dopaminekit;
+package com.usedopamine.dopaminekit.Synchronization;
 
 import android.support.annotation.Nullable;
 

@@ -4,6 +4,9 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
+import com.usedopamine.dopaminekit.Synchronization.Telemetry;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,7 +45,7 @@ public class SyncOverviewContract implements BaseColumns {
     public String cause;
     public String track;
     public String report;
-    public @Nullable String cartridges;
+    public String cartridges;
 
     public SyncOverviewContract(long id, long utc, long timezoneOffset, long totalSyncTime, String cause, String track, String report, @Nullable String cartridges) {
         this.id = id;
@@ -69,11 +72,12 @@ public class SyncOverviewContract implements BaseColumns {
             json.put(COLUMNS_NAME_TIMEZONEOFFSET, timezoneOffset);
             json.put(COLUMNS_NAME_TOTALSYNCTIME, totalSyncTime);
             json.put(COLUMNS_NAME_CAUSE, cause);
-            json.put(COLUMNS_NAME_TRACK, track);
-            json.put(COLUMNS_NAME_REPORT, report);
-            json.put(COLUMNS_NAME_CARTRIDGES, cartridges);
+            json.put(COLUMNS_NAME_TRACK, new JSONObject(track));
+            json.put(COLUMNS_NAME_REPORT, new JSONObject(report));
+            json.put(COLUMNS_NAME_CARTRIDGES, new JSONArray(cartridges));
         } catch (JSONException e) {
             e.printStackTrace();
+            Telemetry.recordException(e);
         }
 
         return json;

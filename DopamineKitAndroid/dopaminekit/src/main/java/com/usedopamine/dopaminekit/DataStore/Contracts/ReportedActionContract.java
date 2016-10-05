@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
+import com.usedopamine.dopaminekit.Synchronization.Telemetry;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,6 +71,7 @@ public final class ReportedActionContract implements BaseColumns {
             );
         } catch (JSONException e) {
             e.printStackTrace();
+            Telemetry.recordException(e);
         }
 
         return json;

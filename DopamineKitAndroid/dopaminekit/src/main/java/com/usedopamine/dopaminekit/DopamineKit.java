@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.usedopamine.dopaminekit.Synchronization.DopeAction;
 import com.usedopamine.dopaminekit.Synchronization.SyncCoordinator;
 
 import org.json.JSONObject;

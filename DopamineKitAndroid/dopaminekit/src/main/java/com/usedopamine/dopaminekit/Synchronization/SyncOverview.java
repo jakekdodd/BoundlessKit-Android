@@ -2,6 +2,7 @@ package com.usedopamine.dopaminekit.Synchronization;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 
 import com.usedopamine.dopaminekit.DataStore.Contracts.SyncOverviewContract;
 import com.usedopamine.dopaminekit.DataStore.SQLSyncOverviewDataHelper;
@@ -9,6 +10,7 @@ import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -21,6 +23,12 @@ import java.util.TimeZone;
 class SyncOverview {
 
     private static SQLiteDatabase sqlDB;
+
+    private static final String syncResponseKey = "syncResponse";
+    private static final String utcKey = "utc";
+    private static final String roundTripTimeKey = "roundTripTime";
+    private static final String statusKey = "status";
+    private static final String errorKey = "error";
 
     long utc;
     long timezoneOffset;
@@ -38,6 +46,54 @@ class SyncOverview {
         this.track = trackTriggers;
         this.report = reportTriggers;
         this.cartridges = cartridgeTriggers;
+    }
+
+    public void setTrackSyncResponse(int status, @Nullable String error, long startedAt) {
+        JSONObject syncResponse = new JSONObject();
+        try {
+            syncResponse.put(utcKey, startedAt);
+            syncResponse.put(roundTripTimeKey, System.currentTimeMillis() - startedAt);
+            syncResponse.put(statusKey, status);
+            syncResponse.put(errorKey, error);
+
+            track.put(syncResponseKey, syncResponse);
+        } catch (JSONException e) {
+            Telemetry.recordException(e);
+            e.printStackTrace();
+        }
+    }
+
+    public void setReportSyncResponse(int status, @Nullable String error, long startedAt) {
+        JSONObject syncResponse = new JSONObject();
+        try {
+            syncResponse.put(utcKey, startedAt);
+            syncResponse.put(roundTripTimeKey, System.currentTimeMillis() - startedAt);
+            syncResponse.put(statusKey, status);
+            syncResponse.put(errorKey, error);
+
+            report.put(syncResponseKey, syncResponse);
+        } catch (JSONException e) {
+            Telemetry.recordException(e);
+            e.printStackTrace();
+        }
+    }
+
+    public void setCartridgeSyncResponse(String actionID, int status, @Nullable String error, long startedAt) {
+        JSONObject syncResponse = new JSONObject();
+        try {
+            syncResponse.put(utcKey, startedAt);
+            syncResponse.put(roundTripTimeKey, System.currentTimeMillis() - startedAt);
+            syncResponse.put(statusKey, status);
+            syncResponse.put(errorKey, error);
+
+            JSONObject cartridge = cartridges.get(actionID);
+            if (cartridge != null) {
+                cartridge.put(syncResponseKey, syncResponse);
+            }
+        } catch (JSONException e) {
+            Telemetry.recordException(e);
+            e.printStackTrace();
+        }
     }
 
     public void store(Context context) {

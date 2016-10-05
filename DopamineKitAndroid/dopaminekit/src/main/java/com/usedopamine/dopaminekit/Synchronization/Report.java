@@ -10,7 +10,6 @@ import com.usedopamine.dopaminekit.DataStore.Contracts.ReportedActionContract;
 import com.usedopamine.dopaminekit.DataStore.SQLReportedActionDataHelper;
 import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
-import com.usedopamine.dopaminekit.DopeAction;
 import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
 
 import org.json.JSONException;
@@ -23,11 +22,10 @@ import java.util.concurrent.Callable;
  * Created by cuddergambino on 9/4/16.
  */
 
-public class Report extends ContextWrapper implements Callable<JSONObject> {
+public class Report extends ContextWrapper implements Callable<Integer> {
 
     private static Report sharedInstance;
 
-    private DopamineAPI dopamineAPI;
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
     private final String preferencesName = "com.usedopamine.synchronization.report";
@@ -52,7 +50,6 @@ public class Report extends ContextWrapper implements Callable<JSONObject> {
 
     private Report(Context base) {
         super(base);
-        dopamineAPI = DopamineAPI.getInstance(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
         preferences = getSharedPreferences(preferencesName, 0);
         sizeToSync = preferences.getInt(sizeToSyncKey, 15);
@@ -71,8 +68,6 @@ public class Report extends ContextWrapper implements Callable<JSONObject> {
         }
         if (startTime != null) {
             timerStartsAt = startTime;
-        } else {
-            timerStartsAt = System.currentTimeMillis();
         }
         if (expiresIn != null) {
             timerExpiresIn = expiresIn;
@@ -132,46 +127,44 @@ public class Report extends ContextWrapper implements Callable<JSONObject> {
     }
 
     @Override
-    public @Nullable JSONObject call() throws Exception {
+    public Integer call() throws Exception {
         if (syncInProgress) {
             DopamineKit.debugLog("ReportSyncer", "Report sync already happening");
-            return null;
+            return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
                     DopamineKit.debugLog("ReportSyncer", "Report sync already happening");
-                    return null;
+                    return 0;
                 } else {
-                    JSONObject apiResponse = null;
                     try {
-                        DopamineKit.debugLog("ReportSyncer", "Beginning reporter sync!");
                         syncInProgress = true;
-
+                        DopamineKit.debugLog("ReportSyncer", "Beginning reporter sync!");
 
                         final ArrayList<ReportedActionContract> sqlActions = SQLReportedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
                             DopamineKit.debugLog("ReportSyncer", "No reported actions to be synced.");
-                            apiResponse = new JSONObject().put("status", 0);
+                            updateTriggers(null, System.currentTimeMillis(), null);
+                            return 0;
                         } else {
-                            apiResponse = dopamineAPI.report(sqlActions);
-                        }
-
-                        if (apiResponse == null) {
-                            DopamineKit.debugLog("ReportSyncer", "Something went wrong during the call...");
-                        } else if (apiResponse.optInt("status", 404) == 200) {
-                            DopamineKit.debugLog("ReportSyncer", "Deleting " + sqlActions.size() + " reported actions...");
-                            for (int i = 0; i < sqlActions.size(); i++) {
-                                remove(sqlActions.get(i));
+                            DopamineKit.debugLog("ReportSyncer", sqlActions.size() + " reported actions to be synced.");
+                            JSONObject apiResponse = DopamineAPI.report(this, sqlActions);
+                            if (apiResponse != null) {
+                                int statusCode = apiResponse.optInt("status", 404);
+                                if (statusCode == 200) {
+                                    for (int i = 0; i < sqlActions.size(); i++) {
+                                        remove(sqlActions.get(i));
+                                    }
+                                    updateTriggers(null, System.currentTimeMillis(), null);
+                                }
+                                return statusCode;
+                            } else {
+                                DopamineKit.debugLog("ReportSyncer", "Something went wrong making the call...");
+                                return -1;
                             }
-                            updateTriggers(null, null, null);
-                        } else {
-                            DopamineKit.debugLog("ReportSyncer", "Something went wrong while syncing... Leaving reported actions in sqlite db");
                         }
-
-                    } catch (JSONException e) {
                     } finally {
                         syncInProgress = false;
-                        return apiResponse;
                     }
                 }
             }
