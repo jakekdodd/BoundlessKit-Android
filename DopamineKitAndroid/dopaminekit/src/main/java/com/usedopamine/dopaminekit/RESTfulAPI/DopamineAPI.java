@@ -41,8 +41,7 @@ public class DopamineAPI extends ContextWrapper {
 
     private Telemetry telemetry;
 
-    private final String DopamineAPIURL = "https://staging-api.usedopamine.com/v4/";
-    //    private final String DopamineAPIURL = "https://api.usedopamine.com/v4/";
+    private final String DopamineAPIURL = "https://api.usedopamine.com/v4/";
     private final String clientSDKVersion = "4.0.1";
     private final String clientOS = "Android";
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;

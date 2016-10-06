@@ -73,7 +73,7 @@ public class DopamineKit extends ContextWrapper {
             private DopamineKit dopamineKit = getInstance(context);
             @Override
             protected String doInBackground(Void... voids) {
-                return dopamineKit.syncCoordinator.removeReinforcementDecisionFor(context, "other");
+                return dopamineKit.syncCoordinator.removeReinforcementDecisionFor(context, actionID);
             }
 
             @Override
