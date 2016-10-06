@@ -16,11 +16,11 @@ import java.util.ArrayList;
 
 public class SQLReportedActionDataHelper extends SQLDataHelper {
 
-    public static void createTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
         db.execSQL(ReportedActionContract.SQL_CREATE_TABLE);
     }
 
-    public static void dropTable(SQLiteDatabase db) {
+    static void dropTable(SQLiteDatabase db) {
         db.execSQL(ReportedActionContract.SQL_DROP_TABLE);
     }
 
@@ -54,8 +54,8 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
             result = cursor.moveToFirst() ? ReportedActionContract.fromCursor(cursor) : null;
         } finally {
             if (cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 
     public static ArrayList<ReportedActionContract> findAll(SQLiteDatabase db) {
@@ -72,8 +72,8 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
             }
         } finally {
             if (cursor != null) { cursor.close(); }
-            return actions;
         }
+        return actions;
     }
 
     public static int count(SQLiteDatabase db) {
@@ -84,7 +84,7 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
             if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
             if (cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 }

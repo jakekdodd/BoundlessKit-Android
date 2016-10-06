@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.usedopamine.dopaminekit.Synchronization.DopeAction;
 import com.usedopamine.dopaminekit.Synchronization.SyncCoordinator;
 
 import org.json.JSONObject;
@@ -40,7 +41,7 @@ public class DopamineKit extends ContextWrapper {
         syncCoordinator = SyncCoordinator.getInstance(this);
     }
 
-    public static DopamineKit getInstance(Context context) {
+    protected static DopamineKit getInstance(Context context) {
         if (sharedInstance == null) {
             sharedInstance = new DopamineKit(context);
         }
@@ -55,11 +56,8 @@ public class DopamineKit extends ContextWrapper {
      * @param metaData			Optional metadata for better analytics
      */
     public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
-        SyncCoordinator coordinator = getInstance(context).syncCoordinator;
-
         DopeAction action = new DopeAction(actionID, null, metaData);
-        coordinator.storeTrackedAction(action);
-        coordinator.sync();
+        getInstance(context).syncCoordinator.storeTrackedAction(action);
     }
 
     /**
@@ -72,20 +70,17 @@ public class DopamineKit extends ContextWrapper {
      */
     public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
         AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
-            SyncCoordinator coordinator = getInstance(context).syncCoordinator;;
-
+            private DopamineKit dopamineKit = getInstance(context);
             @Override
             protected String doInBackground(Void... voids) {
-                String reinforcementDecision = coordinator.removeReinforcementDecisionFor(context, actionID);
-                return reinforcementDecision;
+                return dopamineKit.syncCoordinator.removeReinforcementDecisionFor(context, actionID);
             }
 
             @Override
             protected void onPostExecute(String reinforcementDecision) {
                 callback.onReinforcement(reinforcementDecision);
                 DopeAction action = new DopeAction(actionID, reinforcementDecision, metaData);
-                coordinator.storeReportedAction(action);
-                coordinator.sync();
+                dopamineKit.syncCoordinator.storeReportedAction(action);
             }
 
         }.execute();

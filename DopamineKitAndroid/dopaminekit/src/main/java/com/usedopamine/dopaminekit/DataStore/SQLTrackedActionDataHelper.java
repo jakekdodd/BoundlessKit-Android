@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
 import com.usedopamine.dopaminekit.DataStore.Contracts.TrackedActionContract;
-import com.usedopamine.dopaminekit.DopamineKit;
 
 import java.util.ArrayList;
 
@@ -16,17 +15,17 @@ import java.util.ArrayList;
 
 public class SQLTrackedActionDataHelper extends SQLDataHelper {
 
-    public static void createTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
         db.execSQL(TrackedActionContract.SQL_CREATE_TABLE);
     }
 
-    public static void dropTable(SQLiteDatabase db) {
+    static void dropTable(SQLiteDatabase db) {
         db.execSQL(TrackedActionContract.SQL_DROP_TABLE);
     }
 
     public static long insert(SQLiteDatabase db, TrackedActionContract item) {
         ContentValues values = new ContentValues();
-        values.put(TrackedActionContract.COLUMNS_NAME_ACTION_ID, item.actionID);
+        values.put(TrackedActionContract.COLUMNS_NAME_ACTIONID, item.actionID);
         values.put(TrackedActionContract.COLUMNS_NAME_METADATA, item.metaData);
         values.put(TrackedActionContract.COLUMNS_NAME_UTC, item.utc);
         values.put(TrackedActionContract.COLUMNS_NAME_TIMEZONEOFFSET, item.timezoneOffset);
@@ -47,15 +46,15 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(TrackedActionContract.TABLE_NAME,
-                    new String[] {TrackedActionContract._ID, TrackedActionContract.COLUMNS_NAME_ACTION_ID, TrackedActionContract.COLUMNS_NAME_METADATA, TrackedActionContract.COLUMNS_NAME_UTC, TrackedActionContract.COLUMNS_NAME_TIMEZONEOFFSET},
+                    new String[] {TrackedActionContract._ID, TrackedActionContract.COLUMNS_NAME_ACTIONID, TrackedActionContract.COLUMNS_NAME_METADATA, TrackedActionContract.COLUMNS_NAME_UTC, TrackedActionContract.COLUMNS_NAME_TIMEZONEOFFSET},
                     TrackedActionContract._ID + "=?",
                     new String[] {String.valueOf(item.id) }, null, null, null, null
             );
             result = cursor.moveToFirst() ? TrackedActionContract.fromCursor(cursor) : null;
         } finally {
             if (cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 
     public static ArrayList<TrackedActionContract> findAll(SQLiteDatabase db) {
@@ -67,13 +66,13 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
                 do {
                     TrackedActionContract action = TrackedActionContract.fromCursor(cursor);
                     actions.add(action);
-                    DopamineKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
+//                    DopamineKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
-            return actions;
         } finally {
             if (cursor != null) { cursor.close(); }
         }
+        return actions;
     }
 
     public static int count(SQLiteDatabase db) {
@@ -84,7 +83,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
             if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
             if(cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 }

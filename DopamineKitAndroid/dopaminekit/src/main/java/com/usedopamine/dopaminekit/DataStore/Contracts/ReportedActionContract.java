@@ -4,6 +4,12 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
+import com.usedopamine.dopaminekit.Synchronization.Telemetry;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by cuddergambino on 8/4/16.
  */
@@ -11,11 +17,22 @@ import android.support.annotation.Nullable;
 public final class ReportedActionContract implements BaseColumns {
 
     public static final String TABLE_NAME = "Reported_Actions";
-    public static final String COLUMNS_NAME_ACTIONID = "actionid";
-    public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementdecision";
-    public static final String COLUMNS_NAME_METADATA = "metadata";
+    public static final String COLUMNS_NAME_ACTIONID = "actionID";
+    public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementDecision";
+    public static final String COLUMNS_NAME_METADATA = "metaData";
     public static final String COLUMNS_NAME_UTC = "utc";
-    public static final String COLUMNS_NAME_TIMEZONEOFFSET = "timezoneoffset";
+    public static final String COLUMNS_NAME_TIMEZONEOFFSET = "deviceTimezoneOffset";
+
+    public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
+            + _ID + " INTEGER PRIMARY KEY,"
+            + COLUMNS_NAME_ACTIONID + " TEXT,"
+            + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT,"
+            + COLUMNS_NAME_METADATA + " TEXT,"
+            + COLUMNS_NAME_UTC + " INTEGER,"
+            + COLUMNS_NAME_TIMEZONEOFFSET + " INTEGER"
+            + " )";
+
+    public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public long id;
     public String actionID;
@@ -39,15 +56,24 @@ public final class ReportedActionContract implements BaseColumns {
         );
     }
 
-    public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-            + _ID + " INTEGER PRIMARY KEY,"
-            + COLUMNS_NAME_ACTIONID + " TEXT,"
-            + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT,"
-            + COLUMNS_NAME_METADATA + " TEXT,"
-            + COLUMNS_NAME_UTC + " INTEGER,"
-            + COLUMNS_NAME_TIMEZONEOFFSET + " INTEGER"
-            + " )";
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
 
-    public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+        try {
+            json.put(COLUMNS_NAME_ACTIONID, actionID);
+            json.put(COLUMNS_NAME_REINFORCEMENTDECISION, reinforcementDecision);
+            if (metaData != null) {
+                json.put(COLUMNS_NAME_METADATA, new JSONObject(metaData));
+            }
+            json.put("time", new JSONArray()
+                    .put( new JSONObject().put("timeType", COLUMNS_NAME_UTC).put("value", utc) )
+                    .put( new JSONObject().put("timeType", COLUMNS_NAME_TIMEZONEOFFSET).put("value", timezoneOffset) )
+            );
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Telemetry.storeException(e);
+        }
 
+        return json;
+    }
 }

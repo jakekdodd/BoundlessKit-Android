@@ -1,18 +1,16 @@
 package com.usedopamine.dopaminekit.Synchronization;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.ContextWrapper;
+import android.content.SharedPreferences;
 
-import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
-import com.usedopamine.dopaminekit.DopeAction;
-import com.usedopamine.dopaminekit.RESTfulAPI.DopamineAPI;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -21,154 +19,227 @@ import java.util.concurrent.Future;
  * Created by cuddergambino on 8/4/16.
  */
 
-public class SyncCoordinator extends Syncer {
+public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
     private static SyncCoordinator sharedInstance;
 
+    private Telemetry telemetry;
+    private Track track;
+    private Report report;
+    private HashMap<String, Cartridge> cartridges;
+
+    // static reference to known actionIDs
+    private SharedPreferences preferences;
+    private final String preferencesName = "com.usedopamine.synchronization.synccoordinator";
+    private final String preferencesActionIDSet = "actionidset";
+
     private ExecutorService syncerExecutor = Executors.newSingleThreadExecutor();
-    private ExecutorService myExecutor = Executors.newFixedThreadPool(2);
-    private TrackSyncer trackSyncer;
-    private ReportSyncer reportSyncer;
+    private ExecutorService myExecutor = Executors.newFixedThreadPool(3);
 
+    private final Object syncLock = new Object();
     private Boolean syncInProgress = false;
-
-    private SyncCoordinator(Context base) {
-        super(base);
-        trackSyncer = TrackSyncer.getInstance(this);
-        reportSyncer = ReportSyncer.getInstance(this);
-
-        sqlDB = SQLiteDataStore.getInstance(this).getWritableDatabase();
-        dopamineAPI = DopamineAPI.getInstance(this);
-
-    }
 
     public static SyncCoordinator getInstance(Context context) {
         if (sharedInstance == null) {
             sharedInstance = new SyncCoordinator(context);
         }
-
         return sharedInstance;
     }
 
+    private SyncCoordinator(Context base) {
+        super(base);
+
+        telemetry = Telemetry.getSharedInstance(base);
+        track = Track.getSharedInstance(base);
+        report = Report.getSharedInstance(base);
+        cartridges = new HashMap<>();
+
+        preferences = getSharedPreferences(preferencesName, 0);
+        Set<String> actionIDs = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
+        DopamineKit.debugLog("SyncCoordinator", "Loading known actionsIDS...");
+        for (String actionID : actionIDs) {
+            cartridges.put(actionID, new Cartridge(base, actionID));
+            DopamineKit.debugLog("SyncCoordinator", "Loaded cartridge for actionID:" + actionID);
+        }
+        DopamineKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
+    }
+
+    /**
+     * Stores a tracked action to be synced.
+     *
+     * @param action A tracked action
+     */
     public void storeTrackedAction(DopeAction action) {
-        trackSyncer.store(action);
+        track.store(action);
+        performSync();
     }
 
+    /**
+     * Stores a reinforced action to be synced.
+     *
+     * @param action A reinforced action
+     */
     public void storeReportedAction(DopeAction action) {
-        reportSyncer.store(action);
+        report.store(action);
+        performSync();
     }
 
+    /**
+     * Finds the right cartridge for an action and returns a reinforcement decision.
+     *
+     * @param context  Context
+     * @param actionID The action to retrieve a reinforcement decision for
+     * @return A reinforcement decision
+     */
     public String removeReinforcementDecisionFor(Context context, String actionID) {
-        return CartridgeSyncer.getCartridgeSyncerFor(context, actionID).unload();
+        Cartridge cartridge = cartridges.get(actionID);
+        if (cartridge == null) {
+            cartridge = new Cartridge(this, actionID);
+            cartridges.put(actionID, cartridge);
+            preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
+            DopamineKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionID + " for the first time!");
+        }
+        return cartridge.remove();
     }
 
-    @Override
-    public boolean isTriggered() {
-        return true;
-    }
-
-    public void sync() {
+    /**
+     * Checks which syncers have been triggered, and syncs them in an order
+     * that allows time for the DopamineAPI to generate fresh cartridges.
+     */
+    public void performSync() {
         myExecutor.submit(this);
     }
 
     @Override
-    public JSONObject call() throws Exception {
+    public Void call() throws Exception {
 
         if (syncInProgress) {
             DopamineKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
-            return null;
         } else {
-            synchronized (syncInProgress) {
+            synchronized (syncLock) {
                 if (syncInProgress) {
                     DopamineKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
-                    return null;
                 } else {
                     try {
                         syncInProgress = true;
 
-                        //////
-                        // Begin syncing logic
-                        //////
+                        // since a cartridge might be triggered during the sleep time,
+                        // lazily check which are triggered
+                        Cartridge someCartridgeToSync = null;
+                        for (Cartridge cartridge : cartridges.values()) {
+                            if (cartridge.isTriggered()) {
+                                someCartridgeToSync = cartridge;
+                                break;
+                            }
+                        }
+                        boolean reportShouldSync = (someCartridgeToSync != null) || report.isTriggered();
+                        boolean trackShouldSync = reportShouldSync || track.isTriggered();
 
-                        HashMap<String, CartridgeSyncer> cartridgesToSync = CartridgeSyncer.whichShouldSync(SyncCoordinator.this);
-                        boolean reporterShouldSync = cartridgesToSync.size() > 0 || reportSyncer.isTriggered();
-                        boolean trackerShouldSync = reporterShouldSync || trackSyncer.isTriggered();
+                        if (trackShouldSync) {
+                            String syncCause;
+                            if (someCartridgeToSync != null) {
+                                syncCause = "Cartridge " + someCartridgeToSync.actionID + " needs to sync.";
+                            } else if (reportShouldSync) {
+                                syncCause = "Report needs to sync.";
+                            } else {
+                                syncCause = "Track needs to sync.";
+                            }
 
-                        Future<JSONObject> apiCall = null;
-                        JSONObject apiResponse = null;
+                            Future<Integer> apiCall;
+                            Integer apiResponse;
+                            telemetry.startRecordingSync(syncCause, track, report, cartridges);
 
-                        if (trackerShouldSync) {
-                            apiCall = syncerExecutor.submit(trackSyncer); // apiThreadPool.schedule(trackSyncer, 1000, TimeUnit.MILLISECONDS);
+                            // Track syncing
+                            //
+                            apiCall = syncerExecutor.submit(track);
                             if (DopamineKit.debugMode) {
                                 while (!apiCall.isDone()) {
                                     DopamineKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
                                     Thread.sleep(200);
                                 }
                             }
-
                             apiResponse = apiCall.get();
-                            Log.v("TrackSyncResponse", apiResponse == null ? "null" : apiResponse.toString());
-                            if (apiResponse == null || apiResponse.optInt("status", 404) == 404) {
-                                DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing tracker... Halting early.");
-                                return null;
-                            } else {
+                            if (apiResponse == 200) {
                                 DopamineKit.debugLog("SyncCoordinator", "Track Syncer is done!");
                                 Thread.sleep(1000);
+                            } else if (apiResponse < 0) {
+                                DopamineKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
+                                telemetry.stopRecordingSync(false);
+                                return null;
                             }
 
-                        }
-
-                        if (reporterShouldSync) {
-                            apiCall = syncerExecutor.submit(reportSyncer);
-                            if (DopamineKit.debugMode) {
-                                while (!apiCall.isDone()) {
-                                    DopamineKit.debugLog("SyncCoordinator", "Waiting for report syncer to be done...");
-                                    Thread.sleep(200);
+                            // Report syncing
+                            //
+                            if (reportShouldSync) {
+                                apiCall = syncerExecutor.submit(report);
+                                if (DopamineKit.debugMode) {
+                                    while (!apiCall.isDone()) {
+                                        DopamineKit.debugLog("SyncCoordinator", "Waiting for report syncer to be done...");
+                                        Thread.sleep(200);
+                                    }
+                                }
+                                apiResponse = apiCall.get();
+                                if (apiResponse == 200) {
+                                    DopamineKit.debugLog("SyncCoordinator", "Report Syncer is done!");
+                                    Thread.sleep(5000);
+                                } else if (apiResponse < 0) {
+                                    DopamineKit.debugLog("SyncCoordinator", "Report failed during sync cycle. Halting sync cycle early.");
+                                    telemetry.stopRecordingSync(false);
+                                    return null;
                                 }
                             }
 
-                            apiResponse = apiCall.get();
-                            DopamineKit.debugLog("ReportSyncResponse", apiResponse == null ? "null" : apiResponse.toString());
-                            if (apiResponse == null || apiResponse.optInt("status", 404) == 404) {
-                                DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing reporter... Halting early.");
-                                return null;
-                            } else {
-                                DopamineKit.debugLog("SyncCoordinator", "Report Syncer is done!");
-                                Thread.sleep(5000);
-                            }
-                        }
 
-                        for (Map.Entry<String, CartridgeSyncer> cartridge : cartridgesToSync.entrySet()) {
-                            apiCall = syncerExecutor.submit(cartridge.getValue());
-                            if (DopamineKit.debugMode) {
-                                while (!apiCall.isDone()) {
-                                    DopamineKit.debugLog("SyncCoordinator", "Waiting for " + cartridge.getKey() + " cartridge refresh to be done...");
-                                    Thread.sleep(200);
+                            // Cartridge syncing
+                            // lazily check
+                            for (Map.Entry<String, Cartridge> entry : cartridges.entrySet()) {
+                                if (entry.getValue().isTriggered()) {
+                                    apiCall = syncerExecutor.submit(entry.getValue());
+                                    if (DopamineKit.debugMode) {
+                                        while (!apiCall.isDone()) {
+                                            DopamineKit.debugLog("SyncCoordinator", "Waiting for " + entry.getKey() + " cartridge refresh to be done...");
+                                            Thread.sleep(200);
+                                        }
+                                    }
+                                    apiResponse = apiCall.get();
+                                    if (apiResponse == 200) {
+                                        DopamineKit.debugLog("SyncCoordinator", entry.getKey() + " cartridge syncer is done!");
+                                    } else if (apiResponse < 0) {
+                                        DopamineKit.debugLog("SyncCoordinator", "Cartridge " + entry.getKey() + " failed during sync cycle. Halting sync cycle early.");
+                                        telemetry.stopRecordingSync(false);
+                                        return null;
+                                    }
                                 }
                             }
 
-                            apiResponse = apiCall.get();
-                            DopamineKit.debugLog("CartridgeSyncResponse", apiResponse == null ? "null" : apiResponse.toString());
-                            if (apiResponse == null || apiResponse.optInt("status", 404) == 404) {
-                                DopamineKit.debugLog("SyncCoordinator", "Something went wrong while syncing cartridge... Halting early.");
-                                return null;
-                            } else {
-                                DopamineKit.debugLog("SyncCoordinator", cartridge.getKey() + " cartridge syncer is done!");
-                            }
+                            telemetry.stopRecordingSync(true);
                         }
-
                     } catch (InterruptedException e) {
                         e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
+                        Telemetry.storeException(e);
+                        telemetry.stopRecordingSync(false);
                     } finally {
                         syncInProgress = false;
-                        return null;
                     }
                 }
 
             }
 
         }
+        return null;
     }
+
+    /**
+     * Erase the syncer triggers
+     */
+    public void removeSyncers() {
+        track.removeTriggers();
+        report.removeTriggers();
+        for (Cartridge cartridge : cartridges.values()) {
+            cartridge.removeTriggers();
+        }
+        cartridges.clear();
+        preferences.edit().remove(preferencesActionIDSet).apply();
+    }
+
 }

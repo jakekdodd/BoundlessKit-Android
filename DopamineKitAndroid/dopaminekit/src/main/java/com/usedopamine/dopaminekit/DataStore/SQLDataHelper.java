@@ -5,5 +5,6 @@ package com.usedopamine.dopaminekit.DataStore;
  */
 
 abstract class SQLDataHelper {
-    protected SQLDataHelper() { }
+
+    SQLDataHelper() { }
 }
