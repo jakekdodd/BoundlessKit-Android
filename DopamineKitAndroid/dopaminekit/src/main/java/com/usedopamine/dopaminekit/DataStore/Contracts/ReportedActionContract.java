@@ -71,7 +71,7 @@ public final class ReportedActionContract implements BaseColumns {
             );
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
         }
 
         return json;

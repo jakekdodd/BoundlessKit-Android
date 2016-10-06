@@ -49,6 +49,30 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
     }
 
+    /**
+     * Creates a DopeException object and reports it to DopamineAPI for increased stability.
+     *
+     * @param exception The exception thrown by DopamineKit
+     */
+    public static void storeException(Throwable exception) {
+        if (sharedInstance != null) {
+            DopeException.store(sharedInstance, exception);
+        } else {
+            DopamineKit.debugLog("Telemetry", "Trying to store exception, but Telemetry was never initialized.");
+        }
+    }
+
+    /**
+     * Creates a SyncOverview object to record to sync performance and take a snapshot of the syncers.
+     * Use the functions setResponseForTrackSync(), setResponseForReportSync(), and setResponseForCartridgeSync()
+     * to record progress throughout the synchornization.
+     * Use stopRecordingSync() to finalize the recording.
+     *
+     * @param cause      The reason the synchronization process has been triggered
+     * @param track      The Track object to snapshot its triggers
+     * @param report     The Report object to snapshot its triggers
+     * @param cartridges The cartridges dictionary to snapshot its triggers
+     */
     public void startRecordingSync(String cause, Track track, Report report, HashMap<String, Cartridge> cartridges) {
         synchronized (syncOverviewLock) {
             HashMap<String, JSONObject> cartridgeJSONs = new HashMap<>();
@@ -59,6 +83,13 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
         }
     }
 
+    /**
+     * Sets the `syncResponse` for `Track` in the current sync overview.
+     *
+     * @param status    The HTTP status code received from the DopamineAPI
+     * @param error     An error if one was received
+     * @param startedAt The time the API call started at
+     */
     public void setResponseForTrackSync(int status, @Nullable String error, long startedAt) {
         synchronized (syncOverviewLock) {
             if (currentSyncOverview != null) {
@@ -67,6 +98,13 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
         }
     }
 
+    /**
+     * Sets the `syncResponse` for `Report` in the current sync overview.
+     *
+     * @param status    The HTTP status code received from the DopamineAPI
+     * @param error     An error if one was received
+     * @param startedAt The time the API call started at
+     */
     public void setResponseForReportSync(int status, @Nullable String error, long startedAt) {
         synchronized (syncOverviewLock) {
             if (currentSyncOverview != null) {
@@ -75,6 +113,14 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
         }
     }
 
+    /**
+     * Sets the `syncResponse` for the cartridge in the current sync overview.
+     *
+     * @param actionID  The name of the cartridge's action
+     * @param status    The HTTP status code received from the DopamineAPI
+     * @param error     An error if one was received
+     * @param startedAt The time the API call started at
+     */
     public void setResponseForCartridgeSync(String actionID, int status, @Nullable String error, long startedAt) {
         synchronized (syncOverviewLock) {
             if (currentSyncOverview != null) {
@@ -83,13 +129,18 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
         }
     }
 
+    /**
+     * Finalizes the current syncOverview object.
+     *
+     * @param successfulSync Whether a successful sync was made with the DopamineAPI
+     */
     public void stopRecordingSync(boolean successfulSync) {
         synchronized (syncOverviewLock) {
             if (currentSyncOverview != null) {
-                currentSyncOverview.totalSyncTime = System.currentTimeMillis() - currentSyncOverview.utc;
+                currentSyncOverview.finish();
                 currentSyncOverview.store(this);
                 currentSyncOverview = null;
-                DopamineKit.debugLog("Telemetry", "Saved a sync overview, totalling "+ SQLSyncOverviewDataHelper.count(sqlDB) +" overviews");
+                DopamineKit.debugLog("Telemetry", "Saved a sync overview, totalling " + SQLSyncOverviewDataHelper.count(sqlDB) + " overviews");
             } else {
                 DopamineKit.debugLog("Telemetry", "No recording has started. Did you remember to execute startRecordingSync() at the beginning of the sync performance?");
             }
@@ -97,14 +148,6 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
 
         if (successfulSync) {
             syncerExecutor.submit(this);
-        }
-    }
-
-    public static void recordException(Throwable e) {
-        if (sharedInstance != null) {
-            DopeException.store(sharedInstance, e);
-        } else {
-            DopamineKit.debugLog("Telemetry", "Trying to store exception, but Telemetry was never initialized.");
         }
     }
 

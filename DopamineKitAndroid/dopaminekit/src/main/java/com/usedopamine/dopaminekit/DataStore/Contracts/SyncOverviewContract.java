@@ -77,7 +77,7 @@ public class SyncOverviewContract implements BaseColumns {
             json.put(COLUMNS_NAME_CARTRIDGES, new JSONArray(cartridges));
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
         }
 
         return json;

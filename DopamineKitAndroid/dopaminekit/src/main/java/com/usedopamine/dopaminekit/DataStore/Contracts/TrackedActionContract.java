@@ -17,10 +17,10 @@ import org.json.JSONObject;
 public final class TrackedActionContract implements BaseColumns {
 
     public static final String TABLE_NAME = "Tracked_Actions";
-    public static final String COLUMNS_NAME_ACTIONID = "actionid";
-    public static final String COLUMNS_NAME_METADATA = "metadata";
+    public static final String COLUMNS_NAME_ACTIONID = "actionID";
+    public static final String COLUMNS_NAME_METADATA = "metaData";
     public static final String COLUMNS_NAME_UTC = "utc";
-    public static final String COLUMNS_NAME_TIMEZONEOFFSET = "deviceTimezoneoffset";
+    public static final String COLUMNS_NAME_TIMEZONEOFFSET = "deviceTimezoneOffset";
 
     public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
             + _ID + " INTEGER PRIMARY KEY,"
@@ -66,7 +66,7 @@ public final class TrackedActionContract implements BaseColumns {
             );
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
         }
 
         return json;

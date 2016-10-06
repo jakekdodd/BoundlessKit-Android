@@ -64,16 +64,33 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         DopamineKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
     }
 
+    /**
+     * Stores a tracked action to be synced.
+     *
+     * @param action A tracked action
+     */
     public void storeTrackedAction(DopeAction action) {
         track.store(action);
         performSync();
     }
 
+    /**
+     * Stores a reinforced action to be synced.
+     *
+     * @param action A reinforced action
+     */
     public void storeReportedAction(DopeAction action) {
         report.store(action);
         performSync();
     }
 
+    /**
+     * Finds the right cartridge for an action and returns a reinforcement decision.
+     *
+     * @param context  Context
+     * @param actionID The action to retrieve a reinforcement decision for
+     * @return A reinforcement decision
+     */
     public String removeReinforcementDecisionFor(Context context, String actionID) {
         Cartridge cartridge = cartridges.get(actionID);
         if (cartridge == null) {
@@ -85,6 +102,10 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         return cartridge.remove();
     }
 
+    /**
+     * Checks which syncers have been triggered, and syncs them in an order
+     * that allows time for the DopamineAPI to generate fresh cartridges.
+     */
     public void performSync() {
         myExecutor.submit(this);
     }
@@ -141,7 +162,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                             if (apiResponse == 200) {
                                 DopamineKit.debugLog("SyncCoordinator", "Track Syncer is done!");
                                 Thread.sleep(1000);
-                            } else if (apiResponse != 0) {
+                            } else if (apiResponse < 0) {
                                 DopamineKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
                                 telemetry.stopRecordingSync(false);
                                 return null;
@@ -161,7 +182,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 if (apiResponse == 200) {
                                     DopamineKit.debugLog("SyncCoordinator", "Report Syncer is done!");
                                     Thread.sleep(5000);
-                                } else if (apiResponse != 0) {
+                                } else if (apiResponse < 0) {
                                     DopamineKit.debugLog("SyncCoordinator", "Report failed during sync cycle. Halting sync cycle early.");
                                     telemetry.stopRecordingSync(false);
                                     return null;
@@ -183,7 +204,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                     apiResponse = apiCall.get();
                                     if (apiResponse == 200) {
                                         DopamineKit.debugLog("SyncCoordinator", entry.getKey() + " cartridge syncer is done!");
-                                    } else if (apiResponse != 0) {
+                                    } else if (apiResponse < 0) {
                                         DopamineKit.debugLog("SyncCoordinator", "Cartridge " + entry.getKey() + " failed during sync cycle. Halting sync cycle early.");
                                         telemetry.stopRecordingSync(false);
                                         return null;
@@ -194,8 +215,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                             telemetry.stopRecordingSync(true);
                         }
                     } catch (InterruptedException e) {
-                        Telemetry.recordException(e);
                         e.printStackTrace();
+                        Telemetry.storeException(e);
                         telemetry.stopRecordingSync(false);
                     } finally {
                         syncInProgress = false;
@@ -208,6 +229,9 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         return null;
     }
 
+    /**
+     * Erase the syncer triggers
+     */
     public void removeSyncers() {
         track.removeTriggers();
         report.removeTriggers();
@@ -217,4 +241,5 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         cartridges.clear();
         preferences.edit().remove(preferencesActionIDSet).apply();
     }
+
 }

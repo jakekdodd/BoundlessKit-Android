@@ -15,11 +15,11 @@ import java.util.ArrayList;
 
 public class SQLTrackedActionDataHelper extends SQLDataHelper {
 
-    public static void createTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
         db.execSQL(TrackedActionContract.SQL_CREATE_TABLE);
     }
 
-    public static void dropTable(SQLiteDatabase db) {
+    static void dropTable(SQLiteDatabase db) {
         db.execSQL(TrackedActionContract.SQL_DROP_TABLE);
     }
 
@@ -53,8 +53,8 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
             result = cursor.moveToFirst() ? TrackedActionContract.fromCursor(cursor) : null;
         } finally {
             if (cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 
     public static ArrayList<TrackedActionContract> findAll(SQLiteDatabase db) {
@@ -69,10 +69,10 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
 //                    DopamineKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
-            return actions;
         } finally {
             if (cursor != null) { cursor.close(); }
         }
+        return actions;
     }
 
     public static int count(SQLiteDatabase db) {
@@ -83,7 +83,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
             if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
             if(cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 }

@@ -15,11 +15,11 @@ import java.util.ArrayList;
 
 public class SQLSyncOverviewDataHelper extends SQLDataHelper{
 
-    public static void createTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
         db.execSQL(SyncOverviewContract.SQL_CREATE_TABLE);
     }
 
-    public static void dropTable(SQLiteDatabase db) {
+    static void dropTable(SQLiteDatabase db) {
         db.execSQL(SyncOverviewContract.SQL_DROP_TABLE);
     }
 
@@ -56,8 +56,8 @@ public class SQLSyncOverviewDataHelper extends SQLDataHelper{
             result = cursor.moveToFirst() ? SyncOverviewContract.fromCursor(cursor) : null;
         } finally {
             if (cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 
     public static ArrayList<SyncOverviewContract> findAll(SQLiteDatabase db) {
@@ -71,10 +71,10 @@ public class SQLSyncOverviewDataHelper extends SQLDataHelper{
                     syncOverviews.add(syncOverview);
                 } while (cursor.moveToNext());
             }
-            return syncOverviews;
         } finally {
             if (cursor != null) { cursor.close(); }
         }
+        return syncOverviews;
     }
 
     public static int count(SQLiteDatabase db) {
@@ -85,8 +85,8 @@ public class SQLSyncOverviewDataHelper extends SQLDataHelper{
             if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
             if(cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 
 }

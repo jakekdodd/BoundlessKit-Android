@@ -9,23 +9,25 @@ import com.usedopamine.dopaminekit.DataStore.SQLDopeExceptionDataHelper;
 import com.usedopamine.dopaminekit.DataStore.SQLiteDataStore;
 import com.usedopamine.dopaminekit.DopamineKit;
 
+import org.json.JSONException;
+
 import java.util.TimeZone;
 
 /**
  * Created by cuddergambino on 10/3/16.
  */
 
-public class DopeException {
+class DopeException {
 
     private static SQLiteDatabase sqlDB;
 
-    long utc;
-    long timezoneOffset;
-    String exceptionClassName;
-    String message;
-    String stackTrace;
+    private long utc;
+    private long timezoneOffset;
+    private String exceptionClassName;
+    private String message;
+    private String stackTrace;
 
-    public DopeException(Throwable exception) {
+    DopeException(Throwable exception) {
         this.utc = System.currentTimeMillis();
         this.timezoneOffset = TimeZone.getDefault().getOffset(this.utc);
         this.exceptionClassName = exception.getClass().getName();
@@ -33,20 +35,37 @@ public class DopeException {
         this.stackTrace = Log.getStackTraceString(exception);
     }
 
-    public static void store(Context context, Throwable exception) {
+    /**
+     * Convenient method for creating and storing an exception.
+     *
+     * @param context   Context
+     * @param exception An exception thrown within DopamineKit
+     */
+    static void store(Context context, Throwable exception) {
         DopeException dopeException = new DopeException(exception);
         dopeException.store(context);
     }
 
-    public void store(Context context) {
+    /**
+     * Stores the exception to be synced with the DopamineAPI at a later time.
+     *
+     * @param context Context
+     */
+    void store(Context context) {
         if (sqlDB == null) {
             sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
         }
-        long rowId = SQLDopeExceptionDataHelper.insert(sqlDB,
-                new DopeExceptionContract(0, utc, timezoneOffset, exceptionClassName, message, stackTrace)
-        );
+
+        DopeExceptionContract exceptionContract = new DopeExceptionContract(0, utc, timezoneOffset, exceptionClassName, message, stackTrace);
+        long rowId = SQLDopeExceptionDataHelper.insert(sqlDB, exceptionContract);
 
         DopamineKit.debugLog("SQL Dope Exceptions", "Inserted into row " + rowId);
+        try {
+            DopamineKit.debugLog("SQL Dope Exceptions", exceptionContract.toJSON().toString(2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Telemetry.storeException(e);
+        }
     }
 
 }

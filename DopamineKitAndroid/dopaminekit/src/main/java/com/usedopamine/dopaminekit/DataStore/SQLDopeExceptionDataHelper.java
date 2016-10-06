@@ -15,11 +15,11 @@ import java.util.ArrayList;
 
 public class SQLDopeExceptionDataHelper extends SQLDataHelper {
 
-    public static void createTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
         db.execSQL(DopeExceptionContract.SQL_CREATE_TABLE);
     }
 
-    public static void dropTable(SQLiteDatabase db) {
+    static void dropTable(SQLiteDatabase db) {
         db.execSQL(DopeExceptionContract.SQL_DROP_TABLE);
     }
 
@@ -54,8 +54,8 @@ public class SQLDopeExceptionDataHelper extends SQLDataHelper {
             result = cursor.moveToFirst() ? DopeExceptionContract.fromCursor(cursor) : null;
         } finally {
             if (cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 
     public static ArrayList<DopeExceptionContract> findAll(SQLiteDatabase db) {
@@ -68,10 +68,10 @@ public class SQLDopeExceptionDataHelper extends SQLDataHelper {
                     dopeExceptions.add( DopeExceptionContract.fromCursor(cursor) );
                 } while (cursor.moveToNext());
             }
-            return dopeExceptions;
         } finally {
             if (cursor != null) { cursor.close(); }
         }
+        return dopeExceptions;
     }
 
     public static int count(SQLiteDatabase db) {
@@ -82,7 +82,7 @@ public class SQLDopeExceptionDataHelper extends SQLDataHelper {
             if (cursor.moveToFirst()) { result = cursor.getInt(0); }
         } finally {
             if(cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 }

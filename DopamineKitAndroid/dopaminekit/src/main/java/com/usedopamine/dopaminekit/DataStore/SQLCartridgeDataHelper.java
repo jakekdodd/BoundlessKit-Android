@@ -16,11 +16,11 @@ import java.util.ArrayList;
 
 public class SQLCartridgeDataHelper extends SQLDataHelper {
 
-    public static void createTable(SQLiteDatabase db) {
+    static void createTable(SQLiteDatabase db) {
         db.execSQL(ReinforcementDecisionContract.SQL_CREATE_TABLE);
     }
 
-    public static void dropTable(SQLiteDatabase db) {
+    static void dropTable(SQLiteDatabase db) {
         db.execSQL(ReinforcementDecisionContract.SQL_DROP_TABLE);
     }
 
@@ -61,8 +61,8 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
             }
         } finally {
             if (cursor != null) { cursor.close(); }
-            return results;
         }
+        return results;
     }
 
     public static @Nullable ReinforcementDecisionContract findFirstFor(SQLiteDatabase db, String actionID) {
@@ -79,8 +79,8 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
             }
         } finally {
             if (cursor != null) { cursor.close(); }
-            return result;
         }
+        return result;
     }
 
     public static int count(SQLiteDatabase db) {

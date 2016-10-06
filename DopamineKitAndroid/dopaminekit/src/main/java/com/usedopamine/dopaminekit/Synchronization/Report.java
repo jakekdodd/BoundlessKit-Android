@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
  * Created by cuddergambino on 9/4/16.
  */
 
-public class Report extends ContextWrapper implements Callable<Integer> {
+class Report extends ContextWrapper implements Callable<Integer> {
 
     private static Report sharedInstance;
 
@@ -41,7 +41,7 @@ public class Report extends ContextWrapper implements Callable<Integer> {
     private final Object apiSyncLock = new Object();
     private Boolean syncInProgress = false;
 
-    public static Report getSharedInstance(Context base) {
+    static Report getSharedInstance(Context base) {
         if (sharedInstance == null) {
             sharedInstance = new Report(base);
         }
@@ -57,11 +57,21 @@ public class Report extends ContextWrapper implements Callable<Integer> {
         timerExpiresIn = preferences.getLong(timerExpiresInKey, 172800000);
     }
 
-    public boolean isTriggered() {
+    /**
+     * @return Whether a sync should be started
+     */
+    boolean isTriggered() {
         return timerDidExpire() || isSizeToSync();
     }
 
-    public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
+    /**
+     * Updates the sync triggers.
+     *
+     * @param size      The number of reported actions to trigger a sync
+     * @param startTime The start time for a sync timer
+     * @param expiresIn The timer length, in ms, for a sync timer
+     */
+    void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
 
         if (size != null) {
             sizeToSync = size;
@@ -80,14 +90,22 @@ public class Report extends ContextWrapper implements Callable<Integer> {
                 .apply();
     }
 
-    public void removeTriggers() {
+    /**
+     * Clears the saved report sync triggers.
+     */
+    void removeTriggers() {
         sizeToSync = 15;
-        timerStartsAt = 0;
+        timerStartsAt = System.currentTimeMillis();
         timerExpiresIn = 172800000;
         preferences.edit().clear().apply();
     }
 
-    public JSONObject jsonForTriggers() {
+    /**
+     * This function returns a snapshot of this instance as a JSONObject.
+     *
+     * @return A JSONObject containing the size and sync triggers
+     */
+    JSONObject jsonForTriggers() {
         JSONObject json = new JSONObject();
         try {
             json.put(sizeKey, SQLReportedActionDataHelper.count(sqlDB));
@@ -103,18 +121,23 @@ public class Report extends ContextWrapper implements Callable<Integer> {
     private boolean timerDidExpire() {
         long currentTime = System.currentTimeMillis();
         boolean isExpired = currentTime >= (timerStartsAt + timerExpiresIn);
-        DopamineKit.debugLog("Report", "Report timer expires in "+(timerStartsAt + timerExpiresIn - currentTime)+"ms so "+(isExpired ? "does" : "doesn't")+" need to sync...");
+        DopamineKit.debugLog("Report", "Report timer expires in " + (timerStartsAt + timerExpiresIn - currentTime) + "ms so " + (isExpired ? "does" : "doesn't") + " need to sync...");
         return isExpired;
     }
 
     private boolean isSizeToSync() {
         int count = SQLReportedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        DopamineKit.debugLog("Report", "Report has "+count+"/"+sizeToSync+" actions so "+(isSize ? "does" : "doesn't")+" need to sync...");
+        DopamineKit.debugLog("Report", "Report has " + count + "/" + sizeToSync + " actions so " + (isSize ? "does" : "doesn't") + " need to sync...");
         return isSize;
     }
 
-    public void store(DopeAction action) {
+    /**
+     * Stores a reported action to be synced over the DopamineAPI at a later time.
+     *
+     * @param action The action to be stored
+     */
+    void store(DopeAction action) {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
                 0, action.actionID, action.reinforcementDecision, metaData, action.utc, action.timezoneOffset
@@ -122,7 +145,7 @@ public class Report extends ContextWrapper implements Callable<Integer> {
         DopamineKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
     }
 
-    public void remove(ReportedActionContract action) {
+    void remove(ReportedActionContract action) {
         SQLReportedActionDataHelper.delete(sqlDB, action);
     }
 
@@ -150,7 +173,7 @@ public class Report extends ContextWrapper implements Callable<Integer> {
                             DopamineKit.debugLog("ReportSyncer", sqlActions.size() + " reported actions to be synced.");
                             JSONObject apiResponse = DopamineAPI.report(this, sqlActions);
                             if (apiResponse != null) {
-                                int statusCode = apiResponse.optInt("status", 404);
+                                int statusCode = apiResponse.optInt("status", -2);
                                 if (statusCode == 200) {
                                     for (int i = 0; i < sqlActions.size(); i++) {
                                         remove(sqlActions.get(i));
@@ -170,4 +193,5 @@ public class Report extends ContextWrapper implements Callable<Integer> {
             }
         }
     }
+
 }

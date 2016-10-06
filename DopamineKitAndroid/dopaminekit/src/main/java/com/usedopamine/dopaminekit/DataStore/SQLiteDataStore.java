@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class SQLiteDataStore extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 3;
-    public static final String DATABASE_NAME = "DopamineDB.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "DopamineDB.db";
 
     private static SQLiteDataStore sharedInstance = null;
 

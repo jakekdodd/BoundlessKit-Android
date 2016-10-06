@@ -10,8 +10,8 @@ import android.provider.BaseColumns;
 public final class ReinforcementDecisionContract implements BaseColumns {
 
     public static final String TABLE_NAME = "Reinforcement_Decisions";
-    public static final String COLUMNS_NAME_ACTIONID = "actionid";
-    public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementdecision";
+    public static final String COLUMNS_NAME_ACTIONID = "actionID";
+    public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementDecision";
 
     public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
             + _ID + " INTEGER PRIMARY KEY,"

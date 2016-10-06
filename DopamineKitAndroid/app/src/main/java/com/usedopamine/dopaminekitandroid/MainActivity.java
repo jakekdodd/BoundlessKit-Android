@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
         updateUI();
         DopamineKit.debugMode = true;
-        DopamineKit dk = DopamineKit.getInstance(this);
     }
 
     @Override

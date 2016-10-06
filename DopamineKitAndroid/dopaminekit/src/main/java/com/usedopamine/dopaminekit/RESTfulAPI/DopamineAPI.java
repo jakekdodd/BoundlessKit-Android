@@ -81,7 +81,7 @@ public class DopamineAPI extends ContextWrapper {
             configurationData.put("primaryIdentity", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
         }
 
         // Read credentials from ("res/raw/dopamineproperties.json")
@@ -104,9 +104,9 @@ public class DopamineAPI extends ContextWrapper {
             inputStream.close();
             byteArrayOutputStream.close();
         } catch (IOException e) {
-            DopamineKit.debugLog("DopamineAPI", "Error - cannot find dopamineproperties.json");
             e.printStackTrace();
-            Telemetry.recordException(e);
+            DopamineKit.debugLog("DopamineAPI", "Error - cannot find dopamineproperties.json");
+            Telemetry.storeException(e);
             return;
         }
 
@@ -120,9 +120,9 @@ public class DopamineAPI extends ContextWrapper {
                 configurationData.put("secret", credentials.getString("developmentSecret"));
             }
         } catch (JSONException e) {
-            DopamineKit.debugLog("DopamineAPI", "Error - dopamineproperties.json not configured properly");
             e.printStackTrace();
-            Telemetry.recordException(e);
+            DopamineKit.debugLog("DopamineAPI", "Error - dopamineproperties.json not configured properly");
+            Telemetry.storeException(e);
         }
     }
 
@@ -146,7 +146,7 @@ public class DopamineAPI extends ContextWrapper {
             return getInstance(context).send(CallType.TRACK, payload);
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
             return null;
         }
     }
@@ -171,7 +171,7 @@ public class DopamineAPI extends ContextWrapper {
             return getInstance(context).send(CallType.REPORT, payload);
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
             return null;
         }
     }
@@ -192,7 +192,7 @@ public class DopamineAPI extends ContextWrapper {
             return getInstance(context).send(CallType.REFRESH, payload);
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
             return null;
         }
     }
@@ -222,7 +222,7 @@ public class DopamineAPI extends ContextWrapper {
             return getInstance(context).send(CallType.SYNC, payload);
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
             return null;
         }
     }
@@ -253,8 +253,8 @@ public class DopamineAPI extends ContextWrapper {
             payloadString = payload.toString(2);
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
             Log.v("DopamineKit", "Parse Error - " + e.getMessage());
+            Telemetry.storeException(e);
             return null;
         }
 
@@ -302,7 +302,7 @@ public class DopamineAPI extends ContextWrapper {
         } catch (JSONException e) {
             e.printStackTrace();
             Log.v("DopamineKit", "Parse Error - " + e.getMessage());
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
             return null;
         }
 

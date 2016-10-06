@@ -32,7 +32,7 @@ public class DopamineKitInstrumentationTest {
     public void useAppContext() throws Exception {
         // Context of the app under test.
         appContext = InstrumentationRegistry.getTargetContext();
-        DopamineKit.getInstance(appContext).enableDebugMode(true);
+        DopamineKit.debugMode = true;
 
         assertEquals("com.usedopamine.dopaminekitandroid", appContext.getPackageName());
     }

@@ -65,7 +65,7 @@ public class DopeExceptionContract implements BaseColumns {
             json.put(COLUMNS_NAME_STACKTRACE, stackTrace);
         } catch (JSONException e) {
             e.printStackTrace();
-            Telemetry.recordException(e);
+            Telemetry.storeException(e);
         }
 
         return json;

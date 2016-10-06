@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
  * Created by cuddergambino on 9/4/16.
  */
 
-public class Track extends ContextWrapper implements Callable<Integer> {
+class Track extends ContextWrapper implements Callable<Integer> {
 
     private static Track sharedInstance;
 
@@ -42,7 +42,7 @@ public class Track extends ContextWrapper implements Callable<Integer> {
     private final Object apiSyncLock = new Object();
     private Boolean syncInProgress = false;
 
-    public static Track getSharedInstance(Context base) {
+    static Track getSharedInstance(Context base) {
         if (sharedInstance == null) {
             sharedInstance = new Track(base);
         }
@@ -55,14 +55,24 @@ public class Track extends ContextWrapper implements Callable<Integer> {
         preferences = getSharedPreferences(preferencesName, 0);
         sizeToSync = preferences.getInt(sizeToSyncKey, 15);
         timerStartsAt = preferences.getLong(timerStartsAtKey, System.currentTimeMillis());
-        timerExpiresIn = preferences.getLong(timerExpiresInKey, 48 * 3600000);
+        timerExpiresIn = preferences.getLong(timerExpiresInKey, 172800000);
     }
 
-    public boolean isTriggered() {
+    /**
+     * @return Whether a sync should be started
+     */
+    boolean isTriggered() {
         return timerDidExpire() || isSizeToSync();
     }
 
-    public void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
+    /**
+     * Updates the sync triggers.
+     *
+     * @param size      The number of tracked actions to trigger a sync
+     * @param startTime The start time for a sync timer
+     * @param expiresIn The timer length, in ms, for a sync timer
+     */
+    void updateTriggers(@Nullable Integer size, @Nullable Long startTime, @Nullable Long expiresIn) {
 
         if (size != null) {
             sizeToSync = size;
@@ -81,14 +91,22 @@ public class Track extends ContextWrapper implements Callable<Integer> {
                 .apply();
     }
 
-    public void removeTriggers() {
+    /**
+     * Clears the saved track sync triggers.
+     */
+    void removeTriggers() {
         sizeToSync = 15;
-        timerStartsAt = 0;
+        timerStartsAt = System.currentTimeMillis();
         timerExpiresIn = 172800000;
-        preferences.edit().clear().commit();
+        preferences.edit().clear().apply();
     }
 
-    public JSONObject jsonForTriggers() {
+    /**
+     * This function returns a snapshot of this instance as a JSONObject.
+     *
+     * @return A JSONObject containing the size and sync triggers
+     */
+    JSONObject jsonForTriggers() {
         JSONObject json = new JSONObject();
         try {
             json.put(sizeKey, SQLTrackedActionDataHelper.count(sqlDB));
@@ -104,27 +122,29 @@ public class Track extends ContextWrapper implements Callable<Integer> {
     private boolean timerDidExpire() {
         long currentTime = System.currentTimeMillis();
         boolean isExpired = currentTime >= (timerStartsAt + timerExpiresIn);
-        DopamineKit.debugLog("Track", "Track timer expires in "+(timerStartsAt + timerExpiresIn - currentTime)+"ms so "+(isExpired ? "does" : "doesn't")+" need to sync...");
+        DopamineKit.debugLog("Track", "Track timer expires in " + (timerStartsAt + timerExpiresIn - currentTime) + "ms so " + (isExpired ? "does" : "doesn't") + " need to sync...");
         return isExpired;
     }
 
     private boolean isSizeToSync() {
         int count = SQLTrackedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        DopamineKit.debugLog("Track", "Track has "+count+"/"+sizeToSync+" actions so "+(isSize ? "does" : "doesn't")+" need to sync...");
+        DopamineKit.debugLog("Track", "Track has " + count + "/" + sizeToSync + " actions so " + (isSize ? "does" : "doesn't") + " need to sync...");
         return isSize;
     }
 
-    public void store(DopeAction action) {
+    /**
+     * Stores a tracked action to be synced over the DopamineAPI at a later time.
+     *
+     * @param action The action to be stored
+     */
+    void store(DopeAction action) {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
                 0, action.actionID, metaData, action.utc, action.timezoneOffset
-        ));DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+        ));
+        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
 
-    }
-
-    public void remove(TrackedActionContract action) {
-        SQLTrackedActionDataHelper.delete(sqlDB, action);
     }
 
     @Override
@@ -151,10 +171,10 @@ public class Track extends ContextWrapper implements Callable<Integer> {
                             DopamineKit.debugLog("TrackSyncer", sqlActions.size() + " tracked actions to be synced.");
                             JSONObject apiResponse = DopamineAPI.track(this, sqlActions);
                             if (apiResponse != null) {
-                                int statusCode = apiResponse.optInt("status", 404);
+                                int statusCode = apiResponse.optInt("status", -2);
                                 if (statusCode == 200) {
                                     for (int i = 0; i < sqlActions.size(); i++) {
-                                        remove(sqlActions.get(i));
+                                        SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
                                     }
                                     updateTriggers(null, System.currentTimeMillis(), null);
                                 }
@@ -171,4 +191,5 @@ public class Track extends ContextWrapper implements Callable<Integer> {
             }
         }
     }
+
 }

@@ -30,15 +30,15 @@ class SyncOverview {
     private static final String statusKey = "status";
     private static final String errorKey = "error";
 
-    long utc;
-    long timezoneOffset;
-    long totalSyncTime;
-    String cause;
-    JSONObject track;
-    JSONObject report;
-    HashMap<String, JSONObject> cartridges;
+    private long utc;
+    private long timezoneOffset;
+    private long totalSyncTime;
+    private String cause;
+    private JSONObject track;
+    private JSONObject report;
+    private HashMap<String, JSONObject> cartridges;
 
-    public SyncOverview(String cause, JSONObject trackTriggers, JSONObject reportTriggers, HashMap<String, JSONObject> cartridgeTriggers) {
+    SyncOverview(String cause, JSONObject trackTriggers, JSONObject reportTriggers, HashMap<String, JSONObject> cartridgeTriggers) {
         this.utc = System.currentTimeMillis();
         this.timezoneOffset = TimeZone.getDefault().getOffset(this.utc);
         this.totalSyncTime = -1;
@@ -48,7 +48,14 @@ class SyncOverview {
         this.cartridges = cartridgeTriggers;
     }
 
-    public void setTrackSyncResponse(int status, @Nullable String error, long startedAt) {
+    /**
+     * Sets the `syncResponse` for `Track` in the current sync overview.
+     *
+     * @param status    The HTTP status code received from the DopamineAPI
+     * @param error     An error if one was received
+     * @param startedAt The time the API call started at
+     */
+    void setTrackSyncResponse(int status, @Nullable String error, long startedAt) {
         JSONObject syncResponse = new JSONObject();
         try {
             syncResponse.put(utcKey, startedAt);
@@ -58,12 +65,19 @@ class SyncOverview {
 
             track.put(syncResponseKey, syncResponse);
         } catch (JSONException e) {
-            Telemetry.recordException(e);
             e.printStackTrace();
+            Telemetry.storeException(e);
         }
     }
 
-    public void setReportSyncResponse(int status, @Nullable String error, long startedAt) {
+    /**
+     * Sets the `syncResponse` for `Report` in the current sync overview.
+     *
+     * @param status    The HTTP status code received from the DopamineAPI
+     * @param error     An error if one was received
+     * @param startedAt The time the API call started at
+     */
+    void setReportSyncResponse(int status, @Nullable String error, long startedAt) {
         JSONObject syncResponse = new JSONObject();
         try {
             syncResponse.put(utcKey, startedAt);
@@ -73,12 +87,20 @@ class SyncOverview {
 
             report.put(syncResponseKey, syncResponse);
         } catch (JSONException e) {
-            Telemetry.recordException(e);
             e.printStackTrace();
+            Telemetry.storeException(e);
         }
     }
 
-    public void setCartridgeSyncResponse(String actionID, int status, @Nullable String error, long startedAt) {
+    /**
+     * Sets the `syncResponse` for the cartridge in the current sync overview.
+     *
+     * @param actionID  The name of the cartridge's action
+     * @param status    The HTTP status code received from the DopamineAPI
+     * @param error     An error if one was received
+     * @param startedAt The time the API call started at
+     */
+    void setCartridgeSyncResponse(String actionID, int status, @Nullable String error, long startedAt) {
         JSONObject syncResponse = new JSONObject();
         try {
             syncResponse.put(utcKey, startedAt);
@@ -91,20 +113,38 @@ class SyncOverview {
                 cartridge.put(syncResponseKey, syncResponse);
             }
         } catch (JSONException e) {
-            Telemetry.recordException(e);
             e.printStackTrace();
+            Telemetry.storeException(e);
         }
     }
 
-    public void store(Context context) {
+    /**
+     * Use to finalize a sync overview. This will mark the total sync time.
+     */
+    void finish() {
+        totalSyncTime = System.currentTimeMillis() - utc;
+    }
+
+    /**
+     * Stores the sync overview in the sql database
+     *
+     * @param context Context
+     */
+    void store(Context context) {
         if (sqlDB == null) {
             sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
         }
-        long rowId = SQLSyncOverviewDataHelper.insert(sqlDB,
-                new SyncOverviewContract(0, utc, timezoneOffset, totalSyncTime, cause, track.toString(), report.toString(), new JSONArray(cartridges.values()).toString())
-        );
+
+        SyncOverviewContract overviewContract = new SyncOverviewContract(0, utc, timezoneOffset, totalSyncTime, cause, track.toString(), report.toString(), new JSONArray(cartridges.values()).toString());
+        long rowId = SQLSyncOverviewDataHelper.insert(sqlDB, overviewContract);
 
         DopamineKit.debugLog("SQL Sync Overviews", "Inserted into row " + rowId);
+        try {
+            DopamineKit.debugLog("SQL Sync Overviews", overviewContract.toJSON().toString(2));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Telemetry.storeException(e);
+        }
     }
 
 }

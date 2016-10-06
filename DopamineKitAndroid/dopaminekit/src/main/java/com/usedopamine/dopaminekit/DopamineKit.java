@@ -41,7 +41,7 @@ public class DopamineKit extends ContextWrapper {
         syncCoordinator = SyncCoordinator.getInstance(this);
     }
 
-    public static DopamineKit getInstance(Context context) {
+    protected static DopamineKit getInstance(Context context) {
         if (sharedInstance == null) {
             sharedInstance = new DopamineKit(context);
         }
@@ -73,7 +73,7 @@ public class DopamineKit extends ContextWrapper {
             private DopamineKit dopamineKit = getInstance(context);
             @Override
             protected String doInBackground(Void... voids) {
-                return dopamineKit.syncCoordinator.removeReinforcementDecisionFor(context, actionID);
+                return dopamineKit.syncCoordinator.removeReinforcementDecisionFor(context, "other");
             }
 
             @Override
@@ -86,7 +86,7 @@ public class DopamineKit extends ContextWrapper {
         }.execute();
     }
 
-    public static boolean debugMode = true;
+    public static boolean debugMode = false;
     /**
      * By default debug mode is set to `false`.
      * When debug mode is enabled, the data sent to and received from
