@@ -19,10 +19,6 @@ plugins {
 allprojects {
     repositories {
         jcenter()
-
-        flatDir {
-            dir 'dopaminekit'
-        }
     }
 }
 
