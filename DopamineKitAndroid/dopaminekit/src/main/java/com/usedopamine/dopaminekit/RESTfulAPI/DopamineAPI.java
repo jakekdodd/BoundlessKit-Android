@@ -39,6 +39,10 @@ public class DopamineAPI extends ContextWrapper {
 
     private static DopamineAPI myInstance = null;
 
+    // Resource ID for 'dopamineproperties.json'. Get this file at https://dashboard.usedopamine.com
+    // If no resource ID is set, the file is expected to be at ("res/raw/dopamineproperties.json")
+    public static int credentialResourceID = 0;
+
     private Telemetry telemetry;
 
     private final String DopamineAPIURL = "https://api.usedopamine.com/v4/";
@@ -83,9 +87,11 @@ public class DopamineAPI extends ContextWrapper {
             Telemetry.storeException(e);
         }
 
-        // Read credentials from ("res/raw/dopamineproperties.json")
-        int credentialRes = context.getResources().getIdentifier("dopamineproperties", "raw", context.getPackageName());
-        if (credentialRes != 0) {
+        if (credentialResourceID == 0) {
+            credentialResourceID = context.getResources().getIdentifier("dopamineproperties", "raw", context.getPackageName());
+        }
+
+        if (credentialResourceID != 0) {
             DopamineKit.debugLog("DopamineAPIRequest", "Found dopamineproperties.json");
         } else {
             DopamineKit.debugLog("DopamineAPIRequest", "Couldn't find dopamineproperties.json");
@@ -95,7 +101,7 @@ public class DopamineAPI extends ContextWrapper {
         String credentialsFile;
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            InputStream inputStream = context.getResources().openRawResource(credentialRes);
+            InputStream inputStream = context.getResources().openRawResource(credentialResourceID);
             for (int character = inputStream.read(); character != -1; character = inputStream.read()) {
                 byteArrayOutputStream.write(character);
             }
