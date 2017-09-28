@@ -48,7 +48,7 @@ public class DopamineAPI extends ContextWrapper {
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
 
     private JSONObject credentials = new JSONObject();
-    
+
     private enum CallType {
         TRACK("app/track"),
         REPORT("app/report"),
@@ -110,14 +110,14 @@ public class DopamineAPI extends ContextWrapper {
             Telemetry.storeException(e);
             return;
         }
-
         addCredentials(credentialsString);
     }
 
-    public void addCredential(String key, Object value) throws JSONException {
-        credentials.putOpt(key, value);
-    }
-
+    /**
+     * Extracts credentials from the given JSON. Credentials are obtained from dashboard.usedopamine.com
+     *
+     * @param credentialsJSONString     A JSON formatted string
+     */
     public void addCredentials(String credentialsJSONString) {
         try {
             JSONObject credentialsJSON = new JSONObject(credentialsJSONString);
@@ -126,7 +126,7 @@ public class DopamineAPI extends ContextWrapper {
             if (credentialsJSON.has("secret")) {
                 credentials.put("secret", credentialsJSON.getString("secret"));
             } else if (credentialsJSON.has("productionSecret") ^ credentialsJSON.has("developmentSecret")) {
-                credentials.put("secret", credentialsJSON.optString("productionSecret", credentialsJSON.getString("developmentSecret")));
+                credentials.put("secret", credentialsJSON.optString("productionSecret", credentialsJSON.optString("developmentSecret")));
             } else {
                 credentials.put("secret", credentialsJSON.getString(credentialsJSON.getBoolean("inProduction") ? "productionSecret" : "developmentSecret"));
             }
