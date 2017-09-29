@@ -122,14 +122,13 @@ class Track extends ContextWrapper implements Callable<Integer> {
     private boolean timerDidExpire() {
         long currentTime = System.currentTimeMillis();
         boolean isExpired = currentTime >= (timerStartsAt + timerExpiresIn);
-        DopamineKit.debugLog("Track", "Track timer expires in " + (timerStartsAt + timerExpiresIn - currentTime) + "ms so " + (isExpired ? "does" : "doesn't") + " need to sync...");
         return isExpired;
     }
 
     private boolean isSizeToSync() {
         int count = SQLTrackedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        DopamineKit.debugLog("Track", "Track has " + count + "/" + sizeToSync + " actions so " + (isSize ? "does" : "doesn't") + " need to sync...");
+        DopamineKit.debugLog("Track", "Track has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
         return isSize;
     }
 
@@ -143,7 +142,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
         long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
                 0, action.actionID, metaData, action.utc, action.timezoneOffset
         ));
-        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+//        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
 
     }
 

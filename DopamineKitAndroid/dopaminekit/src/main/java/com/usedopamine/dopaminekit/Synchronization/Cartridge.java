@@ -126,14 +126,13 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
     private boolean timerDidExpire() {
         long currentTime = System.currentTimeMillis();
         boolean isExpired = currentTime >= (timerStartsAt + timerExpiresIn);
-        DopamineKit.debugLog("Cartridge", "Cartridge for actionID:(" + actionID + ") timer expires in " + (timerStartsAt + timerExpiresIn - currentTime) + "ms so " + (isExpired ? "does" : "doesn't") + " need to sync...");
         return isExpired;
     }
 
     private boolean isCapacityToSync() {
         int count = SQLCartridgeDataHelper.countFor(sqlDB, actionID);
         boolean isCapacity = count < minimumCount || (double) count / initialSize <= capacityToSync;
-        DopamineKit.debugLog("Cartridge", "Cartridge for actionID:(" + actionID + ") has " + count + "/" + initialSize + " decisions remaining, or " + 100.0 * count / initialSize + "% capacity, so " + (isCapacity ? "does" : "doesn't") + " need to sync since a cartridge requires at least " + minimumCount + " decisions or " + (capacityToSync * 100) + "% capacity.");
+        DopamineKit.debugLog("Cartridge", "Cartridge for actionID:(" + actionID + ") has " + count + "/" + initialSize + " decisions remaining in its queue" + (isCapacity ? " so needs to sync..." : "."));
         return isCapacity;
     }
 
