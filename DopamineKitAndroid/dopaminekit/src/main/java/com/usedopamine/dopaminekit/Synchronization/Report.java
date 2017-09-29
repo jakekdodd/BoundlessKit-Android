@@ -121,14 +121,13 @@ class Report extends ContextWrapper implements Callable<Integer> {
     private boolean timerDidExpire() {
         long currentTime = System.currentTimeMillis();
         boolean isExpired = currentTime >= (timerStartsAt + timerExpiresIn);
-        DopamineKit.debugLog("Report", "Report timer expires in " + (timerStartsAt + timerExpiresIn - currentTime) + "ms so " + (isExpired ? "does" : "doesn't") + " need to sync...");
         return isExpired;
     }
 
     private boolean isSizeToSync() {
         int count = SQLReportedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        DopamineKit.debugLog("Report", "Report has " + count + "/" + sizeToSync + " actions so " + (isSize ? "does" : "doesn't") + " need to sync...");
+        DopamineKit.debugLog("Report", "Report has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
         return isSize;
     }
 
@@ -142,7 +141,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
         long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
                 0, action.actionID, action.reinforcementDecision, metaData, action.utc, action.timezoneOffset
         ));
-        DopamineKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
+//        DopamineKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
     }
 
     void remove(ReportedActionContract action) {

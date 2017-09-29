@@ -39,17 +39,15 @@ public class DopamineAPI extends ContextWrapper {
 
     private static DopamineAPI myInstance = null;
 
-    // Resource ID for 'dopamineproperties.json'. Get this file at https://dashboard.usedopamine.com
-    // If no resource ID is set, the file is expected to be at ("res/raw/dopamineproperties.json")
-    public static int credentialResourceID = 0;
-
     private Telemetry telemetry;
 
     private final String DopamineAPIURL = "https://api.usedopamine.com/v4/";
-    private final String clientSDKVersion = "4.0.2";
+
+    private final String clientSDKVersion = "4.0.4";
     private final String clientOS = "Android";
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
-    private JSONObject configurationData = new JSONObject();
+
+    private JSONObject credentials = new JSONObject();
 
     private enum CallType {
         TRACK("app/track"),
@@ -78,55 +76,63 @@ public class DopamineAPI extends ContextWrapper {
 
         // Basic configuration
         try {
-            configurationData.put("clientOS", clientOS);
-            configurationData.put("clientOSVersion", clientOSVersion);
-            configurationData.put("clientSDKVersion", clientSDKVersion);
-            configurationData.put("primaryIdentity", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
+            credentials.put("clientOS", clientOS);
+            credentials.put("clientOSVersion", clientOSVersion);
+            credentials.put("clientSDKVersion", clientSDKVersion);
+            credentials.put("primaryIdentity", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
         } catch (JSONException e) {
             e.printStackTrace();
             Telemetry.storeException(e);
         }
 
-        if (credentialResourceID == 0) {
-            credentialResourceID = context.getResources().getIdentifier("dopamineproperties", "raw", context.getPackageName());
-        }
-
+        // Read credentials from ("res/raw/dopamineproperties.json")
+        int credentialResourceID = context.getResources().getIdentifier("dopamineproperties", "raw", context.getPackageName());
         if (credentialResourceID != 0) {
             DopamineKit.debugLog("DopamineAPIRequest", "Found dopamineproperties.json");
         } else {
-            DopamineKit.debugLog("DopamineAPIRequest", "Couldn't find dopamineproperties.json");
+            DopamineKit.debugLog("DopamineAPIRequest", "Nonfatal Error - Could not find raw/dopamineproperties.json");
             return;
         }
 
-        String credentialsFile;
+        String credentialsString;
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             InputStream inputStream = context.getResources().openRawResource(credentialResourceID);
             for (int character = inputStream.read(); character != -1; character = inputStream.read()) {
                 byteArrayOutputStream.write(character);
             }
-            credentialsFile = byteArrayOutputStream.toString();
+            credentialsString = byteArrayOutputStream.toString();
             inputStream.close();
             byteArrayOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
-            DopamineKit.debugLog("DopamineAPI", "Error - cannot find dopamineproperties.json");
+            DopamineKit.debugLog("DopamineAPI", "Could not read read dopamineproperties.json");
             Telemetry.storeException(e);
             return;
         }
+        addCredentials(credentialsString);
+    }
 
+    /**
+     * Extracts credentials from the given JSON. Credentials are obtained from dashboard.usedopamine.com
+     *
+     * @param credentialsJSONString     A JSON formatted string
+     */
+    public void addCredentials(String credentialsJSONString) {
         try {
-            JSONObject credentials = new JSONObject(credentialsFile);
-            configurationData.put("appID", credentials.getString("appID"));
-            configurationData.put("versionID", credentials.getString("versionID"));
-            if (credentials.getBoolean("inProduction")) {
-                configurationData.put("secret", credentials.getString("productionSecret"));
+            JSONObject credentialsJSON = new JSONObject(credentialsJSONString);
+            credentials.put("appID", credentialsJSON.getString("appID"));
+            credentials.put("versionID", credentialsJSON.getString("versionID"));
+            if (credentialsJSON.has("secret")) {
+                credentials.put("secret", credentialsJSON.getString("secret"));
+            } else if (credentialsJSON.has("productionSecret") ^ credentialsJSON.has("developmentSecret")) {
+                credentials.put("secret", credentialsJSON.optString("productionSecret", credentialsJSON.optString("developmentSecret")));
             } else {
-                configurationData.put("secret", credentials.getString("developmentSecret"));
+                credentials.put("secret", credentialsJSON.getString(credentialsJSON.getBoolean("inProduction") ? "productionSecret" : "developmentSecret"));
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            DopamineKit.debugLog("DopamineAPI", "Error - dopamineproperties.json not configured properly");
+            DopamineKit.debugLog("DopamineAPI", "Error - credentials not configured properly");
             Telemetry.storeException(e);
         }
     }
@@ -249,10 +255,10 @@ public class DopamineAPI extends ContextWrapper {
             payload.put("utc", utc);
             payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
 
-            Iterator<String> configurationKeys = configurationData.keys();
-            while (configurationKeys.hasNext()) {
-                String key = configurationKeys.next();
-                payload.put(key, configurationData.get(key));
+            Iterator<String> credentialsKeys = credentials.keys();
+            while (credentialsKeys.hasNext()) {
+                String key = credentialsKeys.next();
+                payload.put(key, credentials.get(key));
             }
 
             payloadString = payload.toString(2);

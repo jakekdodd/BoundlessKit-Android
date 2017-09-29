@@ -59,7 +59,7 @@ class DopeException {
         DopeExceptionContract exceptionContract = new DopeExceptionContract(0, utc, timezoneOffset, exceptionClassName, message, stackTrace);
         long rowId = SQLDopeExceptionDataHelper.insert(sqlDB, exceptionContract);
 
-        DopamineKit.debugLog("SQL Dope Exceptions", "Inserted into row " + rowId);
+//        DopamineKit.debugLog("SQL Dope Exceptions", "Inserted into row " + rowId);
         try {
             DopamineKit.debugLog("SQL Dope Exceptions", exceptionContract.toJSON().toString(2));
         } catch (JSONException e) {
