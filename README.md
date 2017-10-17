@@ -17,7 +17,7 @@ Learn more at [http://usedopamine.com](http://usedopamine.com)
 
 A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloWorld repo](https://github.com/DopamineLabs/DopamineKit-Android-HelloWorld) to demonstrate how DopamineKit may be used in your code.
 
-## Set up DopamineKit
+## Integrating DopamineKit
 
   1. First, make sure you have received your API key and other credentials, which are in the configuration file __dopamineproperties.json__ automatically generated from the [Dopamine Developer Dashboard](http://dashboard.usedopamine.com).
 
@@ -50,12 +50,13 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
     
     *right: java import of DopamineKit*
   
-  5. Start using Dopamine! The main features of DopamineAPI are the `reinforce()` and `track()` functions. These should be added into the response functions of any _action_ to be reinforced or tracked.
+  5. Start using Dopamine! The main features of DopamineKit are the `DopamineKit.reinforce()` and `DopamineKit.track()` functions. These should be added into the response functions of any _action_ to be reinforced or tracked.
 
+## Using DopamineKit
 
 ###### DopamineKit.reinforce()
 
-  -  For example, when a user marks a task as completed in a "To Do List" app or finishes a workout in a "Fitness" app, you should call `reinforce()`.
+  -  For example, when a user marks a task as completed in a "To Do List" app or finishes a workout in a "Fitness" app, you should call `DopamineKit.reinforce()`.
 
   ```java
 	JSONObject metaData = new JSONObject().put("taskName", taskName);
@@ -91,8 +92,8 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
 
 ###### DopamineKit.track()
 
-  - The `track()` function is used to track other user actions. Using `track()` calls gives Dopamine a better understanding of user behavior, and will make your optimization and analytics better.
-  - Continuing the example, you could use the `track()` function to record when the user adds new tasks in your AddTaskActivity's `onCreate()` method for the  "To Do List" app, or  record `userCheckedDietHistory()` in the "Fitness" app.
+  - The `DopamineKit.track()` function is used to track other user actions. Using `track()` gives Dopamine a better understanding of user behavior, and will make your optimization and analytics better.
+  - Continuing the example, you could use `DopamineKit.track()` function to record when the user adds new tasks in your AddTaskActivity's `onCreate()` method for the  "To Do List" app, or  record `userCheckedDietHistory()` in the "Fitness" app.
 
 
   Let's track when a user adds a food item in a "Fitness" app. We will also add the calories for the item in the `metaData` field to gather richer information about user engagement in my app.
@@ -110,17 +111,17 @@ There are additional parameters for the `track()` and `reinforce()` functions th
 
 ========
 
-####Tracking Calls
+#### Tracking Calls
 
 A tracking call should be used to record and communicate to DopamineAPI that a particular action has been performed by the user, each of these calls will be used to improve the reinforcement model used for the particular user. The tracking call itself is asynchronous and non-blocking. Failed tracking calls will not return errors, but will be noted in the log.
 
-######General syntax
+###### General syntax
 
 ```
 Dopamine.track(context, actionID, metaData)
 ```
 
-######Parameters:
+###### Parameters:
 
  - `context: Context` - is used to get API credentials from `res/raw/dopamineproperties.json` of the context's package
 
@@ -130,17 +131,17 @@ Dopamine.track(context, actionID, metaData)
 
 ========
 
-####Reinforcement Calls
+#### Reinforcement Calls
 
 A reinforcement call should be used when the user has performed a particular action that you wish to become a 'habit', the reinforcement call will return the name of the feedback function that should be called to inform, delight or congratulate the user. The names of the reinforcement functions, the feedback functions and their respective pairings may be found and configured on the developer dashboard.
 
-######General syntax
+###### General syntax
 
 ```
 Dopamine.reinforce(context, actionID, metaData, callback)
 ```
 
-######Parameters:
+###### Parameters:
 
  - `context: Context` - is used to get API credentials from `res/raw/dopamineproperties.json` of the context's package
 
@@ -152,7 +153,7 @@ Dopamine.reinforce(context, actionID, metaData, callback)
 
 ========
 
-####dopamineproperties.json
+#### dopamineproperties.json
 
 `dopamineproperties.json ` _must_ be contained within the directory _`app/src/main/res/raw`_. This property list contains configuration variables needed to make valid calls to the API, all of which can be found on your developer dashboard:
 
