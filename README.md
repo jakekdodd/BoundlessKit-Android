@@ -155,7 +155,9 @@ Dopamine.reinforce(context, actionID, metaData, callback)
 
 #### dopamineproperties.json
 
-`dopamineproperties.json ` _must_ be contained within the directory _`app/src/main/res/raw`_. This property list contains configuration variables needed to make valid calls to the API, all of which can be found on your developer dashboard:
+`dopamineproperties.json ` is the credential file received from the [developer dashboard](http://dev.usedopamine.com) with your app's specific keys and configuration variables needed to make valid calls to the API.
+
+The JSON file must be in the _`raw/`_ directory, or the JSON string can be set using `DopamineAPI.setCredentials(context, JSONString)`.
 
  - `appID: String` - uniquely identifies your app, get this from your [developer dashboard](http://dev.usedopamine.com).
 
