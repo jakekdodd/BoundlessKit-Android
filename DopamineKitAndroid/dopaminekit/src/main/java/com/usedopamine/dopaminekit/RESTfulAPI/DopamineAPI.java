@@ -43,7 +43,7 @@ public class DopamineAPI extends ContextWrapper {
 
     private final String DopamineAPIURL = "https://api.usedopamine.com/v4/";
 
-    private final String clientSDKVersion = "4.0.4";
+    private final String clientSDKVersion = "4.0.5";
     private final String clientOS = "Android";
     private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
 
@@ -88,9 +88,9 @@ public class DopamineAPI extends ContextWrapper {
         // Read credentials from ("res/raw/dopamineproperties.json")
         int credentialResourceID = context.getResources().getIdentifier("dopamineproperties", "raw", context.getPackageName());
         if (credentialResourceID != 0) {
-            DopamineKit.debugLog("DopamineAPIRequest", "Found dopamineproperties.json");
+            DopamineKit.debugLog("DopamineAPI", "Found dopamineproperties.json");
         } else {
-            DopamineKit.debugLog("DopamineAPIRequest", "Nonfatal Error - Could not find raw/dopamineproperties.json");
+            DopamineKit.debugLog("DopamineAPI", "Nonfatal Error - Could not find raw/dopamineproperties.json");
             return;
         }
 
@@ -110,15 +110,20 @@ public class DopamineAPI extends ContextWrapper {
             Telemetry.storeException(e);
             return;
         }
-        addCredentials(credentialsString);
+        setCredentials(credentialsString);
     }
 
     /**
      * Extracts credentials from the given JSON. Credentials are obtained from dashboard.usedopamine.com
      *
+     * @param context                   Context
      * @param credentialsJSONString     A JSON formatted string
      */
-    public void addCredentials(String credentialsJSONString) {
+    public static void setCredentials(Context context, String credentialsJSONString) {
+        getInstance(context).setCredentials(credentialsJSONString);
+    }
+
+    public void setCredentials(String credentialsJSONString) {
         try {
             JSONObject credentialsJSON = new JSONObject(credentialsJSONString);
             credentials.put("appID", credentialsJSON.getString("appID"));
@@ -132,7 +137,7 @@ public class DopamineAPI extends ContextWrapper {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            DopamineKit.debugLog("DopamineAPI", "Error - credentials not configured properly");
+            DopamineKit.debugLog("DopamineAPI", "Error - invalid credentials json");
             Telemetry.storeException(e);
         }
     }

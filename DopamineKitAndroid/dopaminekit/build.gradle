@@ -10,10 +10,10 @@ ext {
 
     libraryDescription = 'A wrapper for the DopamineAPI on Android'
 
-    siteUrl = 'https://github.com/DopamineLabs/DopamineKit-Android-Source'
-    gitUrl = 'https://github.com/DopamineLabs/DopamineKit-Android-Source.git'
+    siteUrl = 'https://github.com/DopamineLabs/DopamineKit-Android'
+    gitUrl = 'https://github.com/DopamineLabs/DopamineKit-Android.git'
 
-    libraryVersion = '4.0.4'
+    libraryVersion = '4.0.5'
 
     developerId = 'cuddergambino'
     developerName = 'Akash Desai'
