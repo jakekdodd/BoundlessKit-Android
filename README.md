@@ -42,10 +42,13 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
   4. Move __dopamineproperties.json__ into the directory _`app/src/main/res/raw`_
 
   ![Workspace snapshot](readme/TestApp_with_DopamineKit_and_dopamineproperties.png)
-    *Shown from the left to right pane:
-    <br />left: `app/src/main/res/rawdopamineproperties.json`, 
-    <br />center: gradle import of DopamineKit 4.0.4, 
-    <br />right: java import of DopamineKit*
+    *Shown from the left to right pane:*
+    
+    *left: credentials file stored at `app/src/main/res/rawdopamineproperties.json`,*
+    
+    *center: gradle DopamineKit dependency*
+    
+    *right: java import of DopamineKit*
   
   5. Start using Dopamine! The main features of DopamineAPI are the `reinforce()` and `track()` functions. These should be added into the response functions of any _action_ to be reinforced or tracked.
 
