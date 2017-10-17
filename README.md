@@ -41,7 +41,7 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
 
   4. Move __dopamineproperties.json__ into the directory _`app/src/main/res/raw`_
 
-    ![Workspace snapshot](readme/TestApp_with_DopamineKit_and_dopamineproperties.png)
+  ![Workspace snapshot](readme/TestApp_with_DopamineKit_and_dopamineproperties.png)
 
     *Shown from the left to right pane:
     <br />left: `app/src/main/res/rawdopamineproperties.json`, 
