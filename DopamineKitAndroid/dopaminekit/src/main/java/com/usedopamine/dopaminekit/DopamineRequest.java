@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.util.Log;
 
 import okhttp3.MediaType;
@@ -48,7 +48,7 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
 
     final String DopamineAPIURL = "https://api.usedopamine.com/v3/app/";
     private JSONObject requestData = null;
-    private String value_clientSDKVersion = "3.0.0";
+    private String value_clientSDKVersion = "3.1.02";
     private String key_APPID = "appID";
     private String key_DEVSECRET = "developmentSecret";
     private String key_PROSECRET = "productionSecret";
@@ -173,7 +173,7 @@ class DopamineRequest extends AsyncTask<Void, Void, String> {
             requestData.put("versionID", jsonObject.getString("versionID"));
 
             // Primary Identity
-            requestData.put("primaryIdentity", Settings.Secure.ANDROID_ID);
+            requestData.put("primaryIdentity", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
 
         } catch (JSONException e){
             Log.v("DopamineKit", "Error - dopamineproperties.json not configured properly");
