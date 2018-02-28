@@ -71,7 +71,8 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
         try {
             cursor = db.query(ReinforcementDecisionContract.TABLE_NAME,
                     new String[] {ReinforcementDecisionContract._ID, ReinforcementDecisionContract.COLUMNS_NAME_ACTIONID, ReinforcementDecisionContract.COLUMNS_NAME_REINFORCEMENTDECISION},
-                    null, null, null, null,
+                    ReinforcementDecisionContract.COLUMNS_NAME_ACTIONID+"=?", new String[] {actionID},
+                    null, null,
                     ReinforcementDecisionContract._ID + " ASC", "1"
             );
             if (cursor.moveToFirst()) {
