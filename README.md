@@ -29,7 +29,7 @@ A simple "To Do List" Android App is included in the [DopamineKit-Android-HelloW
     }
     
   dependencies {
-        compile 'com.usedopamine:dopaminekit:4.0.4'
+        compile 'com.usedopamine:dopaminekit:4.0.5'
   	}
   ```
 
