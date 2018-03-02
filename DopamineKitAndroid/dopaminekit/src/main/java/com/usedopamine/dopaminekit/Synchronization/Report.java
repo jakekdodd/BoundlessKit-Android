@@ -173,7 +173,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
                             JSONObject apiResponse = DopamineAPI.report(this, sqlActions);
                             if (apiResponse != null) {
                                 int statusCode = apiResponse.optInt("status", -2);
-                                if (statusCode == 200) {
+                                if (statusCode == 200 || statusCode == 400) {
                                     for (int i = 0; i < sqlActions.size(); i++) {
                                         remove(sqlActions.get(i));
                                     }

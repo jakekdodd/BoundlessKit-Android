@@ -8,6 +8,7 @@ import com.usedopamine.dopaminekit.DopamineKit;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -182,6 +183,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 if (apiResponse == 200) {
                                     DopamineKit.debugLog("SyncCoordinator", "Report Syncer is done!");
                                     Thread.sleep(5000);
+                                } else if (apiResponse == 400) {
+                                    DopamineKit.debugLog("SyncCoordinator", "Report Syncer is being flushed since it has invalid actions.");
                                 } else if (apiResponse < 0) {
                                     DopamineKit.debugLog("SyncCoordinator", "Report failed during sync cycle. Halting sync cycle early.");
                                     telemetry.stopRecordingSync(false);
@@ -192,7 +195,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
                             // Cartridge syncing
                             // lazily check
-                            for (Map.Entry<String, Cartridge> entry : cartridges.entrySet()) {
+                            for(Iterator<Map.Entry<String, Cartridge>> it = cartridges.entrySet().iterator(); it.hasNext(); ) {
+                                Map.Entry<String, Cartridge> entry = it.next();
                                 if (entry.getValue().isTriggered()) {
                                     apiCall = syncerExecutor.submit(entry.getValue());
                                     if (DopamineKit.debugMode) {
@@ -204,6 +208,10 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                     apiResponse = apiCall.get();
                                     if (apiResponse == 200) {
                                         DopamineKit.debugLog("SyncCoordinator", entry.getKey() + " cartridge syncer is done!");
+                                    } else if (apiResponse == 400) {
+                                        it.remove();
+                                        preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
+                                        DopamineKit.debugLog("SyncCoordinator", entry.getKey() + " cartridge syncer erased.");
                                     } else if (apiResponse < 0) {
                                         DopamineKit.debugLog("SyncCoordinator", "Cartridge " + entry.getKey() + " failed during sync cycle. Halting sync cycle early.");
                                         telemetry.stopRecordingSync(false);

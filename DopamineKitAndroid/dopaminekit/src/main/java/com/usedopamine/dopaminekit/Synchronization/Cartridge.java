@@ -59,6 +59,11 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
         timerExpiresIn = preferences.getLong(timerExpiresInKey, 0);
     }
 
+    protected void flush() {
+        SQLCartridgeDataHelper.deleteAllFor(sqlDB, actionID);
+        preferences.edit().clear().apply();
+    }
+
     /**
      * @return Whether a sync should be started
      */
@@ -196,6 +201,9 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
                                     store(reinforcementCartridge.getString(i));
                                 }
                                 updateTriggers(reinforcementCartridge.length(), System.currentTimeMillis(), expiresIn);
+                            } else if (statusCode == 400) {
+                                DopamineKit.debugLog("Cartridge", "ActionID:" + actionID + " not supported for current version. Flushing cartridge...");
+                                flush();
                             }
                             return statusCode;
                         } else {
