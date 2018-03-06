@@ -10,58 +10,58 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import boundless.boundlesskit.Synchronization.DopeAction;
-import boundless.boundlesskit.Synchronization.SyncCoordinator;
-
 import org.json.JSONObject;
 
-public class DopamineKit extends ContextWrapper {
+import boundless.boundlesskit.Synchronization.BoundlessAction;
+import boundless.boundlesskit.Synchronization.SyncCoordinator;
+
+public class BoundlessKit extends ContextWrapper {
     /**
-     * The callback interface used by {@link DopamineKit} to inform its client
+     * The callback interface used by {@link BoundlessKit} to inform its client
      * about a successful reinforcement decision.
      */
     public interface ReinforcementCallback {
 
         /**
-         * Called when a response from the DopamineAPI has been received. The responses are configured
-         * on the Dopamine Dashboard (@link http://dashboard.usedopamine.com)
+         * Called when a response from the BoundlessAPI has been received. The responses are configured
+         * on the Boundless Developer Dashboard (@link https://dashboard.boundless.ai)
          *
-         * @param reinforcementDecision The reinforcement response string returned by DopamineAPI
+         * @param reinforcementDecision The reinforcement response string returned by BoundlessAPI
          */
         void onReinforcement(String reinforcementDecision);
     }
 
-    private static DopamineKit sharedInstance = null;
+    private static BoundlessKit sharedInstance = null;
 
     // Manages local storage and api calls
     private SyncCoordinator syncCoordinator;
 
-    private DopamineKit(Context base) {
+    private BoundlessKit(Context base) {
         super(base);
         syncCoordinator = SyncCoordinator.getInstance(this);
     }
 
-    protected static DopamineKit getInstance(Context context) {
+    protected static BoundlessKit getInstance(Context context) {
         if (sharedInstance == null) {
-            sharedInstance = new DopamineKit(context);
+            sharedInstance = new BoundlessKit(context);
         }
         return sharedInstance;
     }
 
     /**
-     * This method sends a tracking request for the specified actionID to the DopamineAPI.
+     * This method sends a tracking request for the specified actionID to the BoundlessAPI.
      *
      * @param context			Context to retrieve api key from file res/raw/boundlessproperties.json
      * @param actionID			The name of an action
      * @param metaData			Optional metadata for better analytics
      */
     public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
-        DopeAction action = new DopeAction(actionID, null, metaData);
+        BoundlessAction action = new BoundlessAction(actionID, null, metaData);
         getInstance(context).syncCoordinator.storeTrackedAction(action);
     }
 
     /**
-     * This method sends a reinforcement request for the specified actionID to the DopamineAPI.
+     * This method sends a reinforcement request for the specified actionID to the BoundlessAPI.
      *
      * @param context			Context to retrieve api key from file res/raw/boundlessproperties.json
      * @param actionID			The name of the registered action
@@ -70,17 +70,17 @@ public class DopamineKit extends ContextWrapper {
      */
     public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
         AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
-            private DopamineKit dopamineKit = getInstance(context);
+            private BoundlessKit boundlessKit = getInstance(context);
             @Override
             protected String doInBackground(Void... voids) {
-                return dopamineKit.syncCoordinator.removeReinforcementDecisionFor(context, actionID);
+                return boundlessKit.syncCoordinator.removeReinforcementDecisionFor(context, actionID);
             }
 
             @Override
             protected void onPostExecute(String reinforcementDecision) {
                 callback.onReinforcement(reinforcementDecision);
-                DopeAction action = new DopeAction(actionID, reinforcementDecision, metaData);
-                dopamineKit.syncCoordinator.storeReportedAction(action);
+                BoundlessAction action = new BoundlessAction(actionID, reinforcementDecision, metaData);
+                boundlessKit.syncCoordinator.storeReportedAction(action);
             }
 
         }.execute();
@@ -90,7 +90,7 @@ public class DopamineKit extends ContextWrapper {
     /**
      * By default debug mode is set to `false`.
      * When debug mode is enabled, the data sent to and received from
-     * the DopamineAPI will be logged.
+     * the BoundlessAPI will be logged.
      *
      * @param enable Used to set debug mode. `true` will enable, `false` will disable.
      */

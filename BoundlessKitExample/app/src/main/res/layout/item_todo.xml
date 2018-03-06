@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="55sp"
         android:visibility="gone"
-        android:background="@color/DopeGreen"
+        android:background="@color/MyGreen"
         >
         <ImageView
             android:layout_width="wrap_content"

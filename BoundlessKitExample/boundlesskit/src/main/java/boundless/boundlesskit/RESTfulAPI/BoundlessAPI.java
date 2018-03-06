@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TimeZone;
 
-import boundless.boundlesskit.DataStore.Contracts.DopeExceptionContract;
+import boundless.boundlesskit.BoundlessKit;
+import boundless.boundlesskit.DataStore.Contracts.BoundlessExceptionContract;
 import boundless.boundlesskit.DataStore.Contracts.ReportedActionContract;
 import boundless.boundlesskit.DataStore.Contracts.SyncOverviewContract;
 import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
-import boundless.boundlesskit.DopamineKit;
 import boundless.boundlesskit.Synchronization.Telemetry;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -34,13 +34,13 @@ import okhttp3.Response;
  * Created by cuddergambino on 7/17/16.
  */
 
-public class DopamineAPI extends ContextWrapper {
+public class BoundlessAPI extends ContextWrapper {
 
-    private static DopamineAPI myInstance = null;
+    private static BoundlessAPI myInstance = null;
 
     private Telemetry telemetry;
 
-    private final String DopamineAPIURL = "https://api.usedopamine.com/v4/";
+    private final String APIURL = "https://api.usedopamine.com/v4/";
 
     private final String clientSDKVersion = "4.0.5";
     private final String clientOS = "Android";
@@ -61,14 +61,14 @@ public class DopamineAPI extends ContextWrapper {
         }
     }
 
-    private static DopamineAPI getInstance(Context context) {
+    private static BoundlessAPI getInstance(Context context) {
         if (myInstance == null) {
-            myInstance = new DopamineAPI(context);
+            myInstance = new BoundlessAPI(context);
         }
         return myInstance;
     }
 
-    private DopamineAPI(Context context) {
+    private BoundlessAPI(Context context) {
         super(context);
 
         telemetry = Telemetry.getSharedInstance(context);
@@ -87,9 +87,9 @@ public class DopamineAPI extends ContextWrapper {
         // Read credentials from ("res/raw/boundlessproperties.json")
         int credentialResourceID = context.getResources().getIdentifier("boundlessproperties", "raw", context.getPackageName());
         if (credentialResourceID != 0) {
-            DopamineKit.debugLog("DopamineAPI", "Found boundlessproperties.json");
+            BoundlessKit.debugLog("BoundlessAPI", "Found boundlessproperties.json");
         } else {
-            DopamineKit.debugLog("DopamineAPI", "Nonfatal Error - Could not find raw/boundlessproperties.json");
+            BoundlessKit.debugLog("BoundlessAPI", "Nonfatal Error - Could not find raw/boundlessproperties.json");
             return;
         }
 
@@ -105,7 +105,7 @@ public class DopamineAPI extends ContextWrapper {
             byteArrayOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
-            DopamineKit.debugLog("DopamineAPI", "Could not read read boundlessproperties.json");
+            BoundlessKit.debugLog("BoundlessAPI", "Could not read read boundlessproperties.json");
             Telemetry.storeException(e);
             return;
         }
@@ -113,7 +113,7 @@ public class DopamineAPI extends ContextWrapper {
     }
 
     /**
-     * Extracts credentials from the given JSON. Credentials are obtained from dashboard.usedopamine.com
+     * Extracts credentials from the given JSON. Credentials are obtained from dashboard.boundless.ai
      *
      * @param context                   Context
      * @param credentialsJSONString     A JSON formatted string
@@ -136,7 +136,7 @@ public class DopamineAPI extends ContextWrapper {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            DopamineKit.debugLog("DopamineAPI", "Error - invalid credentials json");
+            BoundlessKit.debugLog("BoundlessAPI", "Error - invalid credentials json");
             Telemetry.storeException(e);
         }
     }
@@ -219,20 +219,20 @@ public class DopamineAPI extends ContextWrapper {
      */
     public static
     @Nullable
-    JSONObject sync(Context context, ArrayList<SyncOverviewContract> syncOverviews, ArrayList<DopeExceptionContract> dopeExceptions) {
+    JSONObject sync(Context context, ArrayList<SyncOverviewContract> syncOverviews, ArrayList<BoundlessExceptionContract> exceptions) {
         try {
             JSONObject payload = new JSONObject();
 
             JSONArray syncOverviewsInJSON = new JSONArray();
-            JSONArray dopeExceptionsInJSON = new JSONArray();
+            JSONArray exceptionsJSON = new JSONArray();
             for (int i = 0; i < syncOverviews.size(); i++) {
                 syncOverviewsInJSON.put(syncOverviews.get(i).toJSON());
             }
-            for (int i = 0; i < dopeExceptions.size(); i++) {
-                dopeExceptionsInJSON.put(dopeExceptions.get(i).toJSON());
+            for (int i = 0; i < exceptions.size(); i++) {
+                exceptionsJSON.put(exceptions.get(i).toJSON());
             }
             payload.put("syncOverviews", syncOverviewsInJSON);
-            payload.put("exceptions", dopeExceptionsInJSON);
+            payload.put("exceptions", exceptionsJSON);
 
             return getInstance(context).send(CallType.SYNC, payload);
         } catch (JSONException e) {
@@ -243,7 +243,7 @@ public class DopamineAPI extends ContextWrapper {
     }
 
     /**
-     * This method sends a request to the DopamineAPI.
+     * This method sends a request to the BoundlessAPI.
      *
      * @param type    The {@link CallType} to send
      * @param payload JSON data to send
@@ -252,7 +252,7 @@ public class DopamineAPI extends ContextWrapper {
     @Nullable
     JSONObject send(final CallType type, JSONObject payload) {
 
-        String url = DopamineAPIURL + type.pathExtension;
+        String url = APIURL + type.pathExtension;
         String payloadString;
         try {
             long utc = System.currentTimeMillis();
@@ -268,12 +268,12 @@ public class DopamineAPI extends ContextWrapper {
             payloadString = payload.toString(2);
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.v("DopamineKit", "Parse Error - " + e.getMessage());
+            Log.v("BoundlessAPI", "Parse Error - " + e.getMessage());
             Telemetry.storeException(e);
             return null;
         }
 
-        DopamineKit.debugLog("DopamineAPI", "Preparing api call to " + url + " with payload:\n" + payloadString);
+        BoundlessKit.debugLog("BoundlessAPI", "Preparing api call to " + url + " with payload:\n" + payloadString);
         OkHttpClient client = new OkHttpClient();
         RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), payloadString);
         Request request = new Request.Builder()
@@ -290,7 +290,7 @@ public class DopamineAPI extends ContextWrapper {
             response.close();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.v("DopamineKit", "Network Error - " + e.getMessage());
+            Log.v("BoundlessAPI", "Network Error - " + e.getMessage());
             switch (type) {
                 case TRACK:
                     telemetry.setResponseForTrackSync(-1, e.getMessage(), startTime);
@@ -316,7 +316,7 @@ public class DopamineAPI extends ContextWrapper {
             responseJSON = new JSONObject(responseString);
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.v("DopamineKit", "Parse Error - " + e.getMessage());
+            Log.v("BoundlessAPI", "Parse Error - " + e.getMessage());
             Telemetry.storeException(e);
             return null;
         }
@@ -342,7 +342,7 @@ public class DopamineAPI extends ContextWrapper {
                 break;
         }
 
-        DopamineKit.debugLog("DopamineAPIRequest", "Request resulted in - " + responseString);
+        BoundlessKit.debugLog("BoundlessAPI", "Request resulted in - " + responseString);
         return responseJSON;
     }
 

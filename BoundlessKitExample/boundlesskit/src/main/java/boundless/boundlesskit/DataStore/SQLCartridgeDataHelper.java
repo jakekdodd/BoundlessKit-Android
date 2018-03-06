@@ -5,8 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
+import boundless.boundlesskit.BoundlessKit;
 import boundless.boundlesskit.DataStore.Contracts.ReinforcementDecisionContract;
-import boundless.boundlesskit.DopamineKit;
 
 import java.util.ArrayList;
 
@@ -43,7 +43,7 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
         String selection = ReinforcementDecisionContract.COLUMNS_NAME_ACTIONID + " LIKE ? ";
         String[] args = {actionID};
         int numDeleted = db.delete(ReinforcementDecisionContract.TABLE_NAME, selection, args);
-        DopamineKit.debugLog("SQLCartridge", "Deleted "+numDeleted+" items from Table:"+ReinforcementDecisionContract.TABLE_NAME+" with actionID"+actionID+" successful.");
+        BoundlessKit.debugLog("SQLCartridge", "Deleted "+numDeleted+" items from Table:"+ReinforcementDecisionContract.TABLE_NAME+" with actionID"+actionID+" successful.");
         return numDeleted;
     }
 
@@ -56,7 +56,7 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
                 do {
                     ReinforcementDecisionContract reinforcementDecision = ReinforcementDecisionContract.fromCursor(cursor);
                     results.add(reinforcementDecision);
-                    DopamineKit.debugLog("SQLCartridgeDataHelper", "Found in table " + ReinforcementDecisionContract.TABLE_NAME + " row:" + reinforcementDecision.id + " reinforcementDecision:" + reinforcementDecision.reinforcementDecision);
+                    BoundlessKit.debugLog("SQLCartridgeDataHelper", "Found in table " + ReinforcementDecisionContract.TABLE_NAME + " row:" + reinforcementDecision.id + " reinforcementDecision:" + reinforcementDecision.reinforcementDecision);
                 } while (cursor.moveToNext());
             }
         } finally {

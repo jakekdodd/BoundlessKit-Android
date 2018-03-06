@@ -5,9 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
-
 import java.util.ArrayList;
+
+import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
 
 /**
  * Created by cuddergambino on 8/9/16.
@@ -66,7 +66,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
                 do {
                     TrackedActionContract action = TrackedActionContract.fromCursor(cursor);
                     actions.add(action);
-//                    DopamineKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
+//                    BoundlessKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
         } finally {

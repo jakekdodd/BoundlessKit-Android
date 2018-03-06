@@ -3,18 +3,18 @@ package boundless.boundlesskit.DataStore.Contracts;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
-import boundless.boundlesskit.Synchronization.Telemetry;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import boundless.boundlesskit.Synchronization.Telemetry;
 
 /**
  * Created by cuddergambino on 10/3/16.
  */
 
-public class DopeExceptionContract implements BaseColumns {
+public class BoundlessExceptionContract implements BaseColumns {
 
-    public static final String TABLE_NAME = "Dope_Exceptions";
+    public static final String TABLE_NAME = "Boundless_Exceptions";
     public static final String COLUMNS_NAME_UTC = "utc";
     public static final String COLUMNS_NAME_TIMEZONEOFFSET = "timezoneOffset";
     public static final String COLUMNS_NAME_EXCEPTIONCLASSNAME = "class";
@@ -39,7 +39,7 @@ public class DopeExceptionContract implements BaseColumns {
     public String message;
     public String stackTrace;
     
-    public DopeExceptionContract(long id, long utc, long timezoneOffset, String exceptionClassName, String message, String stackTrace) {
+    public BoundlessExceptionContract(long id, long utc, long timezoneOffset, String exceptionClassName, String message, String stackTrace) {
         this.id = id;
         this.utc = utc;
         this.timezoneOffset = timezoneOffset;
@@ -48,8 +48,8 @@ public class DopeExceptionContract implements BaseColumns {
         this.stackTrace = stackTrace;
     }
 
-    public static DopeExceptionContract fromCursor(Cursor cursor) {
-        return new DopeExceptionContract(
+    public static BoundlessExceptionContract fromCursor(Cursor cursor) {
+        return new BoundlessExceptionContract(
                 cursor.getLong(0), cursor.getLong(1), cursor.getLong(2), cursor.getString(3), cursor.getString(4), cursor.getString(5)
         );
     }

@@ -10,7 +10,7 @@ import java.util.TimeZone;
  * Created by cuddergambino on 7/17/16.
  */
 
-public class DopeAction {
+public class BoundlessAction {
 
     public String actionID;
     public @Nullable String reinforcementDecision = null;
@@ -18,7 +18,7 @@ public class DopeAction {
     public long utc;
     public long timezoneOffset;
 
-    public DopeAction(String actionID, @Nullable String reinforcementDecision, @Nullable JSONObject metaData, long utc, long timezoneOffset) {
+    public BoundlessAction(String actionID, @Nullable String reinforcementDecision, @Nullable JSONObject metaData, long utc, long timezoneOffset) {
         this.actionID = actionID;
         this.reinforcementDecision = reinforcementDecision;
         this.metaData = metaData;
@@ -26,7 +26,7 @@ public class DopeAction {
         this.timezoneOffset = timezoneOffset;
     }
 
-    public DopeAction(String actionID, @Nullable String reinforcementDecision, @Nullable  JSONObject metaData) {
+    public BoundlessAction(String actionID, @Nullable String reinforcementDecision, @Nullable  JSONObject metaData) {
         this(actionID, reinforcementDecision, metaData, System.currentTimeMillis(), TimeZone.getDefault().getOffset(System.currentTimeMillis()));
     }
 

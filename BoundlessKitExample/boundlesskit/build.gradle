@@ -17,7 +17,7 @@ ext {
 
     developerId = 'cuddergambino'
     developerName = 'Akash Desai'
-    developerEmail = 'kash@usedopamine.com'
+    developerEmail = 'kash@boundless.ai'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'

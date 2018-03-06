@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SQLiteDataStore extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 2;
-    private static final String DATABASE_NAME = "DopamineDB.db";
+    private static final String DATABASE_NAME = "boundless.boundlesskit.sqlite";
 
     private static SQLiteDataStore sharedInstance = null;
 
@@ -31,7 +31,7 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
         SQLReportedActionDataHelper.createTable(db);
         SQLCartridgeDataHelper.createTable(db);
         SQLSyncOverviewDataHelper.createTable(db);
-        SQLDopeExceptionDataHelper.createTable(db);
+        SQLBoundlessExceptionDataHelper.createTable(db);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -39,7 +39,7 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
         SQLReportedActionDataHelper.dropTable(db);
         SQLCartridgeDataHelper.dropTable(db);
         SQLSyncOverviewDataHelper.dropTable(db);
-        SQLDopeExceptionDataHelper.dropTable(db);
+        SQLBoundlessExceptionDataHelper.dropTable(db);
         onCreate(db);
     }
 

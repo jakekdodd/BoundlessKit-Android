@@ -6,17 +6,17 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.DataStore.Contracts.ReportedActionContract;
-import boundless.boundlesskit.DataStore.SQLReportedActionDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.DopamineKit;
-import boundless.boundlesskit.RESTfulAPI.DopamineAPI;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+
+import boundless.boundlesskit.BoundlessKit;
+import boundless.boundlesskit.DataStore.Contracts.ReportedActionContract;
+import boundless.boundlesskit.DataStore.SQLReportedActionDataHelper;
+import boundless.boundlesskit.DataStore.SQLiteDataStore;
+import boundless.boundlesskit.RESTfulAPI.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/4/16.
@@ -28,7 +28,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
 
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
-    private final String preferencesName = "com.usedopamine.synchronization.report";
+    private final String preferencesName = "boundless.boundlesskit.synchronization.report";
     private final String sizeKey = "size";
     private final String sizeToSyncKey = "sizeToSync";
     private final String timerStartsAtKey = "timerStartsAt";
@@ -127,21 +127,21 @@ class Report extends ContextWrapper implements Callable<Integer> {
     private boolean isSizeToSync() {
         int count = SQLReportedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        DopamineKit.debugLog("Report", "Report has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
+        BoundlessKit.debugLog("Report", "Report has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
         return isSize;
     }
 
     /**
-     * Stores a reported action to be synced over the DopamineAPI at a later time.
+     * Stores a reported action to be synced over the BoundlessAPI at a later time.
      *
      * @param action The action to be stored
      */
-    void store(DopeAction action) {
+    void store(BoundlessAction action) {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
                 0, action.actionID, action.reinforcementDecision, metaData, action.utc, action.timezoneOffset
         ));
-//        DopamineKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
+//        BoundlessKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
     }
 
     void remove(ReportedActionContract action) {
@@ -151,26 +151,26 @@ class Report extends ContextWrapper implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            DopamineKit.debugLog("ReportSyncer", "Report sync already happening");
+            BoundlessKit.debugLog("ReportSyncer", "Report sync already happening");
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    DopamineKit.debugLog("ReportSyncer", "Report sync already happening");
+                    BoundlessKit.debugLog("ReportSyncer", "Report sync already happening");
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        DopamineKit.debugLog("ReportSyncer", "Beginning reporter sync!");
+                        BoundlessKit.debugLog("ReportSyncer", "Beginning reporter sync!");
 
                         final ArrayList<ReportedActionContract> sqlActions = SQLReportedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
-                            DopamineKit.debugLog("ReportSyncer", "No reported actions to be synced.");
+                            BoundlessKit.debugLog("ReportSyncer", "No reported actions to be synced.");
                             updateTriggers(null, System.currentTimeMillis(), null);
                             return 0;
                         } else {
-                            DopamineKit.debugLog("ReportSyncer", sqlActions.size() + " reported actions to be synced.");
-                            JSONObject apiResponse = DopamineAPI.report(this, sqlActions);
+                            BoundlessKit.debugLog("ReportSyncer", sqlActions.size() + " reported actions to be synced.");
+                            JSONObject apiResponse = BoundlessAPI.report(this, sqlActions);
                             if (apiResponse != null) {
                                 int statusCode = apiResponse.optInt("status", -2);
                                 if (statusCode == 200) {
@@ -181,7 +181,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
                                 }
                                 return statusCode;
                             } else {
-                                DopamineKit.debugLog("ReportSyncer", "Something went wrong making the call...");
+                                BoundlessKit.debugLog("ReportSyncer", "Something went wrong making the call...");
                                 return -1;
                             }
                         }

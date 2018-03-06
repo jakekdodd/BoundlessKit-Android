@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import boundless.boundlesskit.DataStore.Contracts.SyncOverviewContract;
 import boundless.boundlesskit.DataStore.SQLSyncOverviewDataHelper;
 import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.DopamineKit;
+import boundless.boundlesskit.BoundlessKit;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +51,7 @@ class SyncOverview {
     /**
      * Sets the `syncResponse` for `Track` in the current sync overview.
      *
-     * @param status    The HTTP status code received from the DopamineAPI
+     * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
@@ -73,7 +73,7 @@ class SyncOverview {
     /**
      * Sets the `syncResponse` for `Report` in the current sync overview.
      *
-     * @param status    The HTTP status code received from the DopamineAPI
+     * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
@@ -96,7 +96,7 @@ class SyncOverview {
      * Sets the `syncResponse` for the cartridge in the current sync overview.
      *
      * @param actionID  The name of the cartridge's action
-     * @param status    The HTTP status code received from the DopamineAPI
+     * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
@@ -138,9 +138,9 @@ class SyncOverview {
         SyncOverviewContract overviewContract = new SyncOverviewContract(0, utc, timezoneOffset, totalSyncTime, cause, track.toString(), report.toString(), new JSONArray(cartridges.values()).toString());
         long rowId = SQLSyncOverviewDataHelper.insert(sqlDB, overviewContract);
 
-        DopamineKit.debugLog("SQL Sync Overviews", "Inserted into row " + rowId);
+        BoundlessKit.debugLog("SQL Sync Overviews", "Inserted into row " + rowId);
         try {
-            DopamineKit.debugLog("SQL Sync Overviews", overviewContract.toJSON().toString(2));
+            BoundlessKit.debugLog("SQL Sync Overviews", overviewContract.toJSON().toString(2));
         } catch (JSONException e) {
             e.printStackTrace();
             Telemetry.storeException(e);

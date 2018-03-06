@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 
-import boundless.boundlesskit.DopamineKit;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,6 +12,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import boundless.boundlesskit.BoundlessKit;
 
 /**
  * Created by cuddergambino on 8/4/16.
@@ -30,7 +30,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
     // static reference to known actionIDs
     private SharedPreferences preferences;
-    private final String preferencesName = "com.usedopamine.synchronization.synccoordinator";
+    private final String preferencesName = "boundless.boundlesskit.synchronization.synccoordinator";
     private final String preferencesActionIDSet = "actionidset";
 
     private ExecutorService syncerExecutor = Executors.newSingleThreadExecutor();
@@ -56,12 +56,12 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
         preferences = getSharedPreferences(preferencesName, 0);
         Set<String> actionIDs = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
-        DopamineKit.debugLog("SyncCoordinator", "Loading known actionsIDS...");
+        BoundlessKit.debugLog("SyncCoordinator", "Loading known actionsIDS...");
         for (String actionID : actionIDs) {
             cartridges.put(actionID, new Cartridge(base, actionID));
-            DopamineKit.debugLog("SyncCoordinator", "Loaded cartridge for actionID:" + actionID);
+            BoundlessKit.debugLog("SyncCoordinator", "Loaded cartridge for actionID:" + actionID);
         }
-        DopamineKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
+        BoundlessKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
     }
 
     /**
@@ -69,7 +69,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      *
      * @param action A tracked action
      */
-    public void storeTrackedAction(DopeAction action) {
+    public void storeTrackedAction(BoundlessAction action) {
         track.store(action);
         performSync();
     }
@@ -79,7 +79,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      *
      * @param action A reinforced action
      */
-    public void storeReportedAction(DopeAction action) {
+    public void storeReportedAction(BoundlessAction action) {
         report.store(action);
         performSync();
     }
@@ -97,14 +97,14 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
             cartridge = new Cartridge(this, actionID);
             cartridges.put(actionID, cartridge);
             preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
-            DopamineKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionID + " for the first time!");
+            BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionID + " for the first time!");
         }
         return cartridge.remove();
     }
 
     /**
      * Checks which syncers have been triggered, and syncs them in an order
-     * that allows time for the DopamineAPI to generate fresh cartridges.
+     * that allows time for the BoundlessAPI to generate fresh cartridges.
      */
     public void performSync() {
         myExecutor.submit(this);
@@ -114,11 +114,11 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     public Void call() throws Exception {
 
         if (syncInProgress) {
-            DopamineKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
+            BoundlessKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
         } else {
             synchronized (syncLock) {
                 if (syncInProgress) {
-                    DopamineKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
+                    BoundlessKit.debugLog("SyncCoordinator", "Coordinated sync process already happening");
                 } else {
                     try {
                         syncInProgress = true;
@@ -152,18 +152,18 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                             // Track syncing
                             //
                             apiCall = syncerExecutor.submit(track);
-                            if (DopamineKit.debugMode) {
+                            if (BoundlessKit.debugMode) {
                                 while (!apiCall.isDone()) {
-                                    DopamineKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
+                                    BoundlessKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
                                     Thread.sleep(200);
                                 }
                             }
                             apiResponse = apiCall.get();
                             if (apiResponse == 200) {
-                                DopamineKit.debugLog("SyncCoordinator", "Track Syncer is done!");
+                                BoundlessKit.debugLog("SyncCoordinator", "Track Syncer is done!");
                                 Thread.sleep(1000);
                             } else if (apiResponse < 0) {
-                                DopamineKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
+                                BoundlessKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
                                 telemetry.stopRecordingSync(false);
                                 return null;
                             }
@@ -172,18 +172,18 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                             //
                             if (reportShouldSync) {
                                 apiCall = syncerExecutor.submit(report);
-                                if (DopamineKit.debugMode) {
+                                if (BoundlessKit.debugMode) {
                                     while (!apiCall.isDone()) {
-                                        DopamineKit.debugLog("SyncCoordinator", "Waiting for report syncer to be done...");
+                                        BoundlessKit.debugLog("SyncCoordinator", "Waiting for report syncer to be done...");
                                         Thread.sleep(200);
                                     }
                                 }
                                 apiResponse = apiCall.get();
                                 if (apiResponse == 200) {
-                                    DopamineKit.debugLog("SyncCoordinator", "Report Syncer is done!");
+                                    BoundlessKit.debugLog("SyncCoordinator", "Report Syncer is done!");
                                     Thread.sleep(5000);
                                 } else if (apiResponse < 0) {
-                                    DopamineKit.debugLog("SyncCoordinator", "Report failed during sync cycle. Halting sync cycle early.");
+                                    BoundlessKit.debugLog("SyncCoordinator", "Report failed during sync cycle. Halting sync cycle early.");
                                     telemetry.stopRecordingSync(false);
                                     return null;
                                 }
@@ -195,17 +195,17 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                             for (Map.Entry<String, Cartridge> entry : cartridges.entrySet()) {
                                 if (entry.getValue().isTriggered()) {
                                     apiCall = syncerExecutor.submit(entry.getValue());
-                                    if (DopamineKit.debugMode) {
+                                    if (BoundlessKit.debugMode) {
                                         while (!apiCall.isDone()) {
-                                            DopamineKit.debugLog("SyncCoordinator", "Waiting for " + entry.getKey() + " cartridge refresh to be done...");
+                                            BoundlessKit.debugLog("SyncCoordinator", "Waiting for " + entry.getKey() + " cartridge refresh to be done...");
                                             Thread.sleep(200);
                                         }
                                     }
                                     apiResponse = apiCall.get();
                                     if (apiResponse == 200) {
-                                        DopamineKit.debugLog("SyncCoordinator", entry.getKey() + " cartridge syncer is done!");
+                                        BoundlessKit.debugLog("SyncCoordinator", entry.getKey() + " cartridge syncer is done!");
                                     } else if (apiResponse < 0) {
-                                        DopamineKit.debugLog("SyncCoordinator", "Cartridge " + entry.getKey() + " failed during sync cycle. Halting sync cycle early.");
+                                        BoundlessKit.debugLog("SyncCoordinator", "Cartridge " + entry.getKey() + " failed during sync cycle. Halting sync cycle early.");
                                         telemetry.stopRecordingSync(false);
                                         return null;
                                     }

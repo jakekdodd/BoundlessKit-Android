@@ -22,7 +22,8 @@ import android.widget.Toast;
 
 import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
-import boundless.boundlesskit.DopamineKit;
+
+import boundless.boundlesskit.BoundlessKit;
 import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         mTaskListView = (ListView) findViewById(R.id.list_todo);
 
         updateUI();
-        DopamineKit.debugMode = true;
+        BoundlessKit.debugMode = true;
     }
 
     @Override
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                                         SQLiteDatabase.CONFLICT_REPLACE);
                                 db.close();
                                 updateUI();
-                                DopamineKit.reinforce(getApplicationContext(), "action1", null, new DopamineKit.ReinforcementCallback() {
+                                BoundlessKit.reinforce(getApplicationContext(), "action1", null, new BoundlessKit.ReinforcementCallback() {
                                     @Override
                                     public void onReinforcement(String reinforcementDecision) {
 
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addDemoTasks(){
-        DopamineKit.track(getApplicationContext(), "addedDemoTasks", null);
+        BoundlessKit.track(getApplicationContext(), "addedDemoTasks", null);
 
         String demoTasks[] = {"Feed the kitties", "Feed the mice", "Feed the snakes the mice", "Feed the mongoose the snakes", "a", "b", "c"};
         SQLiteDatabase db = mHelper.getWritableDatabase();
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                                         deleteTask(mTaskListView.getChildAt(position));
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
-                                        DopamineKit.reinforce(getApplicationContext(), "taskCompleted", null, new DopamineKit.ReinforcementCallback() {
+                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
 
                                             @Override
                                             public void onReinforcement(String reinforcement) {
@@ -216,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
 //                                    HashMap<String, String> metaData = new HashMap<String, String>();
 //                                    metaData.put("calories", "400");
-//                                    DopamineKit.track(getApplicationContext(), "foodItemAdded", null);
+//                                    BoundlessKit.track(getApplicationContext(), "foodItemAdded", null);
 
                                     }
                                 });

@@ -5,14 +5,6 @@ import android.content.ContextWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.DataStore.Contracts.DopeExceptionContract;
-import boundless.boundlesskit.DataStore.Contracts.SyncOverviewContract;
-import boundless.boundlesskit.DataStore.SQLDopeExceptionDataHelper;
-import boundless.boundlesskit.DataStore.SQLSyncOverviewDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.DopamineKit;
-import boundless.boundlesskit.RESTfulAPI.DopamineAPI;
-
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -20,6 +12,14 @@ import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import boundless.boundlesskit.BoundlessKit;
+import boundless.boundlesskit.DataStore.Contracts.BoundlessExceptionContract;
+import boundless.boundlesskit.DataStore.Contracts.SyncOverviewContract;
+import boundless.boundlesskit.DataStore.SQLBoundlessExceptionDataHelper;
+import boundless.boundlesskit.DataStore.SQLSyncOverviewDataHelper;
+import boundless.boundlesskit.DataStore.SQLiteDataStore;
+import boundless.boundlesskit.RESTfulAPI.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/30/16.
@@ -50,15 +50,15 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
     }
 
     /**
-     * Creates a DopeException object and reports it to DopamineAPI for increased stability.
+     * Creates a BoundlessException object and reports it to BoundlessAPI for increased stability.
      *
-     * @param exception The exception thrown by DopamineKit
+     * @param exception The exception thrown by BoundlessKit
      */
     public static void storeException(Throwable exception) {
         if (sharedInstance != null) {
-            DopeException.store(sharedInstance, exception);
+            BoundlessException.store(sharedInstance, exception);
         } else {
-            DopamineKit.debugLog("Telemetry", "Trying to store exception, but Telemetry was never initialized.");
+            BoundlessKit.debugLog("Telemetry", "Trying to store exception, but Telemetry was never initialized.");
         }
     }
 
@@ -86,7 +86,7 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
     /**
      * Sets the `syncResponse` for `Track` in the current sync overview.
      *
-     * @param status    The HTTP status code received from the DopamineAPI
+     * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
@@ -101,7 +101,7 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
     /**
      * Sets the `syncResponse` for `Report` in the current sync overview.
      *
-     * @param status    The HTTP status code received from the DopamineAPI
+     * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
@@ -117,7 +117,7 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
      * Sets the `syncResponse` for the cartridge in the current sync overview.
      *
      * @param actionID  The name of the cartridge's action
-     * @param status    The HTTP status code received from the DopamineAPI
+     * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
@@ -132,7 +132,7 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
     /**
      * Finalizes the current syncOverview object.
      *
-     * @param successfulSync Whether a successful sync was made with the DopamineAPI
+     * @param successfulSync Whether a successful sync was made with the BoundlessAPI
      */
     public void stopRecordingSync(boolean successfulSync) {
         synchronized (syncOverviewLock) {
@@ -140,9 +140,9 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
                 currentSyncOverview.finish();
                 currentSyncOverview.store(this);
                 currentSyncOverview = null;
-                DopamineKit.debugLog("Telemetry", "Saved a sync overview, totalling " + SQLSyncOverviewDataHelper.count(sqlDB) + " overviews");
+                BoundlessKit.debugLog("Telemetry", "Saved a sync overview, totalling " + SQLSyncOverviewDataHelper.count(sqlDB) + " overviews");
             } else {
-                DopamineKit.debugLog("Telemetry", "No recording has started. Did you remember to execute startRecordingSync() at the beginning of the sync performance?");
+                BoundlessKit.debugLog("Telemetry", "No recording has started. Did you remember to execute startRecordingSync() at the beginning of the sync performance?");
             }
         }
 
@@ -154,39 +154,39 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            DopamineKit.debugLog("Telemetry", "Telemetry sync already happening");
+            BoundlessKit.debugLog("Telemetry", "Telemetry sync already happening");
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    DopamineKit.debugLog("Telemetry", "Telemetry sync already happening");
+                    BoundlessKit.debugLog("Telemetry", "Telemetry sync already happening");
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        DopamineKit.debugLog("Telemetry", "Beginning telemetry sync!");
+                        BoundlessKit.debugLog("Telemetry", "Beginning telemetry sync!");
 
                         final ArrayList<SyncOverviewContract> syncOverviews = SQLSyncOverviewDataHelper.findAll(sqlDB);
-                        final ArrayList<DopeExceptionContract> dopeExceptions = SQLDopeExceptionDataHelper.findAll(sqlDB);
-                        if (syncOverviews.size() == 0 && dopeExceptions.size() == 0) {
-                            DopamineKit.debugLog("Telemetry", "No sync overviews or exceptions to be synced.");
+                        final ArrayList<BoundlessExceptionContract> exceptions = SQLBoundlessExceptionDataHelper.findAll(sqlDB);
+                        if (syncOverviews.size() == 0 && exceptions.size() == 0) {
+                            BoundlessKit.debugLog("Telemetry", "No sync overviews or exceptions to be synced.");
                             return 0;
                         } else {
-                            DopamineKit.debugLog("Telemetry", syncOverviews.size() + " sync overviews and " + dopeExceptions.size() + " exceptions to be synced.");
-                            JSONObject apiResponse = DopamineAPI.sync(this, syncOverviews, dopeExceptions);
+                            BoundlessKit.debugLog("Telemetry", syncOverviews.size() + " sync overviews and " + exceptions.size() + " exceptions to be synced.");
+                            JSONObject apiResponse = BoundlessAPI.sync(this, syncOverviews, exceptions);
                             if (apiResponse != null) {
                                 int statusCode = apiResponse.optInt("status", 404);
                                 if (statusCode == 200) {
                                     for (int i = 0; i < syncOverviews.size(); i++) {
                                         SQLSyncOverviewDataHelper.delete(sqlDB, syncOverviews.get(i));
                                     }
-                                    for (int i = 0; i < dopeExceptions.size(); i++) {
-                                        SQLDopeExceptionDataHelper.delete(sqlDB, dopeExceptions.get(i));
+                                    for (int i = 0; i < exceptions.size(); i++) {
+                                        SQLBoundlessExceptionDataHelper.delete(sqlDB, exceptions.get(i));
                                     }
                                 }
                                 return statusCode;
                             } else {
-                                DopamineKit.debugLog("Telemetry", "Something went wrong making the call...");
+                                BoundlessKit.debugLog("Telemetry", "Something went wrong making the call...");
                                 return -1;
                             }
                         }

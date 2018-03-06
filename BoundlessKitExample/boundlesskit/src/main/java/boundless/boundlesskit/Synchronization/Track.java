@@ -6,17 +6,17 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
-import boundless.boundlesskit.DataStore.SQLTrackedActionDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.DopamineKit;
-import boundless.boundlesskit.RESTfulAPI.DopamineAPI;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+
+import boundless.boundlesskit.BoundlessKit;
+import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
+import boundless.boundlesskit.DataStore.SQLTrackedActionDataHelper;
+import boundless.boundlesskit.DataStore.SQLiteDataStore;
+import boundless.boundlesskit.RESTfulAPI.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/4/16.
@@ -26,10 +26,9 @@ class Track extends ContextWrapper implements Callable<Integer> {
 
     private static Track sharedInstance;
 
-    private DopamineAPI dopamineAPI;
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
-    private final String preferencesName = "com.usedopamine.synchronization.track";
+    private final String preferencesName = "boundless.boundlesskit.synchronization.track";
     private final String sizeKey = "size";
     private final String sizeToSyncKey = "sizeToSync";
     private final String timerStartsAtKey = "timerStartsAt";
@@ -128,47 +127,47 @@ class Track extends ContextWrapper implements Callable<Integer> {
     private boolean isSizeToSync() {
         int count = SQLTrackedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        DopamineKit.debugLog("Track", "Track has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
+        BoundlessKit.debugLog("Track", "Track has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
         return isSize;
     }
 
     /**
-     * Stores a tracked action to be synced over the DopamineAPI at a later time.
+     * Stores a tracked action to be synced over the BoundlessAPI at a later time.
      *
      * @param action The action to be stored
      */
-    void store(DopeAction action) {
+    void store(BoundlessAction action) {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
                 0, action.actionID, metaData, action.utc, action.timezoneOffset
         ));
-//        DopamineKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+//        BoundlessKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
 
     }
 
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            DopamineKit.debugLog("TrackSyncer", "Track sync already happening");
+            BoundlessKit.debugLog("TrackSyncer", "Track sync already happening");
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    DopamineKit.debugLog("TrackSyncer", "Track sync already happening");
+                    BoundlessKit.debugLog("TrackSyncer", "Track sync already happening");
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        DopamineKit.debugLog("TrackSyncer", "Beginning tracker sync!");
+                        BoundlessKit.debugLog("TrackSyncer", "Beginning tracker sync!");
 
                         final ArrayList<TrackedActionContract> sqlActions = SQLTrackedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
-                            DopamineKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
+                            BoundlessKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
                             updateTriggers(null, System.currentTimeMillis(), null);
                             return 0;
                         } else {
-                            DopamineKit.debugLog("TrackSyncer", sqlActions.size() + " tracked actions to be synced.");
-                            JSONObject apiResponse = DopamineAPI.track(this, sqlActions);
+                            BoundlessKit.debugLog("TrackSyncer", sqlActions.size() + " tracked actions to be synced.");
+                            JSONObject apiResponse = BoundlessAPI.track(this, sqlActions);
                             if (apiResponse != null) {
                                 int statusCode = apiResponse.optInt("status", -2);
                                 if (statusCode == 200) {
@@ -179,7 +178,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
                                 }
                                 return statusCode;
                             } else {
-                                DopamineKit.debugLog("TrackSyncer", "Something went wrong making the call...");
+                                BoundlessKit.debugLog("TrackSyncer", "Something went wrong making the call...");
                                 return -1;
                             }
                         }

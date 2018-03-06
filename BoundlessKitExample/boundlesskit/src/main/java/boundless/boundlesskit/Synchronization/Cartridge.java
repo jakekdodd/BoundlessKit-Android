@@ -5,17 +5,17 @@ import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 
-import boundless.boundlesskit.DataStore.Contracts.ReinforcementDecisionContract;
-import boundless.boundlesskit.DataStore.SQLCartridgeDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.DopamineKit;
-import boundless.boundlesskit.RESTfulAPI.DopamineAPI;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
+
+import boundless.boundlesskit.BoundlessKit;
+import boundless.boundlesskit.DataStore.Contracts.ReinforcementDecisionContract;
+import boundless.boundlesskit.DataStore.SQLCartridgeDataHelper;
+import boundless.boundlesskit.DataStore.SQLiteDataStore;
+import boundless.boundlesskit.RESTfulAPI.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/6/16.
@@ -27,7 +27,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
     private SharedPreferences preferences;
 
     private String preferencesName() {
-        return "com.usedopamine.synchronization.cartridge." + actionID;
+        return "boundless.boundlesskit.synchronization.cartridge." + actionID;
     }
 
     private static final String actionIDKey = "actionID";
@@ -132,7 +132,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
     private boolean isCapacityToSync() {
         int count = SQLCartridgeDataHelper.countFor(sqlDB, actionID);
         boolean isCapacity = count < minimumCount || (double) count / initialSize <= capacityToSync;
-        DopamineKit.debugLog("Cartridge", "Cartridge for actionID:(" + actionID + ") has " + count + "/" + initialSize + " decisions remaining in its queue" + (isCapacity ? " so needs to sync..." : "."));
+        BoundlessKit.debugLog("Cartridge", "Cartridge for actionID:(" + actionID + ") has " + count + "/" + initialSize + " decisions remaining in its queue" + (isCapacity ? " so needs to sync..." : "."));
         return isCapacity;
     }
 
@@ -145,7 +145,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
         long rowId = SQLCartridgeDataHelper.insert(sqlDB, new ReinforcementDecisionContract(
                 0, actionID, reinforcementDecision
         ));
-//        DopamineKit.debugLog("Cartridge", "Inserted "+reinforcementDecision+" into row "+rowId+" for action "+actionID);
+//        BoundlessKit.debugLog("Cartridge", "Inserted "+reinforcementDecision+" into row "+rowId+" for action "+actionID);
     }
 
     /**
@@ -170,23 +170,23 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            DopamineKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionID);
+            BoundlessKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionID);
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    DopamineKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionID);
+                    BoundlessKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionID);
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        DopamineKit.debugLog("Cartridge", "Beginning cartridge sync for " + actionID + "!");
+                        BoundlessKit.debugLog("Cartridge", "Beginning cartridge sync for " + actionID + "!");
 
-                        JSONObject apiResponse = DopamineAPI.refresh(this, actionID);
+                        JSONObject apiResponse = BoundlessAPI.refresh(this, actionID);
                         if (apiResponse != null) {
                             int statusCode = apiResponse.optInt("status", -2);
                             if (statusCode == 200) {
-                                DopamineKit.debugLog("Cartridge", "Replacing cartridge for " + actionID + "...");
+                                BoundlessKit.debugLog("Cartridge", "Replacing cartridge for " + actionID + "...");
 
                                 JSONArray reinforcementCartridge = apiResponse.getJSONArray("reinforcementCartridge");
                                 long expiresIn = apiResponse.getLong("expiresIn");
@@ -199,7 +199,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
                             }
                             return statusCode;
                         } else {
-                            DopamineKit.debugLog("ReportSyncer", "Something went wrong making the call...");
+                            BoundlessKit.debugLog("ReportSyncer", "Something went wrong making the call...");
                             return -1;
                         }
                     } finally {

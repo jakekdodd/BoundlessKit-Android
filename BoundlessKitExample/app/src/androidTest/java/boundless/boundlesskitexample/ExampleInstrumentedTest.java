@@ -6,16 +6,15 @@ import android.support.test.filters.MediumTest;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
-import boundless.BoundlessKit;
-
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import boundless.boundlesskit.BoundlessKit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -24,7 +23,7 @@ import static org.junit.Assert.*;
  */
 @MediumTest
 @RunWith(AndroidJUnit4.class)
-public class BoundlessKitInstrumentationTest {
+public class ExampleInstrumentedTest {
 
     public static Context appContext;
 
@@ -34,7 +33,7 @@ public class BoundlessKitInstrumentationTest {
         appContext = InstrumentationRegistry.getTargetContext();
         BoundlessKit.debugMode = true;
 
-        assertEquals("com.usedopamine.dopaminekitandroid", appContext.getPackageName());
+        assertEquals("boundless.boundlesskitexample", appContext.getPackageName());
     }
 
     @Test

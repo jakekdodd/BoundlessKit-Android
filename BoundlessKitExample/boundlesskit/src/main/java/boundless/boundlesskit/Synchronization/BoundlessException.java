@@ -4,20 +4,20 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import boundless.boundlesskit.DataStore.Contracts.DopeExceptionContract;
-import boundless.boundlesskit.DataStore.SQLDopeExceptionDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.DopamineKit;
-
 import org.json.JSONException;
 
 import java.util.TimeZone;
+
+import boundless.boundlesskit.BoundlessKit;
+import boundless.boundlesskit.DataStore.Contracts.BoundlessExceptionContract;
+import boundless.boundlesskit.DataStore.SQLBoundlessExceptionDataHelper;
+import boundless.boundlesskit.DataStore.SQLiteDataStore;
 
 /**
  * Created by cuddergambino on 10/3/16.
  */
 
-class DopeException {
+class BoundlessException {
 
     private static SQLiteDatabase sqlDB;
 
@@ -27,7 +27,7 @@ class DopeException {
     private String message;
     private String stackTrace;
 
-    DopeException(Throwable exception) {
+    BoundlessException(Throwable exception) {
         this.utc = System.currentTimeMillis();
         this.timezoneOffset = TimeZone.getDefault().getOffset(this.utc);
         this.exceptionClassName = exception.getClass().getName();
@@ -39,15 +39,15 @@ class DopeException {
      * Convenient method for creating and storing an exception.
      *
      * @param context   Context
-     * @param exception An exception thrown within DopamineKit
+     * @param exception An exception thrown within BoundlessKit
      */
     static void store(Context context, Throwable exception) {
-        DopeException dopeException = new DopeException(exception);
-        dopeException.store(context);
+        BoundlessException boundlessException = new BoundlessException(exception);
+        boundlessException.store(context);
     }
 
     /**
-     * Stores the exception to be synced with the DopamineAPI at a later time.
+     * Stores the exception to be synced with the BoundlessAPI at a later time.
      *
      * @param context Context
      */
@@ -56,12 +56,12 @@ class DopeException {
             sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
         }
 
-        DopeExceptionContract exceptionContract = new DopeExceptionContract(0, utc, timezoneOffset, exceptionClassName, message, stackTrace);
-        long rowId = SQLDopeExceptionDataHelper.insert(sqlDB, exceptionContract);
+        BoundlessExceptionContract exceptionContract = new BoundlessExceptionContract(0, utc, timezoneOffset, exceptionClassName, message, stackTrace);
+        long rowId = SQLBoundlessExceptionDataHelper.insert(sqlDB, exceptionContract);
 
-//        DopamineKit.debugLog("SQL Dope Exceptions", "Inserted into row " + rowId);
+//        BoundlessKit.debugLog("BoundlessException", "Inserted into row " + rowId);
         try {
-            DopamineKit.debugLog("SQL Dope Exceptions", exceptionContract.toJSON().toString(2));
+            BoundlessKit.debugLog("BoundlessException", exceptionContract.toJSON().toString(2));
         } catch (JSONException e) {
             e.printStackTrace();
             Telemetry.storeException(e);

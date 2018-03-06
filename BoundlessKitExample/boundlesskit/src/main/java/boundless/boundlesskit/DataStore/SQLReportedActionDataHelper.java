@@ -5,8 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
+import boundless.boundlesskit.BoundlessKit;
 import boundless.boundlesskit.DataStore.Contracts.ReportedActionContract;
-import boundless.boundlesskit.DopamineKit;
 
 import java.util.ArrayList;
 
@@ -67,7 +67,7 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
                 do {
                     ReportedActionContract action = ReportedActionContract.fromCursor(cursor);
                     actions.add(action);
-                    DopamineKit.debugLog("SQLReportedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " reinforcementDecision:" + action.reinforcementDecision + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
+                    BoundlessKit.debugLog("SQLReportedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " reinforcementDecision:" + action.reinforcementDecision + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
         } finally {
