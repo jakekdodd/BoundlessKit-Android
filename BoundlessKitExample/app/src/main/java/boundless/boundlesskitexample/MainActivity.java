@@ -1,7 +1,10 @@
 package boundless.boundlesskitexample;
 
+
 import android.content.ContentValues;
+
 import android.content.DialogInterface;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -27,7 +30,6 @@ import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
 
 import java.util.ArrayList;
-
 import boundless.boundlesskit.BoundlessKit;
 import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
                                         Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
-                                        rotate.setRepeatCount(20);
+                                        rotate.setRepeatCount(1);
                                         logoView.startAnimation(rotate);
 
 //                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);

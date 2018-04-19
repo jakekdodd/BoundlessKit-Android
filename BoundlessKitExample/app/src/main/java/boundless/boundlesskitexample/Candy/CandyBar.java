@@ -46,7 +46,12 @@ public final class CandyBar {
     public static final int LENGTH_SHORT = Snackbar.LENGTH_SHORT;
     public static final int LENGTH_LONG = Snackbar.LENGTH_LONG;
 
+    public enum Position {
+        TOP, BOTTOM
+    }
+
     private Snackbar snackbar;
+    private Position position;
 
     /**
      * Make a CandyBar to display a {@link Candy} icon and message text
@@ -117,7 +122,7 @@ public final class CandyBar {
     }
 
 
-    private static Snackbar makeSnackbarWithIcon(View view, Candy candy, CharSequence text, int backgroundColor,  int duration){
+    private static Snackbar makeSnackbarWithIcon(View view, Candy candy,  CharSequence text, int backgroundColor,  int duration){
         Snackbar snackbar = Snackbar.make(view, text, duration);
         View snackbarView = snackbar.getView();
         TextView textView = (TextView)snackbarView.findViewById(android.support.design.R.id.snackbar_text);
@@ -131,7 +136,7 @@ public final class CandyBar {
 
         // Set background color
         snackbarView.setBackgroundColor(backgroundColor);
-        snackbarView.setAlpha(0.85f);
+        snackbarView.setAlpha(0.95f);
 
         return snackbar;
     }
