@@ -1,4 +1,4 @@
-package boundless.boundlesskit.Synchronization;
+package boundless.kit.Synchronization;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -12,23 +12,23 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
-import boundless.boundlesskit.BoundlessKit;
-import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
-import boundless.boundlesskit.DataStore.SQLTrackedActionDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.RESTfulAPI.BoundlessAPI;
+import boundless.kit.BoundlessKit;
+import boundless.kit.DataStore.Contracts.ReportedActionContract;
+import boundless.kit.DataStore.SQLReportedActionDataHelper;
+import boundless.kit.DataStore.SQLiteDataStore;
+import boundless.kit.RESTfulAPI.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/4/16.
  */
 
-class Track extends ContextWrapper implements Callable<Integer> {
+class Report extends ContextWrapper implements Callable<Integer> {
 
-    private static Track sharedInstance;
+    private static Report sharedInstance;
 
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
-    private final String preferencesName = "boundless.boundlesskit.synchronization.track";
+    private final String preferencesName = "boundless.boundlesskit.synchronization.report";
     private final String sizeKey = "size";
     private final String sizeToSyncKey = "sizeToSync";
     private final String timerStartsAtKey = "timerStartsAt";
@@ -41,14 +41,14 @@ class Track extends ContextWrapper implements Callable<Integer> {
     private final Object apiSyncLock = new Object();
     private Boolean syncInProgress = false;
 
-    static Track getSharedInstance(Context base) {
+    static Report getSharedInstance(Context base) {
         if (sharedInstance == null) {
-            sharedInstance = new Track(base);
+            sharedInstance = new Report(base);
         }
         return sharedInstance;
     }
 
-    private Track(Context base) {
+    private Report(Context base) {
         super(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
         preferences = getSharedPreferences(preferencesName, 0);
@@ -67,7 +67,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
     /**
      * Updates the sync triggers.
      *
-     * @param size      The number of tracked actions to trigger a sync
+     * @param size      The number of reported actions to trigger a sync
      * @param startTime The start time for a sync timer
      * @param expiresIn The timer length, in ms, for a sync timer
      */
@@ -91,7 +91,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
     }
 
     /**
-     * Clears the saved track sync triggers.
+     * Clears the saved report sync triggers.
      */
     void removeTriggers() {
         sizeToSync = 15;
@@ -108,7 +108,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
     JSONObject jsonForTriggers() {
         JSONObject json = new JSONObject();
         try {
-            json.put(sizeKey, SQLTrackedActionDataHelper.count(sqlDB));
+            json.put(sizeKey, SQLReportedActionDataHelper.count(sqlDB));
             json.put(sizeToSyncKey, sizeToSync);
             json.put(timerStartsAtKey, timerStartsAt);
             json.put(timerExpiresInKey, timerExpiresIn);
@@ -125,60 +125,63 @@ class Track extends ContextWrapper implements Callable<Integer> {
     }
 
     private boolean isSizeToSync() {
-        int count = SQLTrackedActionDataHelper.count(sqlDB);
+        int count = SQLReportedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        BoundlessKit.debugLog("Track", "Track has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
+        BoundlessKit.debugLog("Report", "Report has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
         return isSize;
     }
 
     /**
-     * Stores a tracked action to be synced over the BoundlessAPI at a later time.
+     * Stores a reported action to be synced over the BoundlessAPI at a later time.
      *
      * @param action The action to be stored
      */
     void store(BoundlessAction action) {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
-        long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
-                0, action.actionID, metaData, action.utc, action.timezoneOffset
+        long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
+                0, action.actionID, action.reinforcementDecision, metaData, action.utc, action.timezoneOffset
         ));
-//        BoundlessKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+//        BoundlessKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
+    }
 
+    void remove(ReportedActionContract action) {
+        SQLReportedActionDataHelper.delete(sqlDB, action);
     }
 
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            BoundlessKit.debugLog("TrackSyncer", "Track sync already happening");
+            BoundlessKit.debugLog("ReportSyncer", "Report sync already happening");
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    BoundlessKit.debugLog("TrackSyncer", "Track sync already happening");
+                    BoundlessKit.debugLog("ReportSyncer", "Report sync already happening");
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        BoundlessKit.debugLog("TrackSyncer", "Beginning tracker sync!");
+                        BoundlessKit.debugLog("ReportSyncer", "Beginning reporter sync!");
 
-                        final ArrayList<TrackedActionContract> sqlActions = SQLTrackedActionDataHelper.findAll(sqlDB);
+                        final ArrayList<ReportedActionContract> sqlActions = SQLReportedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
-                            BoundlessKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
+                            BoundlessKit.debugLog("ReportSyncer", "No reported actions to be synced.");
                             updateTriggers(null, System.currentTimeMillis(), null);
                             return 0;
                         } else {
-                            BoundlessKit.debugLog("TrackSyncer", sqlActions.size() + " tracked actions to be synced.");
-                            JSONObject apiResponse = BoundlessAPI.track(this, sqlActions);
+                            BoundlessKit.debugLog("ReportSyncer", sqlActions.size() + " reported actions to be synced.");
+                            JSONObject apiResponse = BoundlessAPI.report(this, sqlActions);
                             if (apiResponse != null) {
                                 int statusCode = apiResponse.optInt("status", -2);
                                 if (statusCode == 200) {
                                     for (int i = 0; i < sqlActions.size(); i++) {
-                                        SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
+                                        remove(sqlActions.get(i));
                                     }
                                     updateTriggers(null, System.currentTimeMillis(), null);
                                 }
                                 return statusCode;
                             } else {
-                                BoundlessKit.debugLog("TrackSyncer", "Something went wrong making the call...");
+                                BoundlessKit.debugLog("ReportSyncer", "Something went wrong making the call...");
                                 return -1;
                             }
                         }

@@ -1,10 +1,10 @@
-package boundless.boundlesskit.DataStore.Contracts;
+package boundless.kit.DataStore.Contracts;
 
 import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.Synchronization.Telemetry;
+import boundless.kit.Synchronization.Telemetry;
 
 import org.json.JSONArray;
 import org.json.JSONException;

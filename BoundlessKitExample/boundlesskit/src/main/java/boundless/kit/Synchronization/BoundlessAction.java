@@ -1,4 +1,4 @@
-package boundless.boundlesskit.Synchronization;
+package boundless.kit.Synchronization;
 
 import android.support.annotation.Nullable;
 

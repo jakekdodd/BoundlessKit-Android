@@ -1,4 +1,4 @@
-package boundless.boundlesskit.Synchronization;
+package boundless.kit.Synchronization;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -11,11 +11,11 @@ import org.json.JSONObject;
 
 import java.util.concurrent.Callable;
 
-import boundless.boundlesskit.BoundlessKit;
-import boundless.boundlesskit.DataStore.Contracts.ReinforcementDecisionContract;
-import boundless.boundlesskit.DataStore.SQLCartridgeDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.RESTfulAPI.BoundlessAPI;
+import boundless.kit.BoundlessKit;
+import boundless.kit.DataStore.Contracts.ReinforcementDecisionContract;
+import boundless.kit.DataStore.SQLCartridgeDataHelper;
+import boundless.kit.DataStore.SQLiteDataStore;
+import boundless.kit.RESTfulAPI.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/6/16.

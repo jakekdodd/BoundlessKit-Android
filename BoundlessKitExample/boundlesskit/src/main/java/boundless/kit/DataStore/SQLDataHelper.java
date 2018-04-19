@@ -1,4 +1,4 @@
-package boundless.boundlesskit.DataStore;
+package boundless.kit.DataStore;
 
 /**
  * Created by cuddergambino on 8/24/16.

@@ -1,13 +1,13 @@
-package boundless.boundlesskit.Synchronization;
+package boundless.kit.Synchronization;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.DataStore.Contracts.SyncOverviewContract;
-import boundless.boundlesskit.DataStore.SQLSyncOverviewDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
-import boundless.boundlesskit.BoundlessKit;
+import boundless.kit.DataStore.Contracts.SyncOverviewContract;
+import boundless.kit.DataStore.SQLSyncOverviewDataHelper;
+import boundless.kit.DataStore.SQLiteDataStore;
+import boundless.kit.BoundlessKit;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -1,4 +1,4 @@
-package boundless.boundlesskit.DataStore;
+package boundless.kit.DataStore;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
-import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
+import boundless.kit.DataStore.Contracts.TrackedActionContract;
 
 /**
  * Created by cuddergambino on 8/9/16.

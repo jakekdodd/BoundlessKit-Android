@@ -1,4 +1,4 @@
-package boundless.boundlesskit;
+package boundless.kit;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

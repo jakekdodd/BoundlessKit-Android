@@ -1,4 +1,4 @@
-package boundless.boundlesskit;
+package boundless.kit;
 
 /**
  * Created by cuddergambino on 6/1/16.
@@ -12,8 +12,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import boundless.boundlesskit.Synchronization.BoundlessAction;
-import boundless.boundlesskit.Synchronization.SyncCoordinator;
+import boundless.kit.Synchronization.BoundlessAction;
+import boundless.kit.Synchronization.SyncCoordinator;
 
 public class BoundlessKit extends ContextWrapper {
     /**

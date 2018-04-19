@@ -1,4 +1,4 @@
-package boundless.boundlesskit.Synchronization;
+package boundless.kit.Synchronization;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,10 +8,10 @@ import org.json.JSONException;
 
 import java.util.TimeZone;
 
-import boundless.boundlesskit.BoundlessKit;
-import boundless.boundlesskit.DataStore.Contracts.BoundlessExceptionContract;
-import boundless.boundlesskit.DataStore.SQLBoundlessExceptionDataHelper;
-import boundless.boundlesskit.DataStore.SQLiteDataStore;
+import boundless.kit.BoundlessKit;
+import boundless.kit.DataStore.Contracts.BoundlessExceptionContract;
+import boundless.kit.DataStore.SQLBoundlessExceptionDataHelper;
+import boundless.kit.DataStore.SQLiteDataStore;
 
 /**
  * Created by cuddergambino on 10/3/16.

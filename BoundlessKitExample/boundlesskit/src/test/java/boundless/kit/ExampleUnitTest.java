@@ -1,4 +1,4 @@
-package boundless.boundlesskit;
+package boundless.kit;
 
 import org.junit.Test;
 

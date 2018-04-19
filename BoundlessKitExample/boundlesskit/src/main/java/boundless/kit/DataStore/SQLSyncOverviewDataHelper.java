@@ -1,11 +1,11 @@
-package boundless.boundlesskit.DataStore;
+package boundless.kit.DataStore;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.DataStore.Contracts.SyncOverviewContract;
+import boundless.kit.DataStore.Contracts.SyncOverviewContract;
 
 import java.util.ArrayList;
 

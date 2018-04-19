@@ -1,14 +1,14 @@
-package boundless.boundlesskit.DataStore;
+package boundless.kit.DataStore;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.BoundlessKit;
-import boundless.boundlesskit.DataStore.Contracts.ReinforcementDecisionContract;
-
 import java.util.ArrayList;
+
+import boundless.kit.BoundlessKit;
+import boundless.kit.DataStore.Contracts.ReinforcementDecisionContract;
 
 /**
  * Created by cuddergambino on 8/21/16.

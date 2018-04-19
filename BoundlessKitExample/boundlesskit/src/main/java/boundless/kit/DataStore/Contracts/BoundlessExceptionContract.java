@@ -1,4 +1,4 @@
-package boundless.boundlesskit.DataStore.Contracts;
+package boundless.kit.DataStore.Contracts;
 
 import android.database.Cursor;
 import android.provider.BaseColumns;
@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import boundless.boundlesskit.Synchronization.Telemetry;
+import boundless.kit.Synchronization.Telemetry;
 
 /**
  * Created by cuddergambino on 10/3/16.

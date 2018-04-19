@@ -1,4 +1,4 @@
-package boundless.boundlesskit.RESTfulAPI;
+package boundless.kit.RESTfulAPI;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TimeZone;
 
-import boundless.boundlesskit.BoundlessKit;
-import boundless.boundlesskit.DataStore.Contracts.BoundlessExceptionContract;
-import boundless.boundlesskit.DataStore.Contracts.ReportedActionContract;
-import boundless.boundlesskit.DataStore.Contracts.SyncOverviewContract;
-import boundless.boundlesskit.DataStore.Contracts.TrackedActionContract;
-import boundless.boundlesskit.Synchronization.Telemetry;
+import boundless.kit.BoundlessKit;
+import boundless.kit.DataStore.Contracts.BoundlessExceptionContract;
+import boundless.kit.DataStore.Contracts.ReportedActionContract;
+import boundless.kit.DataStore.Contracts.SyncOverviewContract;
+import boundless.kit.DataStore.Contracts.TrackedActionContract;
+import boundless.kit.Synchronization.Telemetry;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;

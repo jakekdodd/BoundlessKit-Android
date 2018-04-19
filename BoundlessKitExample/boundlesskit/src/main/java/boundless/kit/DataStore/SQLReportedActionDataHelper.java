@@ -1,12 +1,12 @@
-package boundless.boundlesskit.DataStore;
+package boundless.kit.DataStore;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
-import boundless.boundlesskit.BoundlessKit;
-import boundless.boundlesskit.DataStore.Contracts.ReportedActionContract;
+import boundless.kit.BoundlessKit;
+import boundless.kit.DataStore.Contracts.ReportedActionContract;
 
 import java.util.ArrayList;
 

@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import boundless.boundlesskit.BoundlessKit;
+import boundless.kit.BoundlessKit;
 
 import static org.junit.Assert.assertEquals;
 
