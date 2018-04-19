@@ -12,10 +12,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,12 +26,12 @@ import android.widget.Toast;
 import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
 
+import java.util.ArrayList;
+
 import boundless.boundlesskit.BoundlessKit;
 import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
-
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -37,11 +40,14 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> mAdapter;
 
     private View rootView;
+    private ImageView logoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        logoView = (ImageView) findViewById(R.id.header_icon);
 
         mHelper = new TaskDbHelper(this);
         mTaskListView = (ListView) findViewById(R.id.list_todo);
@@ -191,21 +197,31 @@ public class MainActivity extends AppCompatActivity {
                                         deleteTask(mTaskListView.getChildAt(position));
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
+                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
+                                        rotate.setRepeatCount(20);
+                                        logoView.startAnimation(rotate);
+
+//                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
                                         BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
 
                                             @Override
                                             public void onReinforcement(String reinforcement) {
                                                 // Show some candy and make them feel good!
                                                 CandyBar candyBar = null;
-                                                if (reinforcement.equals("stars")) {
-                                                    candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
-                                                } else if (reinforcement.equals("medalStar")) {
-                                                    candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
-                                                } else if (reinforcement.equals("thumbsUp")) {
-                                                    candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
-                                                } else {
-                                                    // Show nothing! This is called a neutral response,
-                                                    // and builds up the good feelings for the next surprise!
+                                                switch (reinforcement) {
+                                                    case "stars":
+                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
+                                                        break;
+                                                    case "medalStar":
+                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
+                                                        break;
+                                                    case "thumbsUp":
+                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
+                                                        break;
+                                                    default:
+                                                        // Show nothing! This is called a neutral response,
+                                                        // and builds up the good feelings for the next surprise!
+                                                        break;
                                                 }
                                                 if (candyBar != null) {
                                                     candyBar.show();
