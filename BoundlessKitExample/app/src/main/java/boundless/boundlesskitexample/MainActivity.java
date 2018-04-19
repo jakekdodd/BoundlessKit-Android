@@ -2,9 +2,7 @@ package boundless.boundlesskitexample;
 
 
 import android.content.ContentValues;
-
 import android.content.DialogInterface;
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -15,8 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -30,10 +26,12 @@ import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
 
 import java.util.ArrayList;
-import boundless.kit.BoundlessKit;
+
 import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
+import boundless.kit.BoundlessKit;
+import boundless.kit.rewards.animation.attention.WobbleAnimator;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -199,9 +197,15 @@ public class MainActivity extends AppCompatActivity {
                                         deleteTask(mTaskListView.getChildAt(position));
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
-                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
-                                        rotate.setRepeatCount(1);
-                                        logoView.startAnimation(rotate);
+
+//                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
+//                                        rotate.setRepeatCount(1);
+//                                        logoView.startAnimation(rotate);
+
+                                        WobbleAnimator animator = new WobbleAnimator();
+                                        animator.prepare(logoView);
+                                        animator.animate();
+
 
 //                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
                                         BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
