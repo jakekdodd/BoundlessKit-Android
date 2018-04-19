@@ -19,7 +19,7 @@ import boundless.kit.DataStore.Contracts.SyncOverviewContract;
 import boundless.kit.DataStore.SQLBoundlessExceptionDataHelper;
 import boundless.kit.DataStore.SQLSyncOverviewDataHelper;
 import boundless.kit.DataStore.SQLiteDataStore;
-import boundless.kit.RESTfulAPI.BoundlessAPI;
+import boundless.kit.Dashboard.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/30/16.

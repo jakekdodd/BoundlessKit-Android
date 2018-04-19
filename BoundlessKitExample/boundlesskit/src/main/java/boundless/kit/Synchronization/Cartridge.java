@@ -15,7 +15,7 @@ import boundless.kit.BoundlessKit;
 import boundless.kit.DataStore.Contracts.ReinforcementDecisionContract;
 import boundless.kit.DataStore.SQLCartridgeDataHelper;
 import boundless.kit.DataStore.SQLiteDataStore;
-import boundless.kit.RESTfulAPI.BoundlessAPI;
+import boundless.kit.Dashboard.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/6/16.

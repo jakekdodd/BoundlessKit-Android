@@ -16,7 +16,7 @@ import boundless.kit.BoundlessKit;
 import boundless.kit.DataStore.Contracts.ReportedActionContract;
 import boundless.kit.DataStore.SQLReportedActionDataHelper;
 import boundless.kit.DataStore.SQLiteDataStore;
-import boundless.kit.RESTfulAPI.BoundlessAPI;
+import boundless.kit.Dashboard.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 9/4/16.

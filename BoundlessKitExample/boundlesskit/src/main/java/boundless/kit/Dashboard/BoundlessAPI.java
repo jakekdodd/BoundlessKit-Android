@@ -1,4 +1,4 @@
-package boundless.kit.RESTfulAPI;
+package boundless.kit.Dashboard;
 
 import android.content.Context;
 import android.content.ContextWrapper;
