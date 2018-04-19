@@ -12,8 +12,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import boundless.kit.Synchronization.BoundlessAction;
-import boundless.kit.Synchronization.SyncCoordinator;
+import boundless.kit.data.BoundlessAction;
+import boundless.kit.data.SyncCoordinator;
 
 public class BoundlessKit extends ContextWrapper {
     /**
