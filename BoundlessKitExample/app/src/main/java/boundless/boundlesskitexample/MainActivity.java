@@ -31,7 +31,7 @@ import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.attention.WobbleAnimator;
+import boundless.kit.rewards.animation.attention.ShimmyAnimator;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -202,7 +202,8 @@ public class MainActivity extends AppCompatActivity {
 //                                        rotate.setRepeatCount(1);
 //                                        logoView.startAnimation(rotate);
 
-                                        WobbleAnimator animator = new WobbleAnimator();
+
+                                        ShimmyAnimator animator = new ShimmyAnimator.Builder().build();
                                         animator.prepare(logoView);
                                         animator.animate();
 

@@ -25,29 +25,11 @@
 
 package boundless.kit.rewards.animation;
 
-import boundless.kit.rewards.animation.attention.BounceAnimator;
-import boundless.kit.rewards.animation.attention.FlashAnimator;
-import boundless.kit.rewards.animation.attention.PulseAnimator;
-import boundless.kit.rewards.animation.attention.RubberBandAnimator;
-import boundless.kit.rewards.animation.attention.ShakeAnimator;
-import boundless.kit.rewards.animation.attention.StandUpAnimator;
-import boundless.kit.rewards.animation.attention.SwingAnimator;
-import boundless.kit.rewards.animation.attention.TadaAnimator;
-import boundless.kit.rewards.animation.attention.WaveAnimator;
-import boundless.kit.rewards.animation.attention.WobbleAnimator;
+import boundless.kit.rewards.animation.attention.ShimmyAnimator;
 
 public enum Techniques {
 
-    Flash(FlashAnimator.class),
-    Pulse(PulseAnimator.class),
-    RubberBand(RubberBandAnimator.class),
-    Shake(ShakeAnimator.class),
-    Swing(SwingAnimator.class),
-    Wobble(WobbleAnimator.class),
-    Bounce(BounceAnimator.class),
-    Tada(TadaAnimator.class),
-    StandUp(StandUpAnimator.class),
-    Wave(WaveAnimator.class);
+    Wobble(ShimmyAnimator.class);
 
 
     private Class animatorClazz;
