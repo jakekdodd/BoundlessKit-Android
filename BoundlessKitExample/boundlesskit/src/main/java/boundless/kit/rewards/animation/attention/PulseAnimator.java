@@ -1,9 +1,8 @@
 package boundless.kit.rewards.animation.attention;
 
-import android.support.animation.DynamicAnimation;
-import android.support.animation.SpringAnimation;
-import android.util.TypedValue;
+import android.animation.ObjectAnimator;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
 
@@ -11,7 +10,7 @@ public class PulseAnimator extends BaseViewAnimator {
 
     public static class Builder {
         private int _count = 2;
-        private long _duration = 6000;
+        private long _duration = 860;
         private float _scale = 1.4f;
         private float _velocity = 5f;
         private float _damping = 2f;
@@ -55,12 +54,18 @@ public class PulseAnimator extends BaseViewAnimator {
 
     @Override
     public void prepare(View target) {
-        SpringAnimation animationX = new SpringAnimation(target, DynamicAnimation.SCALE_X, 1f)
-                .setStartVelocity(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, velocity, target.getResources().getDisplayMetrics()));;
-        SpringAnimation animationY = new SpringAnimation(target, DynamicAnimation.SCALE_Y, 1f)
-                .setStartVelocity(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, velocity, target.getResources().getDisplayMetrics()));;
-
-        animationX.start();
-        animationY.start();
+        float[] values = new float[11];
+        for (int i = 0; i < values.length; i++) {
+            values[i] = 1f;
+        }
+        for (int i = 0; i < count && (i*2 + 1)<values.length; i++) {
+            values[i*2 + 1] = scale;
+        }
+        setDuration(getDuration() * count);
+        getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
+        getAnimatorAgent().playTogether(
+                ObjectAnimator.ofFloat(target, "scaleY", values),
+                ObjectAnimator.ofFloat(target, "scaleX", values)
+        );
     }
 }
