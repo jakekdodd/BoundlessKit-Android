@@ -33,11 +33,9 @@ import android.view.animation.Interpolator;
 
 public abstract class BaseViewAnimator {
 
-    public static final long DURATION = 1000;
-
     private AnimatorSet mAnimatorSet;
 
-    private long mDuration = DURATION;
+    private long mDuration = -1;
     private int mRepeatTimes = 0;
     private int mRepeatMode = ValueAnimator.RESTART;
 
@@ -88,10 +86,15 @@ public abstract class BaseViewAnimator {
                 ((ValueAnimator) animator).setRepeatMode(mRepeatMode);
             }
         }
-        mAnimatorSet.setDuration(mDuration);
+        if (mDuration >= 0) {
+            mAnimatorSet.setDuration(mDuration);
+        }
         mAnimatorSet.start();
     }
 
+    /**
+     * A negative duration will rely on children animator durations
+     */
     public BaseViewAnimator setDuration(long duration) {
         mDuration = duration;
         return this;
