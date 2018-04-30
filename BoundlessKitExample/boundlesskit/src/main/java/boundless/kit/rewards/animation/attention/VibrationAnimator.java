@@ -1,25 +1,25 @@
 package boundless.kit.rewards.animation.attention;
 
 import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.graphics.Path;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
 
 public class VibrationAnimator extends BaseViewAnimator {
 
-    private int vibrateCount = 2;
+    private int vibrateCount = 4;
     private long vibrateDuration = 5000;
     private float vibrateTranslation = 30;
     private long vibrateSpeed = 3;
     private float scale = 0.8f;
-    private int scaleCount = 2;
-    private long scaleDuration = 5300;
+    private int scaleCount = 4;
+    private long scaleDuration = 800;
     private long scaleVeloctiy = 20;
     private long scaleDamping = 10;
-    { setDuration(Math.max(vibrateDuration, scaleDuration)); }
 
     public VibrationAnimator() {
         super();
@@ -36,8 +36,6 @@ public class VibrationAnimator extends BaseViewAnimator {
         this.scaleDuration = scaleDuration;
         this.scaleVeloctiy = scaleVeloctiy;
         this.scaleDamping = scaleDamping;
-//        setDuration(Math.max(vibrateDuration * vibrateCount, scaleDuration * scaleCount));
-        setDuration(Math.max(this.vibrateDuration, this.scaleDuration));
     }
 
     @Override
@@ -47,68 +45,47 @@ public class VibrationAnimator extends BaseViewAnimator {
         Path path = new Path();
         path.moveTo(x, y);
         float xMove = target.getWidth() * (vibrateTranslation/100f);
-        Log.v("Test", "Target width:" + target.getWidth() + " transaltion:" + vibrateTranslation + " diff:" + (vibrateTranslation/100));
         for(int i = 0; i < vibrateCount; i++) {
             path.lineTo(x + xMove, y);
             path.lineTo(x - xMove, y);
-            Log.v("Test", "Got point " + i + " with value:" + x + " diff:" + xMove);
         }
         path.lineTo(x, y);
         Animator shimmyAnimator = ObjectAnimator.ofFloat(target, View.X, View.Y, path);
-//        shimmyAnimator.setDuration(vibrateDuration / vibrateSpeed);
-//        setDuration(vibrateDuration / vibrateSpeed);
 
-
-        float[] values = new float[scaleCount*2 + 1];
-        for (int i = values.length - 1; i >= 0; i--) {
-            values[i] = (i%2 == 0) ? 1f : scale;
+        float[] values = new float[scaleCount * 2];
+        float[] reversedValues = new float[scaleCount * 2];
+        for (int i = reversedValues.length - 1; i >= 0; i--) {
+            if (i%2 == 0) {
+                values[i] = 1f;
+                reversedValues[i] = scale;
+            } else {
+                values[i] = scale;
+                reversedValues[i] = 1f;
+            }
         }
-
-        setDuration(getDuration() / vibrateSpeed);
-        Log.v("Test", "Got duration for vibrate:" + getDuration());
-
-//        getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
-
-        getAnimatorAgent().playTogether(
+        AnimatorSet zoomSet = new AnimatorSet();
+        AnimatorSet unzoomSet = new AnimatorSet();
+        zoomSet.playTogether(
                 ObjectAnimator.ofFloat(target, "scaleY", values),
-                ObjectAnimator.ofFloat(target, "scaleX", values),
-                shimmyAnimator
+                ObjectAnimator.ofFloat(target, "scaleX", values)
+        );
+        unzoomSet.playTogether(
+                ObjectAnimator.ofFloat(target, "scaleY", reversedValues),
+                ObjectAnimator.ofFloat(target, "scaleX", reversedValues)
         );
 
 
+        zoomSet.setDuration(scaleDuration/2);
+        shimmyAnimator.setStartDelay(zoomSet.getDuration() * 8 / 10);
+        shimmyAnimator.setDuration(vibrateDuration / vibrateSpeed);
+        unzoomSet.setStartDelay(zoomSet.getDuration() - shimmyAnimator.getStartDelay() + shimmyAnimator.getDuration());
+        unzoomSet.setDuration(scaleDuration/2);
 
-
-//        float[] values = new float[11];
-//        for (int i = 0; i < values.length; i++) {
-//            values[i] = 1f;
-//        }
-//        for (int i = 0; i < scaleCount && (i*2 + 1)<values.length; i++) {
-//            values[i*2 + 1] = scale;
-//        }
-//        Animator scaleXAnimator = ObjectAnimator.ofFloat(target, "scaleX", values)
-//                .setDuration(scaleDuration * scaleCount);
-//        Animator scaleYAnimator = ObjectAnimator.ofFloat(target, "scaleY", values)
-//                .setDuration(scaleDuration * scaleCount);
-//
-////        setDuration(Math.max(shimmyAnimator.getDuration(), scaleXAnimator.getDuration()));
-//        getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
-//        getAnimatorAgent().playTogether(shimmyAnimator, scaleXAnimator, scaleYAnimator);
-//
-//
-//
-//
-////        float x = target.getX();
-////        float y = target.getY();
-////        Path path = new Path();
-////        path.moveTo(x, y);
-////        float xMove = target.getWidth() * (vibrateTranslation/100);
-////        for(int i = 0; i < vibrateCount; i++) {
-////            path.lineTo(x + xMove, y);
-////            path.lineTo(x - xMove, y);
-////        }
-////        path.lineTo(x, y);
-////        Animator animator = ObjectAnimator.ofFloat(target, View.X, View.Y, path);
-//////        setDuration(getDuration() / vibrateSpeed);
-////        getAnimatorAgent().play(animator);
+        getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
+        getAnimatorAgent().playTogether(
+                zoomSet,
+                shimmyAnimator,
+                unzoomSet
+        );
     }
 }
