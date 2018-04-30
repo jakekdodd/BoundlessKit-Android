@@ -42,7 +42,7 @@ public class PulseAnimator extends BaseViewAnimator {
     private float velocity;
     private float damping;
 
-    // only uses scale currently
+    // does not use velocity or damping currently
     public PulseAnimator(int count, long duration, float scale, float velocity, float damping) {
         super();
         this.count = count;
@@ -54,14 +54,11 @@ public class PulseAnimator extends BaseViewAnimator {
 
     @Override
     public void prepare(View target) {
-        float[] values = new float[11];
+        float[] values = new float[count*2 + 1];
         for (int i = 0; i < values.length; i++) {
-            values[i] = 1f;
+            values[i] = (i%2 == 0) ? 1f : scale;
         }
-        for (int i = 0; i < count && (i*2 + 1)<values.length; i++) {
-            values[i*2 + 1] = scale;
-        }
-        setDuration(getDuration() * count);
+
         getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
         getAnimatorAgent().playTogether(
                 ObjectAnimator.ofFloat(target, "scaleY", values),
