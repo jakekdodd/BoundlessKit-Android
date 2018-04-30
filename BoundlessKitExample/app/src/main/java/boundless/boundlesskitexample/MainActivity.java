@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 //                                        logoView.startAnimation(rotate);
 
 
-                                        BaseViewAnimator animator = new VibrationAnimator();
+                                        BaseViewAnimator animator = new VibrationAnimator().setScale(1.2f);
                                         animator.prepare(logoView);
                                         animator.animate();
 

@@ -27,15 +27,49 @@ public class VibrationAnimator extends BaseViewAnimator {
 
     public VibrationAnimator(int vibrateCount, long vibrateDuration, long vibrateTranslation, long vibrateSpeed, float scale, int scaleCount, long scaleDuration, long scaleVeloctiy, long scaleDamping) {
         super();
-        this.vibrateCount  = vibrateCount ;
-        this.vibrateDuration = vibrateDuration;
-        this.vibrateTranslation = vibrateTranslation;
-        this.vibrateSpeed = vibrateSpeed;
-        this.scale = scale;
-        this.scaleCount = scaleCount;
-        this.scaleDuration = scaleDuration;
+        setVibrateCount(vibrateCount);
+        setVibrateDuration(vibrateDuration);
+        setVibrateTranslation(vibrateTranslation);
+        setVibrateSpeed(vibrateSpeed);
+        setScale(scale);
+        setScaleCount(scaleCount);
         this.scaleVeloctiy = scaleVeloctiy;
         this.scaleDamping = scaleDamping;
+    }
+
+    public VibrationAnimator setVibrateCount(int count) {
+        this.vibrateCount = count;
+        return this;
+    }
+
+    public VibrationAnimator setVibrateDuration(long duration) {
+        this.vibrateDuration = duration;
+        return this;
+    }
+
+    public VibrationAnimator setVibrateTranslation(long translation) {
+        this.vibrateTranslation = translation;
+        return this;
+    }
+
+    public VibrationAnimator setVibrateSpeed(long speed) {
+        this.vibrateSpeed = speed;
+        return this;
+    }
+
+    public VibrationAnimator setScale(float scale) {
+        this.scale = scale;
+        return this;
+    }
+
+    public VibrationAnimator setScaleCount(int count) {
+        this.scaleCount = count;
+        return this;
+    }
+
+    public VibrationAnimator setScaleDuration(long duration) {
+        this.scaleDuration = duration;
+        return this;
     }
 
     @Override
@@ -78,7 +112,7 @@ public class VibrationAnimator extends BaseViewAnimator {
         zoomSet.setDuration(scaleDuration/2);
         shimmyAnimator.setStartDelay(zoomSet.getDuration() * 8 / 10);
         shimmyAnimator.setDuration(vibrateDuration / vibrateSpeed);
-        unzoomSet.setStartDelay(zoomSet.getDuration() + shimmyAnimator.getDuration());
+        unzoomSet.setStartDelay(shimmyAnimator.getStartDelay() + shimmyAnimator.getDuration());
         unzoomSet.setDuration(scaleDuration/2);
 
         getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
