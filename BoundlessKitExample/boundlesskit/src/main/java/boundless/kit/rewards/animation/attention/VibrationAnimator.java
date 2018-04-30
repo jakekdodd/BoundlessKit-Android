@@ -11,13 +11,13 @@ import boundless.kit.rewards.animation.BaseViewAnimator;
 
 public class VibrationAnimator extends BaseViewAnimator {
 
-    private int vibrateCount = 4;
-    private long vibrateDuration = 5000;
-    private float vibrateTranslation = 30;
-    private long vibrateSpeed = 3;
+    private int vibrateCount = 6;
+    private long vibrateDuration = 1000;
+    private float vibrateTranslation = 10;
+    private long vibrateSpeed = 1;
     private float scale = 0.8f;
-    private int scaleCount = 4;
-    private long scaleDuration = 800;
+    private int scaleCount = 1;
+    private long scaleDuration = 300;
     private long scaleVeloctiy = 20;
     private long scaleDamping = 10;
 
