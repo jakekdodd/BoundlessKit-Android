@@ -78,7 +78,7 @@ public class VibrationAnimator extends BaseViewAnimator {
         zoomSet.setDuration(scaleDuration/2);
         shimmyAnimator.setStartDelay(zoomSet.getDuration() * 8 / 10);
         shimmyAnimator.setDuration(vibrateDuration / vibrateSpeed);
-        unzoomSet.setStartDelay(zoomSet.getDuration() - shimmyAnimator.getStartDelay() + shimmyAnimator.getDuration());
+        unzoomSet.setStartDelay(zoomSet.getDuration() + shimmyAnimator.getDuration());
         unzoomSet.setDuration(scaleDuration/2);
 
         getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
