@@ -32,7 +32,7 @@ import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
 import boundless.kit.rewards.animation.BaseViewAnimator;
-import boundless.kit.rewards.animation.attention.PulseAnimator;
+import boundless.kit.rewards.animation.attention.VibrationAnimator;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 //                                        logoView.startAnimation(rotate);
 
 
-                                        BaseViewAnimator animator = new PulseAnimator().setScale(1.86f);
+                                        BaseViewAnimator animator = new VibrationAnimator();
                                         animator.prepare(logoView);
                                         animator.animate();
 
