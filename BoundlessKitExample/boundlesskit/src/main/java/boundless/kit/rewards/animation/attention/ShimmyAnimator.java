@@ -33,39 +33,42 @@ import boundless.kit.rewards.animation.BaseViewAnimator;
 
 public class ShimmyAnimator extends BaseViewAnimator {
 
-    public static class Builder {
-        private int _count = 2;
-        private long _duration = 5000;
-        private long _translation = 30;
-        private long _speed = 3;
+    private int count = 2;
+    { setDuration(5000); }
+    private float translation = 30;
+    private long speed = 3;
 
-        public Builder() { }
-
-        public ShimmyAnimator build() {
-            return new ShimmyAnimator(_count, _duration, _translation, _speed);
-        }
-
-        public Builder count(int _count) {
-            this._count = _count;
-            return this;
-        }
-
-        public Builder duration(long _duration) {
-            this._duration= _duration;
-            return this;
-        }
+    public ShimmyAnimator() {
+        super();
     }
-
-    private int count;
-    private float translation;
-    private long speed;
 
     public ShimmyAnimator(int count, long duration, float translation, long speed) {
         super();
-        this.count = count;
+        setCount(count);
         setDuration(duration);
+        setTranslation(translation);
+        setSpeed(speed);
+    }
+
+    public ShimmyAnimator setCount(int count) {
+        this.count = count;
+        return this;
+    }
+
+    @Override
+    public ShimmyAnimator setDuration(long duration) {
+        super.setDuration(duration);
+        return this;
+    }
+
+    public ShimmyAnimator setTranslation(float translation) {
         this.translation = translation;
+        return this;
+    }
+
+    public ShimmyAnimator setSpeed(long speed) {
         this.speed = speed;
+        return this;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class ShimmyAnimator extends BaseViewAnimator {
         float y = target.getY();
         Path path = new Path();
         path.moveTo(x, y);
-        float xMove = target.getWidth() * (translation/100);
+        float xMove = target.getWidth() * (translation/100f);
         for(int i = 0; i < count; i++) {
             path.lineTo(x + xMove, y);
             path.lineTo(x - xMove, y);
