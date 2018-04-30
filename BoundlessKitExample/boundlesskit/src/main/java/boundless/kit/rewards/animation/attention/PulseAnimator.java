@@ -8,48 +8,40 @@ import boundless.kit.rewards.animation.BaseViewAnimator;
 
 public class PulseAnimator extends BaseViewAnimator {
 
-    public static class Builder {
-        private int _count = 2;
-        private long _duration = 860;
-        private float _scale = 1.4f;
-        private float _velocity = 5f;
-        private float _damping = 2f;
+    private int count = 2;
+    { setDuration(860); }
+    private float scale = 1.4f;
+    private float velocity = 5f;
+    private float damping = 2f;
 
-        public Builder() { }
-
-        public PulseAnimator build() {
-            return new PulseAnimator(_count, _duration, _scale, _velocity, _damping);
-        }
-
-        public PulseAnimator.Builder count(int _count) {
-            this._count = _count;
-            return this;
-        }
-
-        public PulseAnimator.Builder duration(long _duration) {
-            this._duration = _duration;
-            return this;
-        }
-
-        public PulseAnimator.Builder scale(long _scale) {
-            this._scale =  _scale;
-            return this;
-        }
+    public PulseAnimator() {
+        super();
     }
-
-    private int count;
-    private float scale;
-    private float velocity;
-    private float damping;
 
     // does not use velocity or damping currently
     public PulseAnimator(int count, long duration, float scale, float velocity, float damping) {
         super();
-        this.count = count;
+        setCount(count);
         setDuration(duration);
-        this.scale = scale;
+        setScale(scale);
         this.velocity = velocity;
         this.damping = damping;
+    }
+
+    public PulseAnimator setCount(int count) {
+        this.count = count;
+        return this;
+    }
+
+    @Override
+    public PulseAnimator setDuration(long duration) {
+        super.setDuration(duration);
+        return this;
+    }
+
+    public PulseAnimator setScale(float scale) {
+        this.scale = scale;
+        return this;
     }
 
     @Override
