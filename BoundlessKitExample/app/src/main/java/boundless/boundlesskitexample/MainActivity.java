@@ -7,12 +7,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,8 +33,7 @@ import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.BaseViewAnimator;
-import boundless.kit.rewards.animation.attention.VibrationAnimator;
+import boundless.kit.rewards.animation.particle.Emojisplosion;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -204,9 +205,13 @@ public class MainActivity extends AppCompatActivity {
 //                                        logoView.startAnimation(rotate);
 
 
-                                        BaseViewAnimator animator = new VibrationAnimator().setScale(1.2f);
-                                        animator.prepare(logoView);
-                                        animator.animate();
+//                                        BaseViewAnimator animator = new VibrationAnimator().setScale(1.2f);
+//                                        animator.prepare(logoView);
+//                                        animator.animate();
+                                        ViewGroup group = (ViewGroup) findViewById(android.R.id.content);
+                                        new Emojisplosion(0, 0, ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_balloon))
+                                                .prepare(group);
+
 
 
 //                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
