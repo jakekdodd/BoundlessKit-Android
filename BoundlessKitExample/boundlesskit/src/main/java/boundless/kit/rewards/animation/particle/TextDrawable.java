@@ -2,7 +2,6 @@ package boundless.kit.rewards.animation.particle;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -10,19 +9,19 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.util.TypedValue;
 
-class TextDrawable extends Drawable {
+public class TextDrawable extends Drawable {
 
     private String text;
     private int mIntrinsicWidth;
     private int mIntrinsicHeight;
     private final Paint paint;
 
-    public TextDrawable(Context context, String text, float textSize) {
+    public TextDrawable(Context context, String text, float textSize, int color) {
 
         this.text = text;
 
         this.paint = new Paint();
-        paint.setColor(Color.BLACK);
+        paint.setColor(color);
         paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
                 textSize, context.getResources().getDisplayMetrics()));
         paint.setAntiAlias(true);

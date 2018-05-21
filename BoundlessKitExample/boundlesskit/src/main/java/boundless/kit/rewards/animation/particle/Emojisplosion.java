@@ -1,6 +1,5 @@
 package boundless.kit.rewards.animation.particle;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,11 +68,6 @@ public class Emojisplosion extends BaseViewAnimator {
 
     public Emojisplosion setContent(Drawable content) {
         this.content = content;
-        return this;
-    }
-
-    public Emojisplosion setStringContent(Context context, String content, float textSize, int color) {
-        this.content = new TextDrawable(context, content, textSize, color);
         return this;
     }
 

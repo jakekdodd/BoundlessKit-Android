@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,7 +31,7 @@ import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.particle.Emojisplosion;
+import boundless.kit.rewards.animation.BaseViewAnimator;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -203,15 +202,7 @@ public class MainActivity extends AppCompatActivity {
 //                                        rotate.setRepeatCount(1);
 //                                        logoView.startAnimation(rotate);
 
-
-//                                        BaseViewAnimator animator = new VibrationAnimator().setScale(1.2f);
-//                                        animator.prepare(logoView);
-//                                        animator.animate();
-                                        ViewGroup group = (ViewGroup) findViewById(android.R.id.content);
-//                                        new Emojisplosion().setContent(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_balloon))
-//                                                .prepare(group);
-                                        new Emojisplosion().setStringContent(getApplicationContext(), "\u200FO\uD83D\uDE00\nHELLO", 42f, Color.parseColor("#FF0000"))
-                                                .prepare(group);
+                                        BaseViewAnimator.test(MainActivity.this);
 
 
 //                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
