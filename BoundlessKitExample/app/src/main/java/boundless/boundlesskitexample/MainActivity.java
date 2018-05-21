@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -209,9 +208,10 @@ public class MainActivity extends AppCompatActivity {
 //                                        animator.prepare(logoView);
 //                                        animator.animate();
                                         ViewGroup group = (ViewGroup) findViewById(android.R.id.content);
-                                        new Emojisplosion(0, 0, ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_balloon))
+//                                        new Emojisplosion().setContent(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_balloon))
+//                                                .prepare(group);
+                                        new Emojisplosion().setStringContent(getApplicationContext(), "\u200FO\uD83D\uDE00\nHELLO", 42f, Color.parseColor("#FF0000"))
                                                 .prepare(group);
-
 
 
 //                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);

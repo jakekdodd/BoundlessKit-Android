@@ -1,5 +1,6 @@
 package boundless.kit.rewards.animation.particle;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +26,9 @@ public class Emojisplosion extends BaseViewAnimator {
     private float range = 45f;
     private float spin = 0f;
 
+    public Emojisplosion() {}
 
-    public Emojisplosion(int x, Drawable content, float scale, float scaleRange, long lifetime, long lifetimeRange, float fadeout, float quantity, int bursts, float velocity, float xAcceleration, float yAcceleration, float angle, float range, float spin) {
+    public Emojisplosion(int x, int y, Drawable content, float scale, float scaleRange, long lifetime, long lifetimeRange, float fadeout, float quantity, int bursts, float velocity, float xAcceleration, float yAcceleration, float angle, float range, float spin) {
         this.x = x;
         this.y = y;
         this.content = content;
@@ -46,9 +48,12 @@ public class Emojisplosion extends BaseViewAnimator {
     }
 
     public void prepare(View target) {
+        if (content == null) {
+            return;
+        }
 //        target.add
-        new ParticleSystem((ViewGroup)target, 2, content, 2000)
-                .setSpeedRange(0.2f, 0.5f)
+        new ParticleSystem((ViewGroup)target, 3, content, 2000)
+                .setSpeedRange(0.1f, 0.1f)
                 .oneShot(target, 2);
     }
 
@@ -64,6 +69,11 @@ public class Emojisplosion extends BaseViewAnimator {
 
     public Emojisplosion setContent(Drawable content) {
         this.content = content;
+        return this;
+    }
+
+    public Emojisplosion setStringContent(Context context, String content, float textSize, int color) {
+        this.content = new TextDrawable(context, content, textSize, color);
         return this;
     }
 
