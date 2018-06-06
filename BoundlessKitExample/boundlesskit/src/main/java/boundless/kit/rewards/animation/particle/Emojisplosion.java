@@ -1,10 +1,13 @@
 package boundless.kit.rewards.animation.particle;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
+import boundless.kit.rewards.animation.particle.modifiers.ScaleModifier;
 
 public class Emojisplosion extends BaseViewAnimator {
 
@@ -13,10 +16,11 @@ public class Emojisplosion extends BaseViewAnimator {
     private Drawable content;
     private float scale = 0.6f;
     private float scaleRange = 0.2f;
-    private long lifetime = 3000;
+    private long lifetime = 5000;
     private long lifetimeRange = 500;
-    private float fadeout = -0.2f;
-    private float quantity = 6f;
+    private long fadeIn = 2000;
+    private long fadeOut = 500;
+    private int quantity = 6;
     private int bursts = 1;
     private float velocity = -50f;
     private float xAcceleration = 0f;
@@ -27,7 +31,7 @@ public class Emojisplosion extends BaseViewAnimator {
 
     public Emojisplosion() {}
 
-    public Emojisplosion(int x, int y, Drawable content, float scale, float scaleRange, long lifetime, long lifetimeRange, float fadeout, float quantity, int bursts, float velocity, float xAcceleration, float yAcceleration, float angle, float range, float spin) {
+    public Emojisplosion(int x, int y, Drawable content, float scale, float scaleRange, long lifetime, long lifetimeRange, long fadeIn, long fadeOut, int quantity, int bursts, float velocity, float xAcceleration, float yAcceleration, float angle, float range, float spin) {
         this.x = x;
         this.y = y;
         this.content = content;
@@ -35,7 +39,8 @@ public class Emojisplosion extends BaseViewAnimator {
         this.scaleRange = scaleRange;
         this.lifetime = lifetime;
         this.lifetimeRange = lifetimeRange;
-        this.fadeout = fadeout;
+        this.fadeIn = fadeIn;
+        this.fadeOut = fadeOut;
         this.quantity = quantity;
         this.bursts = bursts;
         this.velocity = velocity;
@@ -51,9 +56,16 @@ public class Emojisplosion extends BaseViewAnimator {
             return;
         }
 //        target.add
-        new ParticleSystem((ViewGroup)target, 3, content, 2000)
-                .setSpeedRange(0.1f, 0.1f)
-                .oneShot(target, 2);
+        ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, bursts * quantity, content, lifetime)
+                .addModifier(new ScaleModifier(scale, scale + scaleRange, 0, lifetime, new LinearInterpolator()))
+//                .setSpeedModuleAndAngleRange(velocity, velocity, (int)(angle + 0.5 * range), (int)(angle - 0.5 * range))
+//                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
+//                .setFadeIn(fadeIn)
+//                .setFadeOut(fadeOut)
+//                .setRotationSpeedRange(spin, spin)
+        ;
+        Log.v("Test", "Width:" + (target.getHeight()/2));
+        particleSystem.emit(target.getWidth() / 2, target.getHeight() / 2, quantity, bursts);
     }
 
     public Emojisplosion setX(int x) {
@@ -91,12 +103,17 @@ public class Emojisplosion extends BaseViewAnimator {
         return this;
     }
 
-    public Emojisplosion setFadeout(float fadeout) {
-        this.fadeout = fadeout;
+    public Emojisplosion setFadeOut(long fadeOut) {
+        this.fadeOut = fadeOut;
         return this;
     }
 
-    public Emojisplosion setQuantity(float quantity) {
+    public Emojisplosion setFadeIn(long fadeIn) {
+        this.fadeIn = fadeOut;
+        return this;
+    }
+
+    public Emojisplosion setQuantity(int quantity) {
         this.quantity = quantity;
         return this;
     }

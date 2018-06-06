@@ -5,14 +5,15 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -27,11 +28,11 @@ import com.hudomju.swipe.adapter.ListViewAdapter;
 
 import java.util.ArrayList;
 
-import boundless.boundlesskitexample.Candy.CandyBar;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.BaseViewAnimator;
+import boundless.kit.rewards.animation.particle.Emojisplosion;
+import boundless.kit.rewards.animation.particle.ParticleSystem;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -202,37 +203,47 @@ public class MainActivity extends AppCompatActivity {
 //                                        rotate.setRepeatCount(1);
 //                                        logoView.startAnimation(rotate);
 
-                                        BaseViewAnimator.test(MainActivity.this);
+//                                        BaseViewAnimator.test(MainActivity.this);
 
+                                        new ParticleSystem(MainActivity.this, 80, R.drawable.red_balloon, 10000)
+                                                .setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
+                                                .setRotationSpeed(144)
+                                                .setAcceleration(0.00005f, 90)
+                                                .emit(findViewById(android.R.id.content), 8);
 
-//                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
-                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
+                                        ViewGroup group = findViewById(android.R.id.content);
+                                        new Emojisplosion().setContent(ContextCompat.getDrawable(getApplicationContext(), boundless.kit.R.drawable.red_balloon))
+//                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
+                                                .prepare(group);
 
-                                            @Override
-                                            public void onReinforcement(String reinforcement) {
-                                                // Show some candy and make them feel good!
-                                                CandyBar candyBar = null;
-                                                switch (reinforcement) {
-                                                    case "stars":
-                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
-                                                        break;
-                                                    case "medalStar":
-                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
-                                                        break;
-                                                    case "thumbsUp":
-                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
-                                                        break;
-                                                    default:
-                                                        // Show nothing! This is called a neutral response,
-                                                        // and builds up the good feelings for the next surprise!
-                                                        break;
-                                                }
-                                                if (candyBar != null) {
-                                                    candyBar.show();
-                                                }
-                                            }
-
-                                        });
+////                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
+//                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
+//
+//                                            @Override
+//                                            public void onReinforcement(String reinforcement) {
+//                                                // Show some candy and make them feel good!
+//                                                CandyBar candyBar = null;
+//                                                switch (reinforcement) {
+//                                                    case "stars":
+//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
+//                                                        break;
+//                                                    case "medalStar":
+//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
+//                                                        break;
+//                                                    case "thumbsUp":
+//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
+//                                                        break;
+//                                                    default:
+//                                                        // Show nothing! This is called a neutral response,
+//                                                        // and builds up the good feelings for the next surprise!
+//                                                        break;
+//                                                }
+//                                                if (candyBar != null) {
+//                                                    candyBar.show();
+//                                                }
+//                                            }
+//
+//                                        });
 
 
 //                                    HashMap<String, String> metaData = new HashMap<String, String>();

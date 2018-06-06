@@ -439,6 +439,26 @@ public class ParticleSystem {
 	}
 
 	/**
+	 * Configures a fade in for the particles when they appear
+	 *
+	 * @param duration fade in duration in milliseconds
+	 * @param interpolator the interpolator for the fade in (default is linear)
+	 */
+	public ParticleSystem setFadeIn(long duration, Interpolator interpolator) {
+		mModifiers.add(new AlphaModifier(0, 255, 0, duration, interpolator));
+		return this;
+	}
+
+	/**
+	 * Configures a fade in for the particles when they appear
+	 *
+	 * @param duration fade in duration in milliseconds
+	 */
+	public ParticleSystem setFadeIn(long duration) {
+		return setFadeIn(duration, new LinearInterpolator());
+	}
+
+	/**
 	 * Starts emitting particles from a specific view. If at some point the number goes over the amount of particles availabe on create
 	 * no new particles will be created
 	 *

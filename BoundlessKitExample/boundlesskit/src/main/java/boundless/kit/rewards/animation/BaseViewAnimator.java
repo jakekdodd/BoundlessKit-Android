@@ -27,29 +27,25 @@ package boundless.kit.rewards.animation;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
-import android.app.Activity;
-import android.graphics.Color;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Interpolator;
-
-import boundless.kit.rewards.animation.particle.Emojisplosion;
-import boundless.kit.rewards.animation.particle.TextDrawable;
 
 
 public abstract class BaseViewAnimator {
 
-    public static void test(Activity activity) {
-
-//        BaseViewAnimator animator = new VibrationAnimator().setScale(1.2f);
-//        animator.prepare(logoView);
-//        animator.animate();
-        ViewGroup group = (ViewGroup) activity.findViewById(android.R.id.content);
-//        new Emojisplosion().setContent(ContextCompat.getDrawable(getApplicationContext(), R.drawable.red_balloon))
+//    public static void test(View view) {
+//
+//////        BaseViewAnimator animator = new VibrationAnimator().setScale(1.2f);
+//////        animator.prepare(logoView);
+//////        animator.animate();
+////        ViewGroup group = (ViewGroup) activity.findViewById(android.R.id.content);
+//        new Emojisplosion().setContent(ContextCompat.getDrawable(activity.getApplicationContext(), R.drawable.red_balloon))
 //                .prepare(group);
-        new Emojisplosion().setContent(new TextDrawable(activity.getApplicationContext(), "\u200FO\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
-                .prepare(group);
-    }
+////        new Emojisplosion().setContent(new TextDrawable(activity.getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
+////                .prepare(group);
+//
+////        new CandyBar(activity.findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT).show();
+//    }
 
     private AnimatorSet mAnimatorSet;
 
