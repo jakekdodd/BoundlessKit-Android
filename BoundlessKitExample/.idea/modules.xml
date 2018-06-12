@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/BoundlessKitExample.iml" filepath="$PROJECT_DIR$/.idea/BoundlessKitExample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BoundlessKitExample.iml" filepath="$PROJECT_DIR$/BoundlessKitExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/boundlesskit/boundlesskit.iml" filepath="$PROJECT_DIR$/boundlesskit/boundlesskit.iml" />
     </modules>

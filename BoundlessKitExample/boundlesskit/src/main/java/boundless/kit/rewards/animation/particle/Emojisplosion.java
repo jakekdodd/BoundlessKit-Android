@@ -7,27 +7,28 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
+import boundless.kit.rewards.animation.particle.initializers.XYAccelerationInitializer;
 import boundless.kit.rewards.animation.particle.modifiers.ScaleModifier;
 
 public class Emojisplosion extends BaseViewAnimator {
 
-    private int x = 0;
-    private int y = 0;
+    private int x = 50;
+    private int y = 50;
     private Drawable content;
     private float scale = 0.6f;
     private float scaleRange = 0.2f;
-    private long lifetime = 5000;
+    private long lifetime = 3000;
     private long lifetimeRange = 500;
-    private long fadeIn = 2000;
-    private long fadeOut = 500;
-    private int quantity = 6;
-    private int bursts = 1;
-    private float velocity = -50f;
-    private float xAcceleration = 0f;
-    private float yAcceleration = -150f;
+    private long fadeIn = 1000;
+    private long fadeOut = 1000;
+    private int quantity = 1;
+    private int bursts = 3000;
+    private float velocity = 0.003f;
+    private float xAcceleration = 0.00002f;
+    private float yAcceleration = -0.00005f;
     private float angle = -90f;
     private float range = 45f;
-    private float spin = 0f;
+    private float spin = 10f;
 
     public Emojisplosion() {}
 
@@ -58,14 +59,14 @@ public class Emojisplosion extends BaseViewAnimator {
 //        target.add
         ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, bursts * quantity, content, lifetime)
                 .addModifier(new ScaleModifier(scale, scale + scaleRange, 0, lifetime, new LinearInterpolator()))
-//                .setSpeedModuleAndAngleRange(velocity, velocity, (int)(angle + 0.5 * range), (int)(angle - 0.5 * range))
-//                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
-//                .setFadeIn(fadeIn)
-//                .setFadeOut(fadeOut)
-//                .setRotationSpeedRange(spin, spin)
+                .setSpeedModuleAndAngleRange(velocity, velocity, (int)(angle + 0.5 * range), (int)(angle - 0.5 * range))
+                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
+                .setFadeOut(fadeOut)
+                .setFadeIn(fadeIn)
+                .setRotationSpeedRange(spin, spin)
         ;
         Log.v("Test", "Width:" + (target.getHeight()/2));
-        particleSystem.emit(target.getWidth() / 2, target.getHeight() / 2, quantity, bursts);
+        particleSystem.emit(x, y, quantity, bursts);
     }
 
     public Emojisplosion setX(int x) {
@@ -109,7 +110,7 @@ public class Emojisplosion extends BaseViewAnimator {
     }
 
     public Emojisplosion setFadeIn(long fadeIn) {
-        this.fadeIn = fadeOut;
+        this.fadeIn = fadeIn;
         return this;
     }
 

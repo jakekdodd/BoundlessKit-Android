@@ -205,16 +205,18 @@ public class MainActivity extends AppCompatActivity {
 
 //                                        BaseViewAnimator.test(MainActivity.this);
 
-                                        new ParticleSystem(MainActivity.this, 80, R.drawable.red_balloon, 10000)
-                                                .setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
-                                                .setRotationSpeed(144)
-                                                .setAcceleration(0.00005f, 90)
-                                                .emit(findViewById(android.R.id.content), 8);
+//                                        new ParticleSystem(MainActivity.this, 80, R.drawable.red_balloon, 10000)
+//                                                .setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
+//                                                .setRotationSpeed(144)
+//                                                .setAcceleration(0.00005f, 90)
+//                                                .emit(findViewById(android.R.id.content), 8);
 
-                                        ViewGroup group = findViewById(android.R.id.content);
-                                        new Emojisplosion().setContent(ContextCompat.getDrawable(getApplicationContext(), boundless.kit.R.drawable.red_balloon))
-//                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
-                                                .prepare(group);
+                                        View contentView = findViewById(android.R.id.content);
+                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+////                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
+                                                .setX(contentView.getWidth() / 2)
+                                                .setY(contentView.getHeight() * 2 / 3)
+                                                .prepare(findViewById(android.R.id.content));
 
 ////                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
 //                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
