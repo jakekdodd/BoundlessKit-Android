@@ -18,24 +18,6 @@ public class VibrationAnimator extends BaseViewAnimator {
     private float scale = 0.8f;
     private int scaleCount = 1;
     private long scaleDuration = 300;
-    private long scaleVeloctiy = 20;
-    private long scaleDamping = 10;
-
-    public VibrationAnimator() {
-        super();
-    }
-
-    public VibrationAnimator(int vibrateCount, long vibrateDuration, long vibrateTranslation, long vibrateSpeed, float scale, int scaleCount, long scaleDuration, long scaleVeloctiy, long scaleDamping) {
-        super();
-        setVibrateCount(vibrateCount);
-        setVibrateDuration(vibrateDuration);
-        setVibrateTranslation(vibrateTranslation);
-        setVibrateSpeed(vibrateSpeed);
-        setScale(scale);
-        setScaleCount(scaleCount);
-        this.scaleVeloctiy = scaleVeloctiy;
-        this.scaleDamping = scaleDamping;
-    }
 
     public VibrationAnimator setVibrateCount(int count) {
         this.vibrateCount = count;
@@ -115,8 +97,8 @@ public class VibrationAnimator extends BaseViewAnimator {
         unzoomSet.setStartDelay(shimmyAnimator.getStartDelay() + shimmyAnimator.getDuration());
         unzoomSet.setDuration(scaleDuration/2);
 
-        getAnimatorAgent().setInterpolator(new AccelerateDecelerateInterpolator());
-        getAnimatorAgent().playTogether(
+        getAnimator().setInterpolator(new AccelerateDecelerateInterpolator());
+        getAnimator().playTogether(
                 zoomSet,
                 shimmyAnimator,
                 unzoomSet

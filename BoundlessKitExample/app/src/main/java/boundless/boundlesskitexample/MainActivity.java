@@ -1,19 +1,18 @@
 package boundless.boundlesskitexample;
 
 
+import android.animation.AnimatorSet;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -31,8 +30,8 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.particle.Emojisplosion;
-import boundless.kit.rewards.animation.particle.ParticleSystem;
+import boundless.kit.rewards.animation.attention.PulseAnimator;
+import boundless.kit.rewards.animation.attention.ShimmyAnimator;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -212,11 +211,27 @@ public class MainActivity extends AppCompatActivity {
 //                                                .emit(findViewById(android.R.id.content), 8);
 
                                         View contentView = findViewById(android.R.id.content);
-                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-////                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
-                                                .setX(contentView.getWidth() / 2)
-                                                .setY(contentView.getHeight() * 2 / 3)
-                                                .prepare(findViewById(android.R.id.content));
+//                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+//////                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
+//                                                .setX(contentView.getWidth() / 2)
+//                                                .setY(contentView.getHeight() * 2 / 3)
+//                                                .prepare(findViewById(android.R.id.content));
+
+                                        ShimmyAnimator shimmyAnimator = new ShimmyAnimator();
+                                        shimmyAnimator.setDuration(5070).setTranslation(50);
+
+                                        PulseAnimator pulseAnimator = new PulseAnimator();
+
+//                                        pulseAnimator.start();
+//                                        shimmyAnimator.getAnimatorAgent().
+//                                        shimmyAnimator.animate(contentView);
+//                                        pulseAnimator.animate(contentView);
+
+                                        shimmyAnimator.prepare(contentView);
+                                        pulseAnimator.prepare(contentView);
+                                        AnimatorSet set = new AnimatorSet();
+                                        set.playTogether(shimmyAnimator.getAnimator(), pulseAnimator.getAnimator());
+                                        set.start();
 
 ////                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
 //                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {

@@ -26,47 +26,24 @@ package boundless.kit.rewards.animation;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.animation.ValueAnimator;
 import android.view.View;
-import android.view.animation.Interpolator;
 
+public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
 
-public abstract class BaseViewAnimator {
+    private AnimatorSet mAnimatorSet = new AnimatorSet();
 
-//    public static void test(View view) {
-//
-//////        BaseViewAnimator animator = new VibrationAnimator().setScale(1.2f);
-//////        animator.prepare(logoView);
-//////        animator.animate();
-////        ViewGroup group = (ViewGroup) activity.findViewById(android.R.id.content);
-//        new Emojisplosion().setContent(ContextCompat.getDrawable(activity.getApplicationContext(), R.drawable.red_balloon))
-//                .prepare(group);
-////        new Emojisplosion().setContent(new TextDrawable(activity.getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
-////                .prepare(group);
-//
-////        new CandyBar(activity.findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT).show();
-//    }
-
-    private AnimatorSet mAnimatorSet;
-
-    private long mDuration = -1;
-    private int mRepeatTimes = 0;
-    private int mRepeatMode = ValueAnimator.RESTART;
-
-    {
-        mAnimatorSet = new AnimatorSet();
+    public void animate(View target) {
+        prepare(target);
+        start();
     }
 
     public abstract void prepare(View target);
 
-    public BaseViewAnimator setTarget(View target) {
-        reset(target);
-        prepare(target);
-        return this;
-    }
-
-    public void animate() {
-        start();
+    /**
+     * start to animate
+     */
+    public void start() {
+        mAnimatorSet.start();
     }
 
     public void restart() {
@@ -90,84 +67,50 @@ public abstract class BaseViewAnimator {
         target.setRotationX(0);
     }
 
-    /**
-     * start to animate
-     */
-    public void start() {
-        for (Animator animator : mAnimatorSet.getChildAnimations()) {
-            if (animator instanceof ValueAnimator) {
-                ((ValueAnimator) animator).setRepeatCount(mRepeatTimes);
-                ((ValueAnimator) animator).setRepeatMode(mRepeatMode);
-            }
-        }
-        if (mDuration >= 0) {
-            mAnimatorSet.setDuration(mDuration);
-        }
-        mAnimatorSet.start();
+
+    public AnimatorSet getAnimator() {
+        return mAnimatorSet;
     }
 
-    /**
-     * A negative duration will rely on children animator durations
-     */
-    public BaseViewAnimator setDuration(long duration) {
-        mDuration = duration;
-        return this;
+    public long getDuration() {
+        return mAnimatorSet.getDuration();
     }
 
-    public BaseViewAnimator setStartDelay(long delay) {
-        getAnimatorAgent().setStartDelay(delay);
-        return this;
+    @SuppressWarnings("unchecked")
+    public T setDuration(long duration) {
+        mAnimatorSet.setDuration(duration);
+        return (T)this;
     }
 
     public long getStartDelay() {
         return mAnimatorSet.getStartDelay();
     }
 
-    public BaseViewAnimator addAnimatorListener(Animator.AnimatorListener l) {
-        mAnimatorSet.addListener(l);
-        return this;
-    }
-
-    public void cancel() {
-        mAnimatorSet.cancel();
-    }
-
-    public boolean isRunning() {
-        return mAnimatorSet.isRunning();
+    @SuppressWarnings("unchecked")
+    public T setStartDelay(long delay) {
+        mAnimatorSet.setStartDelay(delay);
+        return (T)this;
     }
 
     public boolean isStarted() {
         return mAnimatorSet.isStarted();
     }
 
-    public void removeAnimatorListener(Animator.AnimatorListener l) {
-        mAnimatorSet.removeListener(l);
+    public boolean isRunning() {
+        return mAnimatorSet.isRunning();
+    }
+
+    public void cancel() {
+        mAnimatorSet.cancel();
+    }
+
+    @SuppressWarnings("unchecked")
+    public T addListener(Animator.AnimatorListener l) {
+        mAnimatorSet.addListener(l);
+        return (T)this;
     }
 
     public void removeAllListener() {
         mAnimatorSet.removeAllListeners();
-    }
-
-    public BaseViewAnimator setInterpolator(Interpolator interpolator) {
-        mAnimatorSet.setInterpolator(interpolator);
-        return this;
-    }
-
-    public long getDuration() {
-        return mDuration;
-    }
-
-    public AnimatorSet getAnimatorAgent() {
-        return mAnimatorSet;
-    }
-
-    public BaseViewAnimator setRepeatTimes(int repeatTimes) {
-        mRepeatTimes = repeatTimes;
-        return this;
-    }
-
-    public BaseViewAnimator setRepeatMode(int repeatMode) {
-        mRepeatMode = repeatMode;
-        return this;
     }
 }

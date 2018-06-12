@@ -33,30 +33,6 @@ public class Emojisplosion extends BaseViewAnimator {
     private float rotationSpeed = 10f;
     private float rotationSpeedRange = 130f;
 
-
-    public Emojisplosion() {}
-
-    public Emojisplosion(int x, int y, Drawable content, float scale, float scaleChange, long lifetime, long lifetimeRange, long fadeIn, long fadeOut, int quantity, int duration, float velocity, float velocityRange, float xAcceleration, float yAcceleration, float shootingAngle, float shootingAngleRange, float rotationSpeed) {
-        this.x = x;
-        this.y = y;
-        this.content = content;
-        this.scale = scale;
-        this.scaleChange = scaleChange;
-        this.lifetime = lifetime;
-        this.lifetimeRange = lifetimeRange;
-        this.fadeIn = fadeIn;
-        this.fadeOut = fadeOut;
-        this.quantity = quantity;
-        this.duration = duration;
-        this.velocity = velocity;
-        this.velocityRange = velocityRange;
-        this.xAcceleration = xAcceleration;
-        this.yAcceleration = yAcceleration;
-        this.shootingAngle = shootingAngle;
-        this.shootingAngleRange = shootingAngleRange;
-        this.rotationSpeed = rotationSpeed;
-    }
-
     public void prepare(View target) {
         if (content == null) {
             return;

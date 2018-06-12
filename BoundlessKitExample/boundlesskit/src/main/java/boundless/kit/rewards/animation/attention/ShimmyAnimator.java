@@ -24,50 +24,25 @@
 
 package boundless.kit.rewards.animation.attention;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.graphics.Path;
 import android.view.View;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
 
-public class ShimmyAnimator extends BaseViewAnimator {
+public class ShimmyAnimator extends BaseViewAnimator<ShimmyAnimator> {
 
     private int count = 2;
     { setDuration(5000); }
     private float translation = 30;
-    private long speed = 3;
-
-    public ShimmyAnimator() {
-        super();
-    }
-
-    public ShimmyAnimator(int count, long duration, float translation, long speed) {
-        super();
-        setCount(count);
-        setDuration(duration);
-        setTranslation(translation);
-        setSpeed(speed);
-    }
 
     public ShimmyAnimator setCount(int count) {
         this.count = count;
         return this;
     }
 
-    @Override
-    public ShimmyAnimator setDuration(long duration) {
-        super.setDuration(duration);
-        return this;
-    }
-
     public ShimmyAnimator setTranslation(float translation) {
         this.translation = translation;
-        return this;
-    }
-
-    public ShimmyAnimator setSpeed(long speed) {
-        this.speed = speed;
         return this;
     }
 
@@ -83,8 +58,9 @@ public class ShimmyAnimator extends BaseViewAnimator {
             path.lineTo(x - xMove, y);
         }
         path.lineTo(x, y);
-        Animator animator = ObjectAnimator.ofFloat(target, View.X, View.Y, path);
-        setDuration(getDuration() / speed);
-        getAnimatorAgent().play(animator);
+
+        getAnimator().play(
+                ObjectAnimator.ofFloat(target, View.X, View.Y, path)
+        );
     }
 }
