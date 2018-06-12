@@ -9,7 +9,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
 
-public class VibrationAnimator extends BaseViewAnimator {
+public class VibrationAnimator extends BaseViewAnimator<VibrationAnimator> {
 
     private int vibrateCount = 6;
     private long vibrateDuration = 1000;

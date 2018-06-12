@@ -6,7 +6,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
 
-public class PulseAnimator extends BaseViewAnimator {
+public class PulseAnimator extends BaseViewAnimator<PulseAnimator> {
 
     private int count = 2;
     { setDuration(2500); }

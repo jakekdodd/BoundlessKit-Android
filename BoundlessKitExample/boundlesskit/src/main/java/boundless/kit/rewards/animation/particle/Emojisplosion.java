@@ -10,7 +10,7 @@ import boundless.kit.rewards.animation.BaseViewAnimator;
 import boundless.kit.rewards.animation.particle.initializers.XYAccelerationInitializer;
 import boundless.kit.rewards.animation.particle.modifiers.ScaleModifier;
 
-public class Emojisplosion extends BaseViewAnimator {
+public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
 
     private int x = 50;
     private int y = 50;
