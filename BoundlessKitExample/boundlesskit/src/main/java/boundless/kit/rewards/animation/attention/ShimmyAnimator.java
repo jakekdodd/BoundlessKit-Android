@@ -47,7 +47,7 @@ public class ShimmyAnimator extends BaseViewAnimator<ShimmyAnimator> {
     }
 
     @Override
-    public void prepare(View target) {
+    public ShimmyAnimator setTarget(View target) {
         float x = target.getX();
         float y = target.getY();
         Path path = new Path();
@@ -62,5 +62,7 @@ public class ShimmyAnimator extends BaseViewAnimator<ShimmyAnimator> {
         getAnimator().play(
                 ObjectAnimator.ofFloat(target, View.X, View.Y, path)
         );
+
+        return this;
     }
 }

@@ -33,11 +33,11 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
     private AnimatorSet mAnimatorSet = new AnimatorSet();
 
     public void animate(View target) {
-        prepare(target);
+        setTarget(target);
         start();
     }
 
-    public abstract void prepare(View target);
+    public abstract T setTarget(View target);
 
     /**
      * start to animate

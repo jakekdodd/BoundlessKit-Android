@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
 //////                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
 //                                                .setX(contentView.getWidth() / 2)
 //                                                .setY(contentView.getHeight() * 2 / 3)
-//                                                .prepare(findViewById(android.R.id.content));
+//                                                .setTarget(findViewById(android.R.id.content));
 
                                         ShimmyAnimator shimmyAnimator = new ShimmyAnimator();
                                         shimmyAnimator.setDuration(5070).setTranslation(50);
@@ -227,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
 //                                        shimmyAnimator.animate(contentView);
 //                                        pulseAnimator.animate(contentView);
 
-                                        shimmyAnimator.prepare(contentView);
-                                        pulseAnimator.prepare(contentView);
+                                        shimmyAnimator.setTarget(contentView);
+                                        pulseAnimator.setTarget(contentView);
                                         AnimatorSet set = new AnimatorSet();
                                         set.playTogether(shimmyAnimator.getAnimator(), pulseAnimator.getAnimator());
                                         set.start();

@@ -55,7 +55,7 @@ public class VibrationAnimator extends BaseViewAnimator {
     }
 
     @Override
-    public void prepare(View target) {
+    public VibrationAnimator setTarget(View target) {
         float x = target.getX();
         float y = target.getY();
         Path path = new Path();
@@ -103,5 +103,7 @@ public class VibrationAnimator extends BaseViewAnimator {
                 shimmyAnimator,
                 unzoomSet
         );
+
+        return this;
     }
 }

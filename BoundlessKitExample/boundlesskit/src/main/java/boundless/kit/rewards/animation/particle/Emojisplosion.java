@@ -33,23 +33,6 @@ public class Emojisplosion extends BaseViewAnimator {
     private float rotationSpeed = 10f;
     private float rotationSpeedRange = 130f;
 
-    public void prepare(View target) {
-        if (content == null) {
-            return;
-        }
-
-        ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, duration * quantity, content, lifetime)
-                .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
-                .setSpeedModuleAndAngleRange(velocity - 0.5f * velocityRange, velocity + 0.5f * velocityRange, (int)(shootingAngle - 0.5 * shootingAngleRange), (int)(shootingAngle + 0.5 * shootingAngleRange))
-                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
-                .setFadeOut(fadeOut)
-                .setFadeIn(fadeIn)
-                .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
-        ;
-        Log.v("Test", "Width:" + (target.getHeight()/2));
-        particleSystem.emit(x, y, quantity, duration);
-    }
-
     public Emojisplosion setX(int x) {
         this.x = x;
         return this;
@@ -145,4 +128,22 @@ public class Emojisplosion extends BaseViewAnimator {
         return this;
     }
 
+    public Emojisplosion setTarget(View target) {
+        if (content == null) {
+            return this;
+        }
+
+        ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, duration * quantity, content, lifetime)
+                .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
+                .setSpeedModuleAndAngleRange(velocity - 0.5f * velocityRange, velocity + 0.5f * velocityRange, (int)(shootingAngle - 0.5 * shootingAngleRange), (int)(shootingAngle + 0.5 * shootingAngleRange))
+                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
+                .setFadeOut(fadeOut)
+                .setFadeIn(fadeIn)
+                .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
+                ;
+        Log.v("Test", "Width:" + (target.getHeight()/2));
+        particleSystem.emit(x, y, quantity, duration);
+
+        return this;
+    }
 }

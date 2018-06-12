@@ -23,7 +23,7 @@ public class PulseAnimator extends BaseViewAnimator {
     }
 
     @Override
-    public void prepare(View target) {
+    public PulseAnimator setTarget(View target) {
         float[] values = new float[count*2 + 1];
         for (int i = values.length - 1; i >= 0; i--) {
             values[i] = (i%2 == 0) ? 1f : scale;
@@ -34,5 +34,7 @@ public class PulseAnimator extends BaseViewAnimator {
                 ObjectAnimator.ofFloat(target, "scaleY", values),
                 ObjectAnimator.ofFloat(target, "scaleX", values)
         );
+
+        return this;
     }
 }
