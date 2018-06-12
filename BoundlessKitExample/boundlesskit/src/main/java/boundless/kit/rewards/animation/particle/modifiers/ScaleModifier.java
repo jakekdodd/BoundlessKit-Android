@@ -15,30 +15,30 @@ public class ScaleModifier implements ParticleModifier {
 	private float mValueIncrement;
 	private Interpolator mInterpolator;
 
-	public ScaleModifier (float initialValue, float finalValue, long startMilis, long endMilis, Interpolator interpolator) {
+	public ScaleModifier (float initialValue, float finalValue, long startMillis, long endMillis, Interpolator interpolator) {
 		mInitialValue = initialValue;
 		mFinalValue = finalValue;
-		mStartTime = startMilis;
-		mEndTime = endMilis;
+		mStartTime = startMillis;
+		mEndTime = endMillis;
 		mDuration = mEndTime - mStartTime;
 		mValueIncrement = mFinalValue-mInitialValue;
 		mInterpolator = interpolator;
 	}
 	
-	public ScaleModifier (float initialValue, float finalValue, long startMilis, long endMilis) {
-		this (initialValue, finalValue, startMilis, endMilis, new LinearInterpolator());
+	public ScaleModifier (float initialValue, float finalValue, long startMillis, long endMillis) {
+		this (initialValue, finalValue, startMillis, endMillis, new LinearInterpolator());
 	}
 	
 	@Override
-	public void apply(Particle particle, long miliseconds) {
-		if (miliseconds < mStartTime) {
+	public void apply(Particle particle, long milliseconds) {
+		if (milliseconds < mStartTime) {
 			particle.mScale = mInitialValue;
 		}
-		else if (miliseconds > mEndTime) {
+		else if (milliseconds > mEndTime) {
 			particle.mScale = mFinalValue;
 		}
 		else {
-			float interpolaterdValue = mInterpolator.getInterpolation((miliseconds- mStartTime)*1f/mDuration);
+			float interpolaterdValue = mInterpolator.getInterpolation((milliseconds- mStartTime)*1f/mDuration);
 			float newScale = mInitialValue + mValueIncrement*interpolaterdValue;
 			particle.mScale = newScale;
 		}

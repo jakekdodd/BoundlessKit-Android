@@ -421,11 +421,11 @@ public class ParticleSystem {
 	/**
 	 * Configures a fade out for the particles when they disappear
 	 *
-	 * @param milisecondsBeforeEnd fade out duration in milliseconds
+	 * @param millisecondsBeforeEnd fade out duration in milliseconds
 	 * @param interpolator the interpolator for the fade out (default is linear)
 	 */
-	public ParticleSystem setFadeOut(long milisecondsBeforeEnd, Interpolator interpolator) {
-		mModifiers.add(new AlphaModifier(255, 0, mTimeToLive-milisecondsBeforeEnd, mTimeToLive, interpolator));
+	public ParticleSystem setFadeOut(long millisecondsBeforeEnd, Interpolator interpolator) {
+		mModifiers.add(new AlphaModifier(255, 0, mTimeToLive-millisecondsBeforeEnd, mTimeToLive, interpolator));
 		return this;
 	}
 
@@ -604,8 +604,8 @@ public class ParticleSystem {
 		mAnimator.addUpdateListener(new AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                int miliseconds = (Integer) animation.getAnimatedValue();
-                onUpdate(miliseconds);
+                int milliseconds = (Integer) animation.getAnimatedValue();
+                onUpdate(milliseconds);
             }
         });
 		mAnimator.addListener(new AnimatorListener() {
@@ -704,16 +704,16 @@ public class ParticleSystem {
 		}
 	}
 
-	private void onUpdate(long miliseconds) {
-		while (((mEmittingTime > 0 && miliseconds < mEmittingTime)|| mEmittingTime == -1) && // This point should emit
+	private void onUpdate(long milliseconds) {
+		while (((mEmittingTime > 0 && milliseconds < mEmittingTime)|| mEmittingTime == -1) && // This point should emit
 				!mParticles.isEmpty() && // We have particles in the pool
-				mActivatedParticles < mParticlesPerMillisecond *miliseconds) { // and we are under the number of particles that should be launched
+				mActivatedParticles < mParticlesPerMillisecond *milliseconds) { // and we are under the number of particles that should be launched
 			// Activate a new particle
-			activateParticle(miliseconds);
+			activateParticle(milliseconds);
 		}
 		synchronized(mActiveParticles) {
 			for (int i = 0; i < mActiveParticles.size(); i++) {
-				boolean active = mActiveParticles.get(i).update(miliseconds);
+				boolean active = mActiveParticles.get(i).update(milliseconds);
 				if (!active) {
 					Particle p = mActiveParticles.remove(i);
 					i--; // Needed to keep the index at the right position
