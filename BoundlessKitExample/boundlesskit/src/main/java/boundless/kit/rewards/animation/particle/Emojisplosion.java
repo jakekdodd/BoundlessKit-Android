@@ -16,57 +16,62 @@ public class Emojisplosion extends BaseViewAnimator {
     private int y = 50;
     private Drawable content;
     private float scale = 0.6f;
-    private float scaleRange = 0.2f;
+    private float scaleChange = 1.2f;
     private long lifetime = 3000;
     private long lifetimeRange = 500;
     private long fadeIn = 1000;
     private long fadeOut = 1000;
     private int quantity = 1;
-    private int bursts = 3000;
+    private int duration = 3000;
     private float velocity = 0.003f;
+
+    private float velocityRange = 0.001f;
     private float xAcceleration = 0.00002f;
     private float yAcceleration = -0.00005f;
-    private float angle = -90f;
-    private float range = 45f;
-    private float spin = 10f;
+    private float shootingAngle = -90f;
+    private float shootingAngleRange = 45f;
+    private float rotationSpeed = 10f;
+    private float rotationSpeedRange = 130f;
+
 
     public Emojisplosion() {}
 
-    public Emojisplosion(int x, int y, Drawable content, float scale, float scaleRange, long lifetime, long lifetimeRange, long fadeIn, long fadeOut, int quantity, int bursts, float velocity, float xAcceleration, float yAcceleration, float angle, float range, float spin) {
+    public Emojisplosion(int x, int y, Drawable content, float scale, float scaleChange, long lifetime, long lifetimeRange, long fadeIn, long fadeOut, int quantity, int duration, float velocity, float velocityRange, float xAcceleration, float yAcceleration, float shootingAngle, float shootingAngleRange, float rotationSpeed) {
         this.x = x;
         this.y = y;
         this.content = content;
         this.scale = scale;
-        this.scaleRange = scaleRange;
+        this.scaleChange = scaleChange;
         this.lifetime = lifetime;
         this.lifetimeRange = lifetimeRange;
         this.fadeIn = fadeIn;
         this.fadeOut = fadeOut;
         this.quantity = quantity;
-        this.bursts = bursts;
+        this.duration = duration;
         this.velocity = velocity;
+        this.velocityRange = velocityRange;
         this.xAcceleration = xAcceleration;
         this.yAcceleration = yAcceleration;
-        this.angle = angle;
-        this.range = range;
-        this.spin = spin;
+        this.shootingAngle = shootingAngle;
+        this.shootingAngleRange = shootingAngleRange;
+        this.rotationSpeed = rotationSpeed;
     }
 
     public void prepare(View target) {
         if (content == null) {
             return;
         }
-//        target.add
-        ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, bursts * quantity, content, lifetime)
-                .addModifier(new ScaleModifier(scale, scale + scaleRange, 0, lifetime, new LinearInterpolator()))
-                .setSpeedModuleAndAngleRange(velocity, velocity, (int)(angle + 0.5 * range), (int)(angle - 0.5 * range))
+
+        ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, duration * quantity, content, lifetime)
+                .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
+                .setSpeedModuleAndAngleRange(velocity - 0.5f * velocityRange, velocity + 0.5f * velocityRange, (int)(shootingAngle - 0.5 * shootingAngleRange), (int)(shootingAngle + 0.5 * shootingAngleRange))
                 .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
                 .setFadeOut(fadeOut)
                 .setFadeIn(fadeIn)
-                .setRotationSpeedRange(spin, spin)
+                .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
         ;
         Log.v("Test", "Width:" + (target.getHeight()/2));
-        particleSystem.emit(x, y, quantity, bursts);
+        particleSystem.emit(x, y, quantity, duration);
     }
 
     public Emojisplosion setX(int x) {
@@ -89,8 +94,8 @@ public class Emojisplosion extends BaseViewAnimator {
         return this;
     }
 
-    public Emojisplosion setScaleRange(float scaleRange) {
-        this.scaleRange = scaleRange;
+    public Emojisplosion setScaleChange(float scaleChange) {
+        this.scaleChange = scaleChange;
         return this;
     }
 
@@ -119,13 +124,18 @@ public class Emojisplosion extends BaseViewAnimator {
         return this;
     }
 
-    public Emojisplosion setBursts(int bursts) {
-        this.bursts = bursts;
+    public Emojisplosion setDuration(int duration) {
+        this.duration = duration;
         return this;
     }
 
     public Emojisplosion setVelocity(float velocity) {
         this.velocity = velocity;
+        return this;
+    }
+
+    public Emojisplosion setVelocityRange(float velocityRange) {
+        this.velocityRange = velocityRange;
         return this;
     }
 
@@ -139,18 +149,23 @@ public class Emojisplosion extends BaseViewAnimator {
         return this;
     }
 
-    public Emojisplosion setAngle(float angle) {
-        this.angle = angle;
+    public Emojisplosion setShootingAngle(float shootingAngle) {
+        this.shootingAngle = shootingAngle;
         return this;
     }
 
-    public Emojisplosion setRange(float range) {
-        this.range = range;
+    public Emojisplosion setShootingAngleRange(float shootingAngleRange) {
+        this.shootingAngleRange = shootingAngleRange;
         return this;
     }
 
-    public Emojisplosion setSpin(float spin) {
-        this.spin = spin;
+    public Emojisplosion setRotationSpeed(float rotationSpeed) {
+        this.rotationSpeed = rotationSpeed;
+        return this;
+    }
+
+    public Emojisplosion setRotationSpeedRange(float rotationSpeedRange) {
+        this.rotationSpeedRange = rotationSpeedRange;
         return this;
     }
 
