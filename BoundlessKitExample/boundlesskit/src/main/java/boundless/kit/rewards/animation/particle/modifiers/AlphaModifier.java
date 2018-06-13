@@ -28,8 +28,8 @@ public class AlphaModifier implements ParticleModifier {
 			mStartTime = particle.mTimeToLive - mDuration;
 		}
 		if (mStartTime <= milliseconds && milliseconds <= mStartTime + mDuration) {
-			float interpolaterdValue = mInterpolator.getInterpolation((milliseconds - mStartTime)*1f/mDuration);
-			int newAlphaValue = (int) (mInitialValue + mValueIncrement*interpolaterdValue);
+			float interpolatedValue = mInterpolator.getInterpolation((milliseconds - mStartTime)*1f/mDuration);
+			int newAlphaValue = (int) (mInitialValue + mValueIncrement*interpolatedValue);
 			particle.mAlpha = newAlphaValue;
 		}		
 	}

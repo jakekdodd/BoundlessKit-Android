@@ -19,16 +19,15 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private int x = 50;
     private int y = 50;
     private Drawable content;
-    private float scale = 0.6f;
+    { setDuration(3000); }
+    private long lifetime = 1000;
+    private long lifetimeRange = 200;
+    private long fadeIn = 200;
+    private long fadeOut = 200;
+    private int ratePerSecond = 3;
+    private float scale = 1f;
     private float scaleChange = 1.2f;
-    private long lifetime = 3000;
-    private long lifetimeRange = 1000;
-    private long fadeIn = 300;
-    private long fadeOut = 1000;
-    private int quantity = 1;
-    private int duration = 3000;
     private float velocity = 0.003f;
-
     private float velocityRange = 0.001f;
     private float xAcceleration = 0.00002f;
     private float yAcceleration = -0.00005f;
@@ -61,16 +60,6 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
         return this;
     }
 
-    public Emojisplosion setScale(float scale) {
-        this.scale = scale;
-        return this;
-    }
-
-    public Emojisplosion setScaleChange(float scaleChange) {
-        this.scaleChange = scaleChange;
-        return this;
-    }
-
     public Emojisplosion setLifetime(long lifetime) {
         this.lifetime = lifetime;
         return this;
@@ -86,23 +75,28 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
         return this;
     }
 
-    public Emojisplosion setFadeOut(long fadeOut) {
-        this.fadeOut = fadeOut;
-        return this;
-    }
-
     public Emojisplosion setFadeIn(long fadeIn) {
         this.fadeIn = fadeIn;
         return this;
     }
 
-    public Emojisplosion setQuantity(int quantity) {
-        this.quantity = quantity;
+    public Emojisplosion setFadeOut(long fadeOut) {
+        this.fadeOut = fadeOut;
         return this;
     }
 
-    public Emojisplosion setDuration(int duration) {
-        this.duration = duration;
+    public Emojisplosion setRatePerSecond(int ratePerSecond) {
+        this.ratePerSecond = ratePerSecond;
+        return this;
+    }
+
+    public Emojisplosion setScale(float scale) {
+        this.scale = scale;
+        return this;
+    }
+
+    public Emojisplosion setScaleChange(float scaleChange) {
+        this.scaleChange = scaleChange;
         return this;
     }
 
@@ -151,13 +145,13 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
             return this;
         }
 
-        particleSystem = new ParticleSystem((ViewGroup)target, duration * quantity, content, lifetime)
+        particleSystem = new ParticleSystem((ViewGroup)target, (int) (getDuration()* ratePerSecond), content, lifetime)
                 .addInitializer(new LifetimeInitializer(lifetimeRange))
                 .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
                 .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
                 .setSpeedModuleAndAngleRange(velocity - 0.5f * velocityRange, velocity + 0.5f * velocityRange, (int)(shootingAngle - 0.5 * shootingAngleRange), (int)(shootingAngle + 0.5 * shootingAngleRange))
-                .setFadeOut(fadeOut)
                 .setFadeIn(fadeIn)
+                .setFadeOut(fadeOut)
                 .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
                 ;
 
@@ -168,7 +162,7 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     public void start() {
         super.start();
         if (particleSystem != null) {
-            particleSystem.emit(x, y, quantity, duration);
+            particleSystem.emit(x, y, ratePerSecond, (int) getDuration());
         }
     }
 }

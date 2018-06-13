@@ -25,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import boundless.kit.rewards.animation.particle.initializers.AccelerationInitializer;
+import boundless.kit.rewards.animation.particle.initializers.LifetimeInitializer;
 import boundless.kit.rewards.animation.particle.initializers.ParticleInitializer;
 import boundless.kit.rewards.animation.particle.initializers.RotationInitializer;
 import boundless.kit.rewards.animation.particle.initializers.RotationSpeedInitializer;
@@ -679,14 +680,22 @@ public class ParticleSystem {
 
 	private void activateParticle(long delay) {
 		Particle p = mParticles.remove(0);
-		p.init(mTimeToLive);
+		p.init();
 		// Initialization goes before configuration, scale is required before can be configured properly
+        LifetimeInitializer lifetimeHack = null; // to change lifetime after configuration
 		for (int i=0; i<mInitializers.size(); i++) {
-			mInitializers.get(i).initParticle(p, mRandom);
+		    ParticleInitializer initializer = mInitializers.get(i);
+			initializer.initParticle(p, mRandom);
+			if (initializer instanceof LifetimeInitializer) {
+			    lifetimeHack = (LifetimeInitializer)initializer;
+            }
 		}
 		int particleX = getFromRange (mEmitterXMin, mEmitterXMax);
 		int particleY = getFromRange (mEmitterYMin, mEmitterYMax);
-		p.configure(particleX, particleY);
+		p.configure(mTimeToLive, particleX, particleY);
+		if (lifetimeHack != null) {
+		    lifetimeHack.initParticle(p, mRandom);
+        }
 		p.activate(delay, mModifiers);
 		mActiveParticles.add(p);
 		mActivatedParticles++;
