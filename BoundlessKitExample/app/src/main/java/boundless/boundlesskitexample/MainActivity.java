@@ -209,11 +209,12 @@ public class MainActivity extends AppCompatActivity {
 //                                                .emit(findViewById(android.R.id.content), 8);
 
                                         View contentView = findViewById(android.R.id.content);
-                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-////                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
+//                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+                                        new Emojisplosion().setContent(MainActivity.this, "\uD83D\uDE00\n")
                                                 .setX(contentView.getWidth() / 2)
                                                 .setY(contentView.getHeight() * 2 / 3)
-                                                .setTarget(findViewById(android.R.id.content));
+                                                .setTarget(findViewById(android.R.id.content))
+                                                .start();
 
 //                                        new VibrationAnimator().animate(contentView);
 

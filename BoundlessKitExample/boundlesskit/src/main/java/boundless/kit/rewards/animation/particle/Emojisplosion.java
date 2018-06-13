@@ -1,7 +1,8 @@
 package boundless.kit.rewards.animation.particle;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
@@ -12,6 +13,8 @@ import boundless.kit.rewards.animation.particle.initializers.XYAccelerationIniti
 import boundless.kit.rewards.animation.particle.modifiers.ScaleModifier;
 
 public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
+
+    ParticleSystem particleSystem;
 
     private int x = 50;
     private int y = 50;
@@ -46,6 +49,15 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
 
     public Emojisplosion setContent(Drawable content) {
         this.content = content;
+        return this;
+    }
+
+    public Emojisplosion setContent(Context context, String text) {
+        return setContent(context, text, 24, Color.BLACK);
+    }
+
+    public Emojisplosion setContent(Context context, String text, float textSize, int color) {
+        this.content = new TextDrawable(context, text, textSize, color);
         return this;
     }
 
@@ -139,7 +151,7 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
             return this;
         }
 
-        ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, duration * quantity, content, lifetime)
+        particleSystem = new ParticleSystem((ViewGroup)target, duration * quantity, content, lifetime)
                 .addInitializer(new LifetimeInitializer(lifetimeRange))
                 .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
                 .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
@@ -148,9 +160,15 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
                 .setFadeIn(fadeIn)
                 .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
                 ;
-        Log.v("Test", "Width:" + (target.getHeight()/2));
-        particleSystem.emit(x, y, quantity, duration);
 
         return this;
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        if (particleSystem != null) {
+            particleSystem.emit(x, y, quantity, duration);
+        }
     }
 }
