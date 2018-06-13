@@ -37,7 +37,7 @@ public class Particle {
 
 	private float mRotation;
 
-	private long mTimeToLive;
+	public long mTimeToLive;
 
 	protected long mStartingMillisecond;
 
@@ -57,12 +57,13 @@ public class Particle {
 		mImage = bitmap;
 	}
 
-	public void init() {
+	public void init(long timeToLive) {
 		mScale = 1;
-		mAlpha = 255;	
+		mAlpha = 255;
+		mTimeToLive = timeToLive;
 	}
 	
-	public void configure(long timeToLive, float emiterX, float emiterY) {
+	public void configure(float emiterX, float emiterY) {
 		mBitmapHalfWidth = mImage.getWidth()/2;
 		mBitmapHalfHeight = mImage.getHeight()/2;
 		
@@ -70,8 +71,6 @@ public class Particle {
 		mInitialY = emiterY - mBitmapHalfHeight;
 		mCurrentX = mInitialX;
 		mCurrentY = mInitialY;
-		
-		mTimeToLive = timeToLive;
 	}
 
 	public boolean update (long milliseconds) {

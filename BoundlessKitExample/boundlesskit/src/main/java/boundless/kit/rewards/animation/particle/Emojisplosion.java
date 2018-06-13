@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
+import boundless.kit.rewards.animation.particle.initializers.LifetimeInitializer;
 import boundless.kit.rewards.animation.particle.initializers.XYAccelerationInitializer;
 import boundless.kit.rewards.animation.particle.modifiers.ScaleModifier;
 
@@ -18,8 +19,8 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private float scale = 0.6f;
     private float scaleChange = 1.2f;
     private long lifetime = 3000;
-    private long lifetimeRange = 500;
-    private long fadeIn = 1000;
+    private long lifetimeRange = 1000;
+    private long fadeIn = 300;
     private long fadeOut = 1000;
     private int quantity = 1;
     private int duration = 3000;
@@ -63,6 +64,11 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
         return this;
     }
 
+    /**
+     *
+     * @param lifetimeRange a random value between 0 and lifetimeRange will be subtracted from each particle's lifetime
+     * @return this for chaining
+     */
     public Emojisplosion setLifetimeRange(long lifetimeRange) {
         this.lifetimeRange = lifetimeRange;
         return this;
@@ -134,9 +140,10 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
         }
 
         ParticleSystem particleSystem = new ParticleSystem((ViewGroup)target, duration * quantity, content, lifetime)
+                .addInitializer(new LifetimeInitializer(lifetimeRange))
+                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
                 .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
                 .setSpeedModuleAndAngleRange(velocity - 0.5f * velocityRange, velocity + 0.5f * velocityRange, (int)(shootingAngle - 0.5 * shootingAngleRange), (int)(shootingAngle + 0.5 * shootingAngleRange))
-                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
                 .setFadeOut(fadeOut)
                 .setFadeIn(fadeIn)
                 .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)

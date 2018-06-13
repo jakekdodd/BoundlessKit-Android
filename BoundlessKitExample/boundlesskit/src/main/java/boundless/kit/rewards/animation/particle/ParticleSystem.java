@@ -418,14 +418,34 @@ public class ParticleSystem {
 		return this;
 	}
 
+    /**
+     * Configures a fade in for the particles when they appear
+     *
+     * @param duration fade in duration in milliseconds
+     * @param interpolator the interpolator for the fade in (default is linear)
+     */
+    public ParticleSystem setFadeIn(long duration, Interpolator interpolator) {
+        mModifiers.add(new AlphaModifier(0, 255, 0, duration, interpolator));
+        return this;
+    }
+
+    /**
+     * Configures a fade in for the particles when they appear
+     *
+     * @param duration fade in duration in milliseconds
+     */
+    public ParticleSystem setFadeIn(long duration) {
+        return setFadeIn(duration, new LinearInterpolator());
+    }
+
 	/**
 	 * Configures a fade out for the particles when they disappear
 	 *
-	 * @param millisecondsBeforeEnd fade out duration in milliseconds
+	 * @param duration fade out duration in milliseconds
 	 * @param interpolator the interpolator for the fade out (default is linear)
 	 */
-	public ParticleSystem setFadeOut(long millisecondsBeforeEnd, Interpolator interpolator) {
-		mModifiers.add(new AlphaModifier(255, 0, mTimeToLive-millisecondsBeforeEnd, mTimeToLive, interpolator));
+	public ParticleSystem setFadeOut(long duration, Interpolator interpolator) {
+		mModifiers.add(new AlphaModifier(255, 0, -1, duration, interpolator));
 		return this;
 	}
 
@@ -436,26 +456,6 @@ public class ParticleSystem {
 	 */
 	public ParticleSystem setFadeOut(long duration) {
 		return setFadeOut(duration, new LinearInterpolator());
-	}
-
-	/**
-	 * Configures a fade in for the particles when they appear
-	 *
-	 * @param duration fade in duration in milliseconds
-	 * @param interpolator the interpolator for the fade in (default is linear)
-	 */
-	public ParticleSystem setFadeIn(long duration, Interpolator interpolator) {
-		mModifiers.add(new AlphaModifier(0, 255, 0, duration, interpolator));
-		return this;
-	}
-
-	/**
-	 * Configures a fade in for the particles when they appear
-	 *
-	 * @param duration fade in duration in milliseconds
-	 */
-	public ParticleSystem setFadeIn(long duration) {
-		return setFadeIn(duration, new LinearInterpolator());
 	}
 
 	/**
@@ -679,14 +679,14 @@ public class ParticleSystem {
 
 	private void activateParticle(long delay) {
 		Particle p = mParticles.remove(0);
-		p.init();
+		p.init(mTimeToLive);
 		// Initialization goes before configuration, scale is required before can be configured properly
 		for (int i=0; i<mInitializers.size(); i++) {
 			mInitializers.get(i).initParticle(p, mRandom);
 		}
 		int particleX = getFromRange (mEmitterXMin, mEmitterXMax);
 		int particleY = getFromRange (mEmitterYMin, mEmitterYMax);
-		p.configure(mTimeToLive, particleX, particleY);
+		p.configure(particleX, particleY);
 		p.activate(delay, mModifiers);
 		mActiveParticles.add(p);
 		mActivatedParticles++;
