@@ -1,9 +1,7 @@
 package boundless.kit.rewards.animation.attention;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.graphics.Path;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -12,9 +10,9 @@ import boundless.kit.rewards.animation.BaseViewAnimator;
 public class VibrationAnimator extends BaseViewAnimator<VibrationAnimator> {
 
     private int vibrateCount = 6;
-    private long vibrateDuration = 1000;
-    private float vibrateTranslation = 10;
-    private long vibrateSpeed = 1;
+    private long vibrateDuration = 333;
+    private float vibrateTranslation = 50;
+    private boolean vibrateVertically = false;
     private float scale = 0.8f;
     private int scaleCount = 1;
     private long scaleDuration = 300;
@@ -34,8 +32,8 @@ public class VibrationAnimator extends BaseViewAnimator<VibrationAnimator> {
         return this;
     }
 
-    public VibrationAnimator setVibrateSpeed(long speed) {
-        this.vibrateSpeed = speed;
+    public VibrationAnimator setVibrateVertically(boolean vibrateVertically) {
+        this.vibrateVertically = vibrateVertically;
         return this;
     }
 
@@ -56,18 +54,6 @@ public class VibrationAnimator extends BaseViewAnimator<VibrationAnimator> {
 
     @Override
     public VibrationAnimator setTarget(View target) {
-        float x = target.getX();
-        float y = target.getY();
-        Path path = new Path();
-        path.moveTo(x, y);
-        float xMove = target.getWidth() * (vibrateTranslation/100f);
-        for(int i = 0; i < vibrateCount; i++) {
-            path.lineTo(x + xMove, y);
-            path.lineTo(x - xMove, y);
-        }
-        path.lineTo(x, y);
-        Animator shimmyAnimator = ObjectAnimator.ofFloat(target, View.X, View.Y, path);
-
         float[] values = new float[scaleCount * 2];
         float[] reversedValues = new float[scaleCount * 2];
         for (int i = reversedValues.length - 1; i >= 0; i--) {
@@ -90,17 +76,22 @@ public class VibrationAnimator extends BaseViewAnimator<VibrationAnimator> {
                 ObjectAnimator.ofFloat(target, "scaleX", reversedValues)
         );
 
+        ShimmyAnimator shimmyAnimator = new ShimmyAnimator()
+                .setCount(vibrateCount)
+                .setTranslation(vibrateTranslation)
+                .setVertically(vibrateVertically)
+                .setTarget(target);
 
         zoomSet.setDuration(scaleDuration/2);
         shimmyAnimator.setStartDelay(zoomSet.getDuration() * 8 / 10);
-        shimmyAnimator.setDuration(vibrateDuration / vibrateSpeed);
+        shimmyAnimator.setDuration(vibrateDuration);
         unzoomSet.setStartDelay(shimmyAnimator.getStartDelay() + shimmyAnimator.getDuration());
         unzoomSet.setDuration(scaleDuration/2);
 
         getAnimator().setInterpolator(new AccelerateDecelerateInterpolator());
         getAnimator().playTogether(
                 zoomSet,
-                shimmyAnimator,
+                shimmyAnimator.getAnimator(),
                 unzoomSet
         );
 

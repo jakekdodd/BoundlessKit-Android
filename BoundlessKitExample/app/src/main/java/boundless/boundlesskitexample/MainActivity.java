@@ -1,7 +1,6 @@
 package boundless.boundlesskitexample;
 
 
-import android.animation.AnimatorSet;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -30,8 +29,7 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.attention.PulseAnimator;
-import boundless.kit.rewards.animation.attention.ShimmyAnimator;
+import boundless.kit.rewards.animation.particle.Emojisplosion;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -211,27 +209,14 @@ public class MainActivity extends AppCompatActivity {
 //                                                .emit(findViewById(android.R.id.content), 8);
 
                                         View contentView = findViewById(android.R.id.content);
-//                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-//////                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
-//                                                .setX(contentView.getWidth() / 2)
-//                                                .setY(contentView.getHeight() * 2 / 3)
-//                                                .setTarget(findViewById(android.R.id.content));
+                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+////                                        new Emojisplosion().setContent(new TextDrawable(getApplicationContext(), "O\uD83D\uDE00\nHELLO", 42f, Color.BLACK))
+                                                .setX(contentView.getWidth() / 2)
+                                                .setY(contentView.getHeight() * 2 / 3)
+                                                .setTarget(findViewById(android.R.id.content));
 
-                                        ShimmyAnimator shimmyAnimator = new ShimmyAnimator();
-                                        shimmyAnimator.setDuration(5070).setTranslation(50);
+//                                        new VibrationAnimator().animate(contentView);
 
-                                        PulseAnimator pulseAnimator = new PulseAnimator();
-
-//                                        pulseAnimator.start();
-//                                        shimmyAnimator.getAnimatorAgent().
-//                                        shimmyAnimator.animate(contentView);
-//                                        pulseAnimator.animate(contentView);
-
-                                        shimmyAnimator.setTarget(contentView);
-                                        pulseAnimator.setTarget(contentView);
-                                        AnimatorSet set = new AnimatorSet();
-                                        set.playTogether(shimmyAnimator.getAnimator(), pulseAnimator.getAnimator());
-                                        set.start();
 
 ////                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
 //                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {

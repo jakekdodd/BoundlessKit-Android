@@ -33,31 +33,47 @@ import boundless.kit.rewards.animation.BaseViewAnimator;
 public class ShimmyAnimator extends BaseViewAnimator<ShimmyAnimator> {
 
     private int count = 2;
-    { setDuration(5000); }
+    { setDuration(1200); }
     private float translation = 30;
+    private boolean vertically = true;
 
     public ShimmyAnimator setCount(int count) {
         this.count = count;
         return this;
     }
 
+    /**
+     *
+     * @param translation The number of points to move in a single direction.
+     *                    To start animating in the opposite direction, pass a negative value.
+     * @return The animator for chaining
+     */
     public ShimmyAnimator setTranslation(float translation) {
         this.translation = translation;
         return this;
     }
 
+    public ShimmyAnimator setVertically(boolean vertically) {
+        this.vertically = vertically;
+        return this;
+    }
+
     @Override
     public ShimmyAnimator setTarget(View target) {
-        float x = target.getX();
-        float y = target.getY();
+        float startingX = target.getX();
+        float startingY = target.getY();
+        float firstX = (vertically) ? startingX : (startingX + translation);
+        float firstY = (vertically) ? (startingY + translation) : startingY;
+        float secondX = (vertically) ? startingX : (startingX - translation);
+        float secondY = (vertically) ? (startingY - translation) : startingY;
+
         Path path = new Path();
-        path.moveTo(x, y);
-        float xMove = target.getWidth() * (translation/100f);
+        path.moveTo(startingX, startingY);
         for(int i = 0; i < count; i++) {
-            path.lineTo(x + xMove, y);
-            path.lineTo(x - xMove, y);
+            path.lineTo(firstX, firstY);
+            path.lineTo(secondX, secondY);
         }
-        path.lineTo(x, y);
+        path.lineTo(startingX, startingY);
 
         getAnimator().play(
                 ObjectAnimator.ofFloat(target, View.X, View.Y, path)
