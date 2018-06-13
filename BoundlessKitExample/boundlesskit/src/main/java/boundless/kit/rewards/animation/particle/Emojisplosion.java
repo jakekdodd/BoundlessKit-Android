@@ -20,10 +20,10 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private int y = 50;
     private Drawable content;
     { setDuration(3000); }
-    private long lifetime = 1000;
-    private long lifetimeRange = 200;
-    private long fadeIn = 200;
-    private long fadeOut = 200;
+    private long lifetime = 2000;
+    private long lifetimeRange = 500;
+    private long fadeIn = 500;
+    private long fadeOut = 500;
     private int ratePerSecond = 3;
     private float scale = 1f;
     private float scaleChange = 1.2f;
