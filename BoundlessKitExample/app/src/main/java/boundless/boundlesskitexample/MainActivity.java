@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.particle.Emojisplosion;
+import boundless.kit.rewards.animation.attention.CustomSheenView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View rootView;
     private ImageView logoView;
+    private CustomSheenView sheen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +47,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         logoView = (ImageView) findViewById(R.id.header_icon);
+        sheen = findViewById(R.id.sheen);
 
-        mHelper = new TaskDbHelper(this);
+
+        mHelper = new TaskDbHelper(MainActivity.this);
         mTaskListView = (ListView) findViewById(R.id.list_todo);
-
         updateUI();
         BoundlessKit.debugMode = true;
     }
@@ -196,27 +198,50 @@ public class MainActivity extends AppCompatActivity {
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
 
+//                                        View contentView = findViewById(android.R.id.content);
+//
+//                                        ViewGroup parent = (ViewGroup) logoView.getParent();
+//
+//                                        ImageView sheenView = new ImageView(MainActivity.this);
+//                                        sheenView.setImageResource(boundless.kit.R.drawable.sheen);
+//
+////                                        FrameLayout relativeLayout = new FrameLayout(MainActivity.this);
+////                                        relativeLayout.addView(sheenView);
+////                                        relativeLayout.forceLayout();
+////                                        parent.addView(relativeLayout);
+//
+//
+////                                        Log.v("Test", "Type:" + parent);
+////                                        ((ViewGroup)parent).addView(sheenView);
+
+
+//                                        Bitmap returnedBitmap = Bitmap.createBitmap(logoView.getWidth(), logoView.getHeight(),Bitmap.Config.ARGB_8888);
+//                                        Canvas canvas = new Canvas(returnedBitmap);
+//                                        Drawable bgDrawable = logoView.getBackground();
+//                                        if (bgDrawable!=null)
+//                                            bgDrawable.draw(canvas);
+//                                        logoView.draw(canvas);
+//                                        sheen.mMask = returnedBitmap;
+
+                                        sheen.setMask(logoView);
+//                                        sheen.setImage(MainActivity.this.getResources(), R.drawable.sheen);
+
+                                        sheen.setVisibility(View.VISIBLE);
+
+
+
 //                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
 //                                        rotate.setRepeatCount(1);
 //                                        logoView.startAnimation(rotate);
 
-//                                        BaseViewAnimator.test(MainActivity.this);
-
-//                                        new ParticleSystem(MainActivity.this, 80, R.drawable.red_balloon, 10000)
-//                                                .setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
-//                                                .setRotationSpeed(144)
-//                                                .setAcceleration(0.00005f, 90)
-//                                                .emit(findViewById(android.R.id.content), 8);
-
-                                        View contentView = findViewById(android.R.id.content);
-//                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-                                        new Emojisplosion().setContent(MainActivity.this, "\uD83D\uDE00\n")
-                                                .setX(contentView.getWidth() / 2)
-                                                .setY(contentView.getHeight() * 2 / 3)
-                                                .setScale(2f)
-                                                .setVelocity(-0.1f)
-                                                .setTarget(findViewById(android.R.id.content))
-                                                .start();
+////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+//                                        new Emojisplosion().setContent(MainActivity.this, "\uD83D\uDE00\n")
+//                                                .setX(contentView.getWidth() / 2)
+//                                                .setY(contentView.getHeight() * 2 / 3)
+//                                                .setScale(2f)
+//                                                .setVelocity(-0.1f)
+//                                                .setTarget(findViewById(android.R.id.content))
+//                                                .start();
 
 //                                        new VibrationAnimator().animate(contentView);
 
