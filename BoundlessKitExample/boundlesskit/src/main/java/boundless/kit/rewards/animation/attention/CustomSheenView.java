@@ -10,6 +10,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
 
 import boundless.kit.R;
 
@@ -18,7 +20,7 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
     int framesPerSecond = 30;
     long animationDuration = 3000;
     long startTime;
-    float mX = 0;
+    Interpolator interpolator = new AccelerateDecelerateInterpolator();
 
     private Bitmap mImage;
     private Bitmap mMask;
@@ -43,7 +45,6 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
 
         if (mMask != null) {
             setImage(view.getResources(), R.drawable.sheen);
-            mX = -mMask.getWidth();
         }
     }
 
@@ -52,9 +53,11 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
     }
 
     public void start() {
-        this.startTime = System.currentTimeMillis();
-        this.postInvalidate();
-
+        long now = System.currentTimeMillis();
+        if (now >= startTime + animationDuration) {
+            this.startTime = now;
+            this.postInvalidate();
+        }
     }
 
     @Override
@@ -65,11 +68,11 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
 
         if(elapsedTime < animationDuration) {
             this.postInvalidateDelayed(1000 / framesPerSecond);
-            mX += 10;
 
             canvas.save();
             canvas.drawBitmap(mMask, 0, 0, maskPaint);
-            canvas.drawBitmap(mImage, mX, 0, imagePaint);
+            float interpolation = interpolator.getInterpolation(elapsedTime * 1f/animationDuration);
+            canvas.drawBitmap(mImage, mImage.getWidth() * (2*interpolation - 1), 0, imagePaint);
             canvas.restore();
         }
     }

@@ -38,7 +38,7 @@ public class ScaleModifier implements ParticleModifier {
 			particle.mScale = mFinalValue;
 		}
 		else {
-			float interpolaterdValue = mInterpolator.getInterpolation((milliseconds- mStartTime)*1f/mDuration);
+			float interpolaterdValue = mInterpolator.getInterpolation((milliseconds - mStartTime) * 1f/mDuration);
 			float newScale = mInitialValue + mValueIncrement*interpolaterdValue;
 			particle.mScale = newScale;
 		}
