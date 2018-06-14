@@ -31,6 +31,7 @@
             />
 
         <boundless.kit.rewards.animation.attention.CustomSheenView
+            xmlns:boundless="http://schemas.android.com/apk/res-auto"
             android:id="@+id/sheen"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -40,6 +41,7 @@
             android:layout_alignBottom="@id/header_icon"
             android:scaleType="centerCrop"
             android:visibility="gone"
+            boundless:sheenContainerView="@id/header_icon"
             />
 
     </RelativeLayout>
