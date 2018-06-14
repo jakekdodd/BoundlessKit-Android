@@ -15,7 +15,7 @@ import boundless.kit.R;
 
 public class CustomSheenView extends android.support.v7.widget.AppCompatImageView {
     private Bitmap mImage;
-    private Bitmap mMask;  // png mask with transparency
+    private Bitmap mMask;
 
     private final Paint maskPaint;
     private final Paint imagePaint;
@@ -32,7 +32,8 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
     }
 
     private void setImage(Resources res, int id) {
-        mImage = resize(BitmapFactory.decodeResource(res, id), mMask.getWidth(), mMask.getHeight());
+        mImage = resize(BitmapFactory.decodeResource(res, id), mMask.getHeight());
+//        mImage = BitmapFactory.decodeResource(res, id);
     }
 
 //    @Override
@@ -41,20 +42,6 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
 //    }
 
     public void setMask(View view) {
-////        Bitmap maskBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-////        if (bgDrawable!=null)
-////            bgDrawable.draw(canvas);
-//        view.setDrawingCacheEnabled(true);
-//        view.buildDrawingCache();
-//        Bitmap maskBitmap = view.getDrawingCache();
-//        Canvas canvas = new Canvas(maskBitmap);
-//        view.draw(canvas);
-//        mMask = maskBitmap;
-
-//        mMask = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(mMask);
-//        view.draw(canvas);
-
         view.buildDrawingCache();
         mMask = Bitmap.createBitmap(view.getDrawingCache());
 
@@ -73,21 +60,14 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
         canvas.restore();
     }
 
-    private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
-        if (maxHeight > 0 && maxWidth > 0) {
+    private static Bitmap resize(Bitmap image, int maxHeight) {
+        if (maxHeight > 0) {
             int width = image.getWidth();
             int height = image.getHeight();
-            float ratioBitmap = (float) width / (float) height;
-            float ratioMax = (float) maxWidth / (float) maxHeight;
+            float ratio = (float) maxHeight / (float) height;
 
-            int finalWidth = maxWidth;
-            int finalHeight = maxHeight;
-            if (ratioMax > ratioBitmap) {
-                finalWidth = (int) ((float)maxHeight * ratioBitmap);
-            } else {
-                finalHeight = (int) ((float)maxWidth / ratioBitmap);
-            }
-            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
+            int finalWidth = (int) ((float)ratio * width);
+            image = Bitmap.createScaledBitmap(image, finalWidth, maxHeight, true);
             return image;
         } else {
             return image;
