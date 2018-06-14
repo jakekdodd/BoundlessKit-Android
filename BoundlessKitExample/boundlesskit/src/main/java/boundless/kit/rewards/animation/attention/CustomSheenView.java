@@ -43,9 +43,9 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
 
         setLayerType(LAYER_TYPE_SOFTWARE, null);
 
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.boundlessStyle, 0, 0);
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.boundless, 0, 0);
         try {
-            sheenContainerViewId = ta.getResourceId(R.styleable.boundlessStyle_sheenContainerView, 0);
+            sheenContainerViewId = ta.getResourceId(R.styleable.boundless_sheenContainerView, 0);
         } finally {
             ta.recycle();
         }
