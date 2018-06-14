@@ -225,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
                                         sheen.setMask(logoView);
 //                                        sheen.setImage(MainActivity.this.getResources(), R.drawable.sheen);
+                                        sheen.start();
 
                                         sheen.setVisibility(View.VISIBLE);
 

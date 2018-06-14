@@ -14,9 +14,14 @@ import android.view.View;
 import boundless.kit.R;
 
 public class CustomSheenView extends android.support.v7.widget.AppCompatImageView {
+
+    int framesPerSecond = 30;
+    long animationDuration = 3000;
+    long startTime;
+    float mX = 0;
+
     private Bitmap mImage;
     private Bitmap mMask;
-
     private final Paint maskPaint;
     private final Paint imagePaint;
 
@@ -31,33 +36,42 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
         setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
-    private void setImage(Resources res, int id) {
-        mImage = resize(BitmapFactory.decodeResource(res, id), mMask.getHeight());
-//        mImage = BitmapFactory.decodeResource(res, id);
-    }
-
-//    @Override
-//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        setMeasuredDimension(mMask.getWidth(), mMask.getHeight());
-//    }
-
     public void setMask(View view) {
+        if (view == null) { return; }
         view.buildDrawingCache();
         mMask = Bitmap.createBitmap(view.getDrawingCache());
 
-        setImage(view.getResources(), R.drawable.sheen);
+        if (mMask != null) {
+            setImage(view.getResources(), R.drawable.sheen);
+            mX = -mMask.getWidth();
+        }
+    }
+
+    private void setImage(Resources res, int id) {
+        mImage = resize(BitmapFactory.decodeResource(res, id), mMask.getHeight());
+    }
+
+    public void start() {
+        this.startTime = System.currentTimeMillis();
+        this.postInvalidate();
+
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        long elapsedTime = System.currentTimeMillis() - startTime;
 
+        if(elapsedTime < animationDuration) {
+            this.postInvalidateDelayed(1000 / framesPerSecond);
+            mX += 10;
 
-        canvas.save();
-        canvas.drawBitmap(mMask, 0, 0, maskPaint);
-        canvas.drawBitmap(mImage, 0, 0, imagePaint);
-        canvas.restore();
+            canvas.save();
+            canvas.drawBitmap(mMask, 0, 0, maskPaint);
+            canvas.drawBitmap(mImage, mX, 0, imagePaint);
+            canvas.restore();
+        }
     }
 
     private static Bitmap resize(Bitmap image, int maxHeight) {
@@ -66,7 +80,7 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
             int height = image.getHeight();
             float ratio = (float) maxHeight / (float) height;
 
-            int finalWidth = (int) ((float)ratio * width);
+            int finalWidth = (int) (ratio * width);
             image = Bitmap.createScaledBitmap(image, finalWidth, maxHeight, true);
             return image;
         } else {
