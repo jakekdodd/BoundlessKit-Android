@@ -30,8 +30,6 @@
         android:layout_alignEnd="@id/header_icon"
         android:layout_alignStart="@id/header_icon"
         android:layout_alignBottom="@id/header_icon"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
         boundless:animateInView="@id/header_icon"
         boundless:animateRightToLeft="false"
         boundless:imageHorizontalFlip="false"
