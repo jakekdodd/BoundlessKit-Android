@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="boundless">
-        <attr name="sheenContainerView" format="reference"/>
+        <attr name="animateInView" format="reference"/>
+        <attr name="animateRightToLeft" format="boolean"/>
+        <attr name="imageHorizontalFlip" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -17,7 +18,7 @@ import android.view.animation.Interpolator;
 
 import boundless.kit.R;
 
-public class CustomSheenView extends android.support.v7.widget.AppCompatImageView {
+public class SheenView extends android.support.v7.widget.AppCompatImageView {
 
     int framesPerSecond = 30;
     long animationDuration = 3300;
@@ -30,7 +31,10 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
     private final Paint maskPaint;
     private final Paint imagePaint;
 
-    public CustomSheenView(Context context, AttributeSet attrs) {
+    public boolean animateRightToLeft = false;
+    public boolean flipSheenImage = false;
+
+    public SheenView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         setVisibility(GONE);
@@ -45,13 +49,16 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
 
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.boundless, 0, 0);
         try {
-            sheenContainerViewId = ta.getResourceId(R.styleable.boundless_sheenContainerView, 0);
+            sheenContainerViewId = ta.getResourceId(R.styleable.boundless_animateInView, 0);
+            animateRightToLeft = ta.getBoolean(R.styleable.boundless_animateRightToLeft, false);
+            flipSheenImage = ta.getBoolean(R.styleable.boundless_imageHorizontalFlip, false);
         } finally {
             ta.recycle();
         }
     }
 
     public void setMask(View view) {
+
         view.buildDrawingCache();
         mMask = Bitmap.createBitmap(view.getDrawingCache());
 
@@ -61,8 +68,14 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
     }
 
     private void setImage(Resources res, int id) {
-        mImage = resize(BitmapFactory.decodeResource(res, id), mMask.getHeight());
+        mImage = BitmapFactory.decodeResource(res, id);
+        if (flipSheenImage) {
+            mImage = horizontalFlip(mImage);
+        }
+        mImage = resize(mImage, mMask.getHeight());
+//        mImage = rotateBitmap(mImage, 45);
     }
+
 
     public void start() {
         long now = System.currentTimeMillis();
@@ -87,7 +100,7 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
         if(elapsedTime < animationDuration) {
             this.postInvalidateDelayed(1000 / framesPerSecond);
             float interpolation = interpolator.getInterpolation(elapsedTime * 1f/animationDuration);
-            float xPos = mImage.getWidth() * (2*interpolation - 1);
+            float xPos = mImage.getWidth() * (animateRightToLeft ? (-2*interpolation + 1) : (2*interpolation - 1));
 
             canvas.save();
             canvas.drawBitmap(mMask, 0, 0, maskPaint);
@@ -110,5 +123,11 @@ public class CustomSheenView extends android.support.v7.widget.AppCompatImageVie
         } else {
             return image;
         }
+    }
+
+    private static Bitmap horizontalFlip(Bitmap src) {
+        Matrix matrix = new Matrix();
+        matrix.preScale(-1.0f, 1.0f);
+        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
     }
 }

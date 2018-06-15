@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.attention.CustomSheenView;
+import boundless.kit.rewards.animation.attention.SheenView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View rootView;
     private ImageView logoView;
-    private CustomSheenView sheen;
+    private SheenView sheen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

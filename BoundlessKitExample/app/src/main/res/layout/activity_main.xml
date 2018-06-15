@@ -21,18 +21,20 @@
         android:src="@mipmap/brain"
         />
 
-    <boundless.kit.rewards.animation.attention.CustomSheenView
+    <boundless.kit.rewards.animation.attention.SheenView
         xmlns:boundless="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sheen"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_alignTop="@id/header_icon"
-        android:layout_alignRight="@id/header_icon"
-        android:layout_alignLeft="@id/header_icon"
+        android:layout_alignEnd="@id/header_icon"
+        android:layout_alignStart="@id/header_icon"
         android:layout_alignBottom="@id/header_icon"
         android:scaleType="centerCrop"
         android:visibility="gone"
-        boundless:sheenContainerView="@id/header_icon"
+        boundless:animateInView="@id/header_icon"
+        boundless:animateRightToLeft="false"
+        boundless:imageHorizontalFlip="false"
         />
 
     <TextView
