@@ -16,12 +16,14 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
 
     ParticleSystem particleSystem;
 
-    private int xPosition = 50;
-    private int yPosition = 50;
+    private int xPositionMin = 50;
+    private int xPositionMax = 50;
+    private int yPositionMin = 50;
+    private int yPositionMax = 50;
     private Drawable content;
     { setDuration(3000); }
     private long lifetime = 2000;
-    private long lifetimeRange = 500;
+    private long lifetimeRange = 0;
     private long fadeIn = 500;
     private long fadeOut = 500;
     private int ratePerSecond = 3;
@@ -37,12 +39,34 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private float rotationSpeedRange = 130f;
 
     public Emojisplosion setxPosition(int xPosition) {
-        this.xPosition = xPosition;
+        this.xPositionMin = xPosition;
+        this.xPositionMax = xPosition;
         return this;
     }
 
     public Emojisplosion setyPosition(int yPosition) {
-        this.yPosition = yPosition;
+        this.yPositionMin = yPosition;
+        this.yPositionMax = yPosition;
+        return this;
+    }
+
+    public Emojisplosion setxPositionMin(int xPositionMin) {
+        this.xPositionMin = xPositionMin;
+        return this;
+    }
+
+    public Emojisplosion setxPositionMax(int xPositionMax) {
+        this.xPositionMax = xPositionMax;
+        return this;
+    }
+
+    public Emojisplosion setyPositionMin(int yPositionMin) {
+        this.yPositionMin = yPositionMin;
+        return this;
+    }
+
+    public Emojisplosion setyPositionMax(int yPositionMax) {
+        this.yPositionMax = yPositionMax;
         return this;
     }
 
@@ -162,7 +186,7 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     public void start() {
         super.start();
         if (particleSystem != null) {
-            particleSystem.emit(xPosition, yPosition, ratePerSecond, (int) getDuration());
+            particleSystem.emit(xPositionMin, xPositionMax, yPositionMin, yPositionMax, ratePerSecond, (int) getDuration());
         }
     }
 }

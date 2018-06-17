@@ -530,6 +530,14 @@ public class ParticleSystem {
 		startEmitting(particlesPerSecond, emittingTime);
 	}
 
+	public void emit(int emitterXMin, int emitterXMax, int emitterYMin, int emitterYMax, int particlesPerSecond, int emittingTime) {
+		mEmitterXMin = emitterXMin;
+		mEmitterXMax = emitterXMax;
+		mEmitterYMin = emitterYMin;
+		mEmitterYMax = emitterYMax;
+		startEmitting(particlesPerSecond, emittingTime);
+	}
+
 	private void configureEmitter(int emitterX, int emitterY) {
 		// We configure the emitter based on the window location to fix the offset of action bar if present
 		mEmitterXMin = emitterX - mParentLocation[0];
@@ -599,9 +607,9 @@ public class ParticleSystem {
 		startAnimator(interpolator, mTimeToLive);
 	}
 
-	private void startAnimator(Interpolator interpolator, long animnationTime) {
-		mAnimator = ValueAnimator.ofInt(0, (int) animnationTime);
-		mAnimator.setDuration(animnationTime);
+	private void startAnimator(Interpolator interpolator, long animationTime) {
+		mAnimator = ValueAnimator.ofInt(0, (int) animationTime);
+		mAnimator.setDuration(animationTime);
 		mAnimator.addUpdateListener(new AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -644,7 +652,7 @@ public class ParticleSystem {
 			mEmitterXMin = location[0] + emitter.getWidth() - mParentLocation[0];
 			mEmitterXMax = mEmitterXMin;
 		}
-		else if (hasGravity(gravity, Gravity.CENTER_HORIZONTAL)){
+		else if (hasGravity(gravity, Gravity.CENTER_HORIZONTAL)) {
 			mEmitterXMin = location[0] + emitter.getWidth()/2 - mParentLocation[0];
 			mEmitterXMax = mEmitterXMin;
 		}

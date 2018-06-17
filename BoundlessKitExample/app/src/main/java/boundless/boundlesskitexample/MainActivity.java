@@ -30,6 +30,7 @@ import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
 import boundless.kit.rewards.animation.attention.SheenView;
+import boundless.kit.rewards.animation.particle.Emojisplosion;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
 
-//                                        View contentView = findViewById(android.R.id.content);
+                                        View contentView = findViewById(android.R.id.content);
 //
 //                                        ViewGroup parent = (ViewGroup) logoView.getParent();
 //
@@ -225,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
 
 //                                        sheen.setMask(logoView);
 //                                        sheen.setImage(MainActivity.this.getResources(), R.drawable.sheen);
-                                        sheen.start();
+//                                        sheen.start();
 
 
 
@@ -234,13 +235,13 @@ public class MainActivity extends AppCompatActivity {
 //                                        logoView.startAnimation(rotate);
 
 ////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-//                                        new Emojisplosion().setContent(MainActivity.this, "\uD83D\uDE00\n")
-//                                                .setxPosition(contentView.getWidth() / 2)
-//                                                .setyPosition(contentView.getHeight() * 2 / 3)
-//                                                .setScale(2f)
-//                                                .setVelocity(-0.1f)
-//                                                .setTarget(findViewById(android.R.id.content))
-//                                                .start();
+                                        new Emojisplosion().setContent(MainActivity.this, "\uD83D\uDE00\n")
+                                                .setxPosition(contentView.getWidth() / 2)
+                                                .setyPosition(contentView.getHeight() / 2)
+                                                .setScale(2f)
+                                                .setVelocity(-0.1f)
+                                                .setTarget(findViewById(android.R.id.content))
+                                                .start();
 
 //                                        new VibrationAnimator().animate(contentView);
 
