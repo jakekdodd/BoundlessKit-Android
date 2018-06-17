@@ -25,7 +25,7 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
     long startTime;
     Interpolator interpolator = new AccelerateDecelerateInterpolator();
 
-    int sheenContainerViewId;
+    int sheenContainerViewId = 0;
     private Bitmap mImage;
     private Bitmap mMask;
     private final Paint maskPaint;
@@ -40,20 +40,18 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
         setVisibility(GONE);
 
         maskPaint = new Paint();
-//        maskPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-
         imagePaint = new Paint();
         imagePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
         setLayerType(LAYER_TYPE_SOFTWARE, null);
 
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SheenView, 0, 0);
+        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.SheenView, 0, 0);
         try {
-            sheenContainerViewId = ta.getResourceId(R.styleable.SheenView_animateInView, 0);
-            animateRightToLeft = ta.getBoolean(R.styleable.SheenView_animateRightToLeft, false);
-            flipSheenImage = ta.getBoolean(R.styleable.SheenView_imageHorizontalFlip, false);
+            sheenContainerViewId = attributes.getResourceId(R.styleable.SheenView_animateInView, sheenContainerViewId);
+            animateRightToLeft = attributes.getBoolean(R.styleable.SheenView_animateRightToLeft, animateRightToLeft);
+            flipSheenImage = attributes.getBoolean(R.styleable.SheenView_imageHorizontalFlip, flipSheenImage);
         } finally {
-            ta.recycle();
+            attributes.recycle();
         }
     }
 
