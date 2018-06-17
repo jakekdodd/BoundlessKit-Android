@@ -235,8 +235,8 @@ public class MainActivity extends AppCompatActivity {
 
 ////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
 //                                        new Emojisplosion().setContent(MainActivity.this, "\uD83D\uDE00\n")
-//                                                .setX(contentView.getWidth() / 2)
-//                                                .setY(contentView.getHeight() * 2 / 3)
+//                                                .setxPosition(contentView.getWidth() / 2)
+//                                                .setyPosition(contentView.getHeight() * 2 / 3)
 //                                                .setScale(2f)
 //                                                .setVelocity(-0.1f)
 //                                                .setTarget(findViewById(android.R.id.content))

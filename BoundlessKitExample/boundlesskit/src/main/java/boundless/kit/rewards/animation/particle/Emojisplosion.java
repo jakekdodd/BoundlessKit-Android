@@ -16,8 +16,8 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
 
     ParticleSystem particleSystem;
 
-    private int x = 50;
-    private int y = 50;
+    private int xPosition = 50;
+    private int yPosition = 50;
     private Drawable content;
     { setDuration(3000); }
     private long lifetime = 2000;
@@ -36,13 +36,13 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private float rotationSpeed = 10f;
     private float rotationSpeedRange = 130f;
 
-    public Emojisplosion setX(int x) {
-        this.x = x;
+    public Emojisplosion setxPosition(int xPosition) {
+        this.xPosition = xPosition;
         return this;
     }
 
-    public Emojisplosion setY(int y) {
-        this.y = y;
+    public Emojisplosion setyPosition(int yPosition) {
+        this.yPosition = yPosition;
         return this;
     }
 
@@ -162,7 +162,7 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     public void start() {
         super.start();
         if (particleSystem != null) {
-            particleSystem.emit(x, y, ratePerSecond, (int) getDuration());
+            particleSystem.emit(xPosition, yPosition, ratePerSecond, (int) getDuration());
         }
     }
 }
