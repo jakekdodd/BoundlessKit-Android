@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="boundless">
-        <attr name="animateInView" format="reference"/>
-        <attr name="animateRightToLeft" format="boolean"/>
-        <attr name="imageHorizontalFlip" format="boolean"/>
+    <attr name="animateInView" format="reference"/>
+    <attr name="animateRightToLeft" format="boolean"/>
+    <attr name="imageHorizontalFlip" format="boolean"/>
+
+    <declare-styleable name="SheenView">
+        <attr name="animateInView"/>
+        <attr name="animateRightToLeft"/>
+        <attr name="imageHorizontalFlip"/>
     </declare-styleable>
 </resources>

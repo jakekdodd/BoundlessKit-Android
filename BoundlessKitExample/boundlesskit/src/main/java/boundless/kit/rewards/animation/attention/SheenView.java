@@ -47,11 +47,11 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
 
         setLayerType(LAYER_TYPE_SOFTWARE, null);
 
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.boundless, 0, 0);
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SheenView, 0, 0);
         try {
-            sheenContainerViewId = ta.getResourceId(R.styleable.boundless_animateInView, 0);
-            animateRightToLeft = ta.getBoolean(R.styleable.boundless_animateRightToLeft, false);
-            flipSheenImage = ta.getBoolean(R.styleable.boundless_imageHorizontalFlip, false);
+            sheenContainerViewId = ta.getResourceId(R.styleable.SheenView_animateInView, 0);
+            animateRightToLeft = ta.getBoolean(R.styleable.SheenView_animateRightToLeft, false);
+            flipSheenImage = ta.getBoolean(R.styleable.SheenView_imageHorizontalFlip, false);
         } finally {
             ta.recycle();
         }
