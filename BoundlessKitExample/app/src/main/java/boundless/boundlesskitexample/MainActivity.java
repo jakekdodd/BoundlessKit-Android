@@ -32,7 +32,7 @@ import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
 import boundless.kit.rewards.animation.attention.SheenView;
-import boundless.kit.rewards.animation.particle.ConfettiSquare;
+import boundless.kit.rewards.animation.particle.ConfettoDrawable;
 import boundless.kit.rewards.animation.particle.Emojisplosion;
 
 public class MainActivity extends AppCompatActivity {
@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 ////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
                                         new Emojisplosion()
 //                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
-                                                .setContent(new ConfettiSquare(15, 15, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
+                                                .setContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
 //                                                .setxPosition(contentView.getWidth() / 2)
 //                                                .setyPosition(contentView.getHeight() / 2)
 //                                                .setxPosition(0)
