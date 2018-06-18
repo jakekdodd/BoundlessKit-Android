@@ -21,6 +21,7 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private int yPositionMin = 50;
     private int yPositionMax = 50;
     private Drawable content;
+    private ViewGroup target;
     { setDuration(3000); }
     private long lifetime = 2000;
     private long lifetimeRange = 0;
@@ -165,27 +166,26 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     }
 
     public Emojisplosion setTarget(View target) {
-        if (content == null) {
-            return this;
+        if (target instanceof ViewGroup) {
+            this.target = (ViewGroup) target;
         }
-
-        particleSystem = new ParticleSystem((ViewGroup)target, (int) (getDuration()* ratePerSecond), content, lifetime)
-                .addInitializer(new LifetimeInitializer(lifetimeRange))
-                .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
-                .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
-                .setSpeedModuleAndAngleRange(velocity - 0.5f * velocityRange, velocity + 0.5f * velocityRange, (int)(shootingAngle - 0.5 * shootingAngleRange), (int)(shootingAngle + 0.5 * shootingAngleRange))
-                .setFadeIn(fadeIn)
-                .setFadeOut(fadeOut)
-                .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
-                ;
-
         return this;
     }
 
     @Override
     public void start() {
         super.start();
-        if (particleSystem != null) {
+
+        if (target != null && content != null) {
+            particleSystem = new ParticleSystem(target, (int) (getDuration() * ratePerSecond), content, lifetime)
+                    .addInitializer(new LifetimeInitializer(lifetimeRange))
+                    .addInitializer(new XYAccelerationInitializer(xAcceleration, yAcceleration))
+                    .addModifier(new ScaleModifier(scale, scale + scaleChange, 0, lifetime, new LinearInterpolator()))
+                    .setSpeedModuleAndAngleRange(velocity - 0.5f * velocityRange, velocity + 0.5f * velocityRange, (int) (shootingAngle - 0.5 * shootingAngleRange), (int) (shootingAngle + 0.5 * shootingAngleRange))
+                    .setFadeIn(fadeIn)
+                    .setFadeOut(fadeOut)
+                    .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
+            ;
             particleSystem.emit(xPositionMin, xPositionMax, yPositionMin, yPositionMax, ratePerSecond, (int) getDuration());
         }
     }
