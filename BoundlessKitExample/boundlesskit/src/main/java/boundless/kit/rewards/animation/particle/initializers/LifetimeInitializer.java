@@ -6,10 +6,14 @@ import boundless.kit.rewards.animation.particle.Particle;
 
 public class LifetimeInitializer implements ParticleInitializer {
 
-    private float mLifetimeRange;
+    private long mLifetimeRange;
 
-    public LifetimeInitializer(float lifetimeRange) {
+    public LifetimeInitializer(long lifetimeRange) {
         mLifetimeRange = lifetimeRange;
+    }
+
+    public long getLifetimeRange() {
+        return mLifetimeRange;
     }
 
     @Override

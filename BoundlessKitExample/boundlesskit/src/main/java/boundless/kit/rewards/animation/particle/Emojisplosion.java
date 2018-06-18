@@ -24,7 +24,7 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private ViewGroup target;
     { setDuration(3000); }
     private long lifetime = 2000;
-    private long lifetimeRange = 0;
+    private long lifetimeRange = 1000;
     private long fadeIn = 500;
     private long fadeOut = 500;
     private int ratePerSecond = 3;

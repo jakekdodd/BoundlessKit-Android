@@ -700,26 +700,24 @@ public class ParticleSystem {
 		}
 		int particleX = getFromRange (mEmitterXMin, mEmitterXMax);
 		int particleY = getFromRange (mEmitterYMin, mEmitterYMax);
-		p.configure(mTimeToLive, particleX, particleY);
-		if (lifetimeHack != null) {
-		    lifetimeHack.initParticle(p, mRandom);
-        }
+		long particleLifetime = (lifetimeHack == null) ? mTimeToLive : mTimeToLive - getFromRange(0, (int) lifetimeHack.getLifetimeRange());
+		p.configure(particleLifetime, particleX, particleY);
 		p.activate(delay, mModifiers);
 		mActiveParticles.add(p);
 		mActivatedParticles++;
 	}
 
-	private int getFromRange(int minValue, int maxValue) {
-		if (minValue == maxValue) {
-			return minValue;
-		}
-		if (minValue < maxValue) {
-			return mRandom.nextInt(maxValue - minValue) + minValue;
-		}
-		else {
-			return mRandom.nextInt(minValue - maxValue) + maxValue;
-		}
-	}
+    private int getFromRange(int minValue, int maxValue) {
+        if (minValue == maxValue) {
+            return minValue;
+        }
+        if (minValue < maxValue) {
+            return mRandom.nextInt(maxValue - minValue) + minValue;
+        }
+        else {
+            return mRandom.nextInt(minValue - maxValue) + maxValue;
+        }
+    }
 
 	private void onUpdate(long milliseconds) {
 		while (((mEmittingTime > 0 && milliseconds < mEmittingTime)|| mEmittingTime == -1) && // This point should emit

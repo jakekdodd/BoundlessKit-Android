@@ -24,14 +24,18 @@ public class AlphaModifier implements ParticleModifier {
 
 	@Override
 	public void apply(Particle particle, long milliseconds) {
-		if (mStartTime == -1) {
-			mStartTime = particle.mTimeToLive - mDuration;
-		}
-		if (mStartTime <= milliseconds && milliseconds <= mStartTime + mDuration) {
-			float interpolatedValue = mInterpolator.getInterpolation((milliseconds - mStartTime)*1f/mDuration);
-			int newAlphaValue = (int) (mInitialValue + mValueIncrement*interpolatedValue);
-			particle.mAlpha = newAlphaValue;
-		}		
+		if (mStartTime == -1 ) {
+		    long startTime = particle.mTimeToLive - mDuration;
+            if (startTime <= milliseconds && milliseconds <= startTime + mDuration) {
+                float interpolatedValue = mInterpolator.getInterpolation((milliseconds - startTime)*1f/mDuration);
+                particle.mAlpha = (int) (mInitialValue + (mValueIncrement * interpolatedValue));
+            }
+		} else {
+            if (mStartTime <= milliseconds && milliseconds <= mStartTime + mDuration) {
+                float interpolatedValue = mInterpolator.getInterpolation((milliseconds - mStartTime) * 1f / mDuration);
+                particle.mAlpha = (int) (mInitialValue + (mValueIncrement * interpolatedValue));
+            }
+        }
 	}
 
 }
