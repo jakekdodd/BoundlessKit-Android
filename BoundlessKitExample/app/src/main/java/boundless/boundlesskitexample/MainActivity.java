@@ -5,7 +5,9 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -30,6 +32,7 @@ import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
 import boundless.kit.rewards.animation.attention.SheenView;
+import boundless.kit.rewards.animation.particle.ConfettiSquare;
 import boundless.kit.rewards.animation.particle.Emojisplosion;
 
 public class MainActivity extends AppCompatActivity {
@@ -235,12 +238,18 @@ public class MainActivity extends AppCompatActivity {
 //                                        logoView.startAnimation(rotate);
 
 ////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-                                        new Emojisplosion().setContent(MainActivity.this, "\uD83D\uDE00\n")
-                                                .setxPosition(contentView.getWidth() / 2)
-                                                .setyPosition(contentView.getHeight() / 2)
+                                        new Emojisplosion()
+//                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
+                                                .setContent(new ConfettiSquare(15, 15, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
+//                                                .setxPosition(contentView.getWidth() / 2)
+//                                                .setyPosition(contentView.getHeight() / 2)
+//                                                .setxPosition(0)
+//                                                .setyPosition(0)
+                                                .setxPositionMin(0).setxPositionMax(contentView.getWidth())
+                                                .setyPosition(0)
                                                 .setScale(2f)
                                                 .setVelocity(-0.1f)
-                                                .setTarget(findViewById(android.R.id.content))
+                                                .setTarget(contentView)
                                                 .start();
 
 //                                        new VibrationAnimator().animate(contentView);
