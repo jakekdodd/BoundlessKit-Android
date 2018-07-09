@@ -31,9 +31,9 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.attention.SheenView;
-import boundless.kit.rewards.animation.particle.ConfettoDrawable;
-import boundless.kit.rewards.animation.particle.Emojisplosion;
+import boundless.kit.rewards.animation.overlay.SheenView;
+import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
+import boundless.kit.rewards.animation.overlay.Emojisplosion;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";

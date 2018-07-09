@@ -1,4 +1,4 @@
-package boundless.kit.rewards.animation.attention;
+package boundless.kit.rewards.animation.overlay;
 
 /**
  * Created by cuddergambino on 6/1/16.

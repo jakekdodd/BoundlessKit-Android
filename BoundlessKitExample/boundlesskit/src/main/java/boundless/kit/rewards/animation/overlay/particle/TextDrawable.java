@@ -1,4 +1,4 @@
-package boundless.kit.rewards.animation.particle;
+package boundless.kit.rewards.animation.overlay.particle;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -1,4 +1,4 @@
-package boundless.kit.rewards.animation.particle;
+package boundless.kit.rewards.animation.overlay.particle;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,7 +7,7 @@ import android.graphics.Paint;
 
 import java.util.List;
 
-import boundless.kit.rewards.animation.particle.modifiers.ParticleModifier;
+import boundless.kit.rewards.animation.overlay.particle.modifiers.ParticleModifier;
 
 public class Particle {
 

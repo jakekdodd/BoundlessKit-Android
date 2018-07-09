@@ -1,7 +1,7 @@
 package boundless.boundlesskitexample.Candy;
 
 import boundless.boundlesskitexample.R;
-import boundless.kit.rewards.animation.attention.CandyBar;
+import boundless.kit.rewards.animation.overlay.CandyBar;
 
 /**
  * Represents a set of Icons to be used in a {@link CandyBar}.

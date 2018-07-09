@@ -1,6 +1,6 @@
-package boundless.kit.rewards.animation.particle.modifiers;
+package boundless.kit.rewards.animation.overlay.particle.modifiers;
 
-import boundless.kit.rewards.animation.particle.Particle;
+import boundless.kit.rewards.animation.overlay.particle.Particle;
 
 public class AccelerationModifier implements ParticleModifier {
 

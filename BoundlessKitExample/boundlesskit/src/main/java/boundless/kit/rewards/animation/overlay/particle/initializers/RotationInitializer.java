@@ -1,6 +1,6 @@
-package boundless.kit.rewards.animation.particle.initializers;
+package boundless.kit.rewards.animation.overlay.particle.initializers;
 
-import boundless.kit.rewards.animation.particle.Particle;
+import boundless.kit.rewards.animation.overlay.particle.Particle;
 
 import java.util.Random;
 

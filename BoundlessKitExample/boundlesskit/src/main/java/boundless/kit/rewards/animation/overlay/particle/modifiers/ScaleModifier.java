@@ -1,9 +1,9 @@
-package boundless.kit.rewards.animation.particle.modifiers;
+package boundless.kit.rewards.animation.overlay.particle.modifiers;
 
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
-import boundless.kit.rewards.animation.particle.Particle;
+import boundless.kit.rewards.animation.overlay.particle.Particle;
 
 public class ScaleModifier implements ParticleModifier {
 

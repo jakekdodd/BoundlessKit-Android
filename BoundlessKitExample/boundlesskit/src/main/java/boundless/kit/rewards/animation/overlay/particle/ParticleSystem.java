@@ -1,4 +1,4 @@
-package boundless.kit.rewards.animation.particle;
+package boundless.kit.rewards.animation.overlay.particle;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
@@ -24,16 +24,16 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import boundless.kit.rewards.animation.particle.initializers.AccelerationInitializer;
-import boundless.kit.rewards.animation.particle.initializers.LifetimeInitializer;
-import boundless.kit.rewards.animation.particle.initializers.ParticleInitializer;
-import boundless.kit.rewards.animation.particle.initializers.RotationInitializer;
-import boundless.kit.rewards.animation.particle.initializers.RotationSpeedInitializer;
-import boundless.kit.rewards.animation.particle.initializers.ScaleInitializer;
-import boundless.kit.rewards.animation.particle.initializers.SpeedModuleAndRangeInitializer;
-import boundless.kit.rewards.animation.particle.initializers.SpeeddByComponentsInitializer;
-import boundless.kit.rewards.animation.particle.modifiers.AlphaModifier;
-import boundless.kit.rewards.animation.particle.modifiers.ParticleModifier;
+import boundless.kit.rewards.animation.overlay.particle.initializers.AccelerationInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.LifetimeInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.ParticleInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.RotationInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.RotationSpeedInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.ScaleInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.SpeedModuleAndRangeInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.SpeeddByComponentsInitializer;
+import boundless.kit.rewards.animation.overlay.particle.modifiers.AlphaModifier;
+import boundless.kit.rewards.animation.overlay.particle.modifiers.ParticleModifier;
 
 public class ParticleSystem {
 

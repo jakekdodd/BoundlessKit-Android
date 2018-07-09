@@ -1,4 +1,4 @@
-package boundless.kit.rewards.animation.attention;
+package boundless.kit.rewards.animation.overlay;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -56,7 +56,6 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
     }
 
     public void setMask(View view) {
-
         view.buildDrawingCache();
         mMask = Bitmap.createBitmap(view.getDrawingCache());
 

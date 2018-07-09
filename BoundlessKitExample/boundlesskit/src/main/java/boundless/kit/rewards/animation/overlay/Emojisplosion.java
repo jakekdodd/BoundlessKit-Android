@@ -1,4 +1,4 @@
-package boundless.kit.rewards.animation.particle;
+package boundless.kit.rewards.animation.overlay;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 
 import boundless.kit.rewards.animation.BaseViewAnimator;
-import boundless.kit.rewards.animation.particle.initializers.LifetimeInitializer;
-import boundless.kit.rewards.animation.particle.initializers.XYAccelerationInitializer;
-import boundless.kit.rewards.animation.particle.modifiers.ScaleModifier;
+import boundless.kit.rewards.animation.overlay.particle.ParticleSystem;
+import boundless.kit.rewards.animation.overlay.particle.TextDrawable;
+import boundless.kit.rewards.animation.overlay.particle.initializers.LifetimeInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.XYAccelerationInitializer;
+import boundless.kit.rewards.animation.overlay.particle.modifiers.ScaleModifier;
 
 public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
 
