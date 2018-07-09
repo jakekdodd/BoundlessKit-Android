@@ -8,6 +8,11 @@ public class LifetimeInitializer implements ParticleInitializer {
 
     private long mLifetimeRange;
 
+    /**
+     *
+     * @param lifetimeRange The lifetime will be reduced by a random amount up to this value.
+     *                      A negative value will randomly extend the lifetime up to this value.
+     */
     public LifetimeInitializer(long lifetimeRange) {
         mLifetimeRange = lifetimeRange;
     }

@@ -13,6 +13,14 @@ public class AlphaModifier implements ParticleModifier {
 	private float mValueIncrement;
 	private Interpolator mInterpolator;
 
+    /**
+     *
+     * @param initialValue Initial alpha value applied when modifier starts.
+     * @param finalValue Final alpha value by the time modifier finishes.
+     * @param startMillis Time to start modifying alpha. A value of -1 will start from (lifetimeEnd - duration).
+     * @param duration Total time to modify alpha.
+     * @param interpolator Rate at which alpha value will change.
+     */
 	public AlphaModifier(int initialValue, int finalValue, long startMillis, long duration, Interpolator interpolator) {
 		mInitialValue = initialValue;
 		mFinalValue = finalValue;
@@ -24,17 +32,10 @@ public class AlphaModifier implements ParticleModifier {
 
 	@Override
 	public void apply(Particle particle, long milliseconds) {
-		if (mStartTime == -1 ) {
-		    long startTime = particle.mTimeToLive - mDuration;
-            if (startTime <= milliseconds && milliseconds <= startTime + mDuration) {
-                float interpolatedValue = mInterpolator.getInterpolation((milliseconds - startTime)*1f/mDuration);
-                particle.mAlpha = (int) (mInitialValue + (mValueIncrement * interpolatedValue));
-            }
-		} else {
-            if (mStartTime <= milliseconds && milliseconds <= mStartTime + mDuration) {
-                float interpolatedValue = mInterpolator.getInterpolation((milliseconds - mStartTime) * 1f / mDuration);
-                particle.mAlpha = (int) (mInitialValue + (mValueIncrement * interpolatedValue));
-            }
+		long startTime = (mStartTime == -1) ? (particle.mTimeToLive - mDuration) : mStartTime;
+        if (startTime <= milliseconds && milliseconds <= startTime + mDuration) {
+            float interpolatedValue = mInterpolator.getInterpolation((milliseconds - startTime)*1f/mDuration);
+            particle.mAlpha = (int) (mInitialValue + (mValueIncrement * interpolatedValue));
         }
 	}
 
