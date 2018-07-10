@@ -13,26 +13,29 @@ import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.RelativeLayout;
 
 import boundless.kit.R;
 
 public class SheenView extends android.support.v7.widget.AppCompatImageView {
 
-    int framesPerSecond = 30;
-    long animationDuration = 3300;
-    long startTime;
-    Interpolator interpolator = new AccelerateDecelerateInterpolator();
+    public int framesPerSecond = 30;
+    public long animationDuration = 3300;
+    public boolean animateRightToLeft = false;
+    public boolean flipSheenImage = false;
+    public Interpolator interpolator = new AccelerateDecelerateInterpolator();
 
-    int sheenContainerViewId = 0;
+    long startTime;
+    int animateOverViewId = 0;
     private Bitmap mImage;
     private Bitmap mMask;
     private final Paint maskPaint;
     private final Paint imagePaint;
 
-    public boolean animateRightToLeft = false;
-    public boolean flipSheenImage = false;
+
 
     public SheenView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -47,45 +50,73 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
 
         TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.SheenView, 0, 0);
         try {
-            sheenContainerViewId = attributes.getResourceId(R.styleable.SheenView_animateInView, sheenContainerViewId);
+            framesPerSecond = attributes.getInt(R.styleable.SheenView_framesPerSecond, framesPerSecond);
+            animationDuration = attributes.getInt(R.styleable.SheenView_animationDuration, (int)animationDuration);
             animateRightToLeft = attributes.getBoolean(R.styleable.SheenView_animateRightToLeft, animateRightToLeft);
             flipSheenImage = attributes.getBoolean(R.styleable.SheenView_imageHorizontalFlip, flipSheenImage);
+            animateOverViewId = attributes.getResourceId(R.styleable.SheenView_animateOver, animateOverViewId);
         } finally {
             attributes.recycle();
         }
     }
 
-    public void setMask(View view) {
-        view.buildDrawingCache();
-        mMask = Bitmap.createBitmap(view.getDrawingCache());
+    public void setAnimateOverViewId(int viewId) {
+        animateOverViewId = viewId;
+    }
 
-        if (mMask != null) {
-            setImage(getResources(), R.drawable.sheen);
+    public void start() {
+        long now = System.currentTimeMillis();
+        if (now >= startTime + animationDuration && updateLayout() && updateMask()) {
+            this.startTime = now;
+            setVisibility(VISIBLE);
+            this.postInvalidate();
         }
     }
 
-    private void setImage(Resources res, int id) {
+    protected boolean updateLayout() {
+        if (!(getLayoutParams() instanceof RelativeLayout.LayoutParams)) {
+            Log.e("Boundless", "SheenView must be in a RelativeLayout. If using a different layout class, wrap SheenView and the view to animate over in a relative layout.");
+            return false;
+        }
+
+        if (((ViewGroup)getParent()).findViewById(animateOverViewId) == null) {
+            Log.e("Boundless", "View to animate over, with id:<" + animateOverViewId + ">, is not a sibling of SheenView. Must be a sibling.");
+            return false;
+        }
+
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) getLayoutParams();
+        layoutParams.addRule(RelativeLayout.ALIGN_TOP, animateOverViewId);
+        layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, animateOverViewId);
+        layoutParams.addRule(RelativeLayout.ALIGN_START, animateOverViewId);
+        layoutParams.addRule(RelativeLayout.ALIGN_END, animateOverViewId);
+        setLayoutParams(layoutParams);
+        return true;
+    }
+
+    protected boolean updateMask() {
+        View view = ((ViewGroup)getParent()).findViewById(animateOverViewId);
+        if (view == null) {
+            Log.e("Boundless", "View to animate over, with id:<" + animateOverViewId + ">, is not a sibling of SheenView. Must be a sibling.");
+            return false;
+        }
+
+        view.buildDrawingCache();
+        mMask = Bitmap.createBitmap(view.getDrawingCache());
+
+        if (mMask == null) {
+            return false;
+        }
+
+        setImage(getResources(), R.drawable.sheen);
+        return true;
+    }
+
+    protected void setImage(Resources res, int id) {
         mImage = BitmapFactory.decodeResource(res, id);
         if (flipSheenImage) {
             mImage = horizontalFlip(mImage);
         }
         mImage = resize(mImage, mMask.getHeight());
-//        mImage = rotateBitmap(mImage, 45);
-    }
-
-
-    public void start() {
-        long now = System.currentTimeMillis();
-        if (now >= startTime + animationDuration) {
-            if ( !(getParent() instanceof View) || ((View) getParent()).findViewById(sheenContainerViewId) == null) {
-                Log.e("Boundless", "SheenView does not have a parent view, or has an invalid or missing 'sheenContainerView' attribute");
-                return;
-            }
-            setMask(((View) getParent()).findViewById(sheenContainerViewId));
-            this.startTime = now;
-            setVisibility(VISIBLE);
-            this.postInvalidate();
-        }
     }
 
     @Override
@@ -100,7 +131,7 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
             float xPos = mImage.getWidth() * (animateRightToLeft ? (-2*interpolation + 1) : (2*interpolation - 1));
 
             canvas.save();
-            canvas.drawBitmap(mMask, 0, 0, maskPaint);
+            canvas.drawBitmap(mMask,0, 0, maskPaint);
             canvas.drawBitmap(mImage, xPos, 0, imagePaint);
             canvas.restore();
         } else {

@@ -5,9 +5,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,8 +30,6 @@ import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
 import boundless.kit.rewards.animation.overlay.SheenView;
-import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
-import boundless.kit.rewards.animation.overlay.Emojisplosion;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -63,6 +59,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+//        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
+//        rotate.setRepeatCount(100);
+//        logoView.startAnimation(rotate);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -232,25 +232,38 @@ public class MainActivity extends AppCompatActivity {
 //                                        sheen.start();
 
 
+                                        sheen.start();
+
+//                                        SheenView sv = (SheenView) SheenView.inflate(contentView.getContext(), R.layout.layout_sheen, (ViewGroup)contentView);
+//                                        sv.setContainerView(logoView.getId());
+//                                        SheenView sv = new SheenView(MainActivity.this, new RelativeLayout.LayoutParams(0, 0));
+
+//                                        RelativeLayout relativeLayout = (RelativeLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.layout_sheen, null, false);
+//                                        ((RelativeLayout)findViewById(R.id.MainActivity)).addView(relativeLayout);
+//                                        SheenView sheenView = relativeLayout.findViewById(R.id.sheenView);
+//                                        sheenView.setContainerView(logoView);
+
+
+
 
 //                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
 //                                        rotate.setRepeatCount(1);
 //                                        logoView.startAnimation(rotate);
 
-////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-                                        new Emojisplosion()
-//                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
-                                                .setContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
-//                                                .setxPosition(contentView.getWidth() / 2)
-//                                                .setyPosition(contentView.getHeight() / 2)
-//                                                .setxPosition(0)
+//////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+//                                        new Emojisplosion()
+////                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
+//                                                .setContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
+////                                                .setxPosition(contentView.getWidth() / 2)
+////                                                .setyPosition(contentView.getHeight() / 2)
+////                                                .setxPosition(0)
+////                                                .setyPosition(0)
+//                                                .setxPositionMin(0).setxPositionMax(contentView.getWidth())
 //                                                .setyPosition(0)
-                                                .setxPositionMin(0).setxPositionMax(contentView.getWidth())
-                                                .setyPosition(0)
-                                                .setScale(2f)
-                                                .setVelocity(-0.1f)
-                                                .setTarget(contentView)
-                                                .start();
+//                                                .setScale(2f)
+//                                                .setVelocity(-0.1f)
+//                                                .setTarget(contentView)
+//                                                .start();
 
 //                                        new VibrationAnimator().animate(contentView);
 

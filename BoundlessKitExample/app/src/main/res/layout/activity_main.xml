@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/MainActivity"
     android:layout_width="match_parent"
@@ -11,29 +12,30 @@
     android:background="@color/MyYellow"
     tools:context="boundless.boundlesskitexample.MainActivity">
 
-    <ImageView
-        android:id="@+id/header_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:contentDescription="@string/boundlessmind_logo"
-        android:src="@mipmap/brain"
-        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <boundless.kit.rewards.animation.overlay.SheenView
-        xmlns:boundless="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/sheen"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_alignTop="@id/header_icon"
-        android:layout_alignEnd="@id/header_icon"
-        android:layout_alignStart="@id/header_icon"
-        android:layout_alignBottom="@id/header_icon"
-        boundless:animateInView="@id/header_icon"
-        boundless:animateRightToLeft="false"
-        boundless:imageHorizontalFlip="false"
-        />
+        <ImageView
+            android:id="@+id/header_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/boundlessmind_logo"
+            android:src="@mipmap/brain"
+            />
+        <boundless.kit.rewards.animation.overlay.SheenView
+            xmlns:boundless="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/sheen"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            boundless:animationDuration="1000"
+            boundless:animateOver="@id/header_icon"
+            boundless:animateRightToLeft="false"
+            boundless:imageHorizontalFlip="false" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/list_title"
@@ -54,4 +56,4 @@
         android:layout_height="match_parent"
         android:layout_below="@id/list_title"/>
 
-</RelativeLayout>
+</LinearLayout>

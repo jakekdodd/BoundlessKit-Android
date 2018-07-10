@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="animateInView" format="reference"/>
+    <attr name="framesPerSecond" format="integer"/>
+    <attr name="animationDuration" format="integer"/>
+    <attr name="animateOver" format="reference"/>
     <attr name="animateRightToLeft" format="boolean"/>
     <attr name="imageHorizontalFlip" format="boolean"/>
 
     <declare-styleable name="SheenView">
-        <attr name="animateInView"/>
+        <attr name="framesPerSecond"/>
+        <attr name="animationDuration"/>
+        <attr name="animateOver"/>
         <attr name="animateRightToLeft"/>
         <attr name="imageHorizontalFlip"/>
     </declare-styleable>
