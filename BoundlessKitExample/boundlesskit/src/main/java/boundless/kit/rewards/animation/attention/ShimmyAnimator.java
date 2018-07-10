@@ -58,6 +58,10 @@ public class ShimmyAnimator extends BaseViewAnimator<ShimmyAnimator> {
         return this;
     }
 
+    public ShimmyAnimator setHorizontally(boolean horizontally) {
+        return setVertically(!horizontally);
+    }
+
     @Override
     public ShimmyAnimator setTarget(View target) {
         float startingX = target.getX();

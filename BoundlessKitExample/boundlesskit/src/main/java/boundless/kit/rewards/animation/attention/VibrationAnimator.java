@@ -10,7 +10,7 @@ import boundless.kit.rewards.animation.BaseViewAnimator;
 public class VibrationAnimator extends BaseViewAnimator<VibrationAnimator> {
 
     private int vibrateCount = 6;
-    private long vibrateDuration = 333;
+    private long vibrateDuration = 1000;
     private float vibrateTranslation = 50;
     private boolean vibrateVertically = false;
     private float scale = 0.8f;

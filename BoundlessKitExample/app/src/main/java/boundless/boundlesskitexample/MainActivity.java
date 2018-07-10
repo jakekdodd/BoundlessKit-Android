@@ -41,7 +41,50 @@ public class MainActivity extends AppCompatActivity {
 
     private void reinforcementCall() {
 
-        View contentView = findViewById(android.R.id.content);
+        //// Pulse Sample
+        //
+        // Create an animator instance, set values, and animate()
+        //
+//        new PulseAnimator()
+//                .setCount(3)
+//                .animate(findViewById(R.id.list_title));
+
+
+
+
+        //// Rotation Sample
+        //
+        // Create an animator instance, set values, and animate()
+        //
+//        new RotationAnimator()
+//                .setCount(2)
+//                .animate(findViewById(R.id.list_title));
+
+
+
+
+        //// Shimmy Sample
+        //
+        // Create an animator instance, set values, and animate()
+        //
+//        new ShimmyAnimator()
+//                .setCount(3)
+//                .setHorizontally(true)
+//                .animate(findViewById(R.id.list_title));
+
+
+
+
+        //// Vibration Sample
+        //
+        // Create an animator instance, set values, and animate()
+        //
+//        new VibrationAnimator()
+//                .setScale(1.2f)
+//                .animate(findViewById(R.id.list_title));
+
+
+
 
         //// Sheen Sample
         //
@@ -51,12 +94,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        
 
-//                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
-//                                        rotate.setRepeatCount(1);
-//                                        logoView.startAnimation(rotate);
 
+
+
+
+//        View contentView = findViewById(android.R.id.content);
 //////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
 //                                        new Emojisplosion()
 ////                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
@@ -75,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 //                                        new VibrationAnimator().animate(contentView);
 
 
-////                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
+//                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
 //                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
 //
 //                                            @Override
