@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.overlay.SheenView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -39,19 +38,84 @@ public class MainActivity extends AppCompatActivity {
 
     private View rootView;
     private ImageView logoView;
-    private SheenView sheen;
+
+    private void reinforcementCall() {
+
+        View contentView = findViewById(android.R.id.content);
+
+        //// Sheen Sample
+        //
+        // add SheenView to activity layout, after view to animate over
+        //
+//        ((SheenView)findViewById(R.id.sheen)).start();
+
+
+
+        
+
+//                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
+//                                        rotate.setRepeatCount(1);
+//                                        logoView.startAnimation(rotate);
+
+//////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+//                                        new Emojisplosion()
+////                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
+//                                                .setContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
+////                                                .setxPosition(contentView.getWidth() / 2)
+////                                                .setyPosition(contentView.getHeight() / 2)
+////                                                .setxPosition(0)
+////                                                .setyPosition(0)
+//                                                .setxPositionMin(0).setxPositionMax(contentView.getWidth())
+//                                                .setyPosition(0)
+//                                                .setScale(2f)
+//                                                .setVelocity(-0.1f)
+//                                                .setTarget(contentView)
+//                                                .start();
+
+//                                        new VibrationAnimator().animate(contentView);
+
+
+////                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
+//                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
+//
+//                                            @Override
+//                                            public void onReinforcement(String reinforcement) {
+//                                                // Show some candy and make them feel good!
+//                                                CandyBar candyBar = null;
+//                                                switch (reinforcement) {
+//                                                    case "stars":
+//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
+//                                                        break;
+//                                                    case "medalStar":
+//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
+//                                                        break;
+//                                                    case "thumbsUp":
+//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
+//                                                        break;
+//                                                    default:
+//                                                        // Show nothing! This is called a neutral response,
+//                                                        // and builds up the good feelings for the next surprise!
+//                                                        break;
+//                                                }
+//                                                if (candyBar != null) {
+//                                                    candyBar.show();
+//                                                }
+//                                            }
+//
+//                                        });
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        logoView = (ImageView) findViewById(R.id.header_icon);
-        sheen = findViewById(R.id.sheen);
-
+        logoView = findViewById(R.id.header_icon);
 
         mHelper = new TaskDbHelper(MainActivity.this);
-        mTaskListView = (ListView) findViewById(R.id.list_todo);
+        mTaskListView = findViewById(R.id.list_todo);
         updateUI();
         BoundlessKit.debugMode = true;
     }
@@ -59,10 +123,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
-//        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
-//        rotate.setRepeatCount(100);
-//        logoView.startAnimation(rotate);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -202,101 +262,7 @@ public class MainActivity extends AppCompatActivity {
 //                                    // The completed task has been deleted
 //                                    // Let's give em some positive reinforcement!
 
-                                        View contentView = findViewById(android.R.id.content);
-//
-//                                        ViewGroup parent = (ViewGroup) logoView.getParent();
-//
-//                                        ImageView sheenView = new ImageView(MainActivity.this);
-//                                        sheenView.setImageResource(boundless.kit.R.drawable.sheen);
-//
-////                                        FrameLayout relativeLayout = new FrameLayout(MainActivity.this);
-////                                        relativeLayout.addView(sheenView);
-////                                        relativeLayout.forceLayout();
-////                                        parent.addView(relativeLayout);
-//
-//
-////                                        Log.v("Test", "Type:" + parent);
-////                                        ((ViewGroup)parent).addView(sheenView);
-
-
-//                                        Bitmap returnedBitmap = Bitmap.createBitmap(logoView.getWidth(), logoView.getHeight(),Bitmap.Config.ARGB_8888);
-//                                        Canvas canvas = new Canvas(returnedBitmap);
-//                                        Drawable bgDrawable = logoView.getBackground();
-//                                        if (bgDrawable!=null)
-//                                            bgDrawable.draw(canvas);
-//                                        logoView.draw(canvas);
-//                                        sheen.mMask = returnedBitmap;
-
-//                                        sheen.setMask(logoView);
-//                                        sheen.setImage(MainActivity.this.getResources(), R.drawable.sheen);
-//                                        sheen.start();
-
-
-                                        sheen.start();
-
-//                                        SheenView sv = (SheenView) SheenView.inflate(contentView.getContext(), R.layout.layout_sheen, (ViewGroup)contentView);
-//                                        sv.setContainerView(logoView.getId());
-//                                        SheenView sv = new SheenView(MainActivity.this, new RelativeLayout.LayoutParams(0, 0));
-
-//                                        RelativeLayout relativeLayout = (RelativeLayout) LayoutInflater.from(MainActivity.this).inflate(R.layout.layout_sheen, null, false);
-//                                        ((RelativeLayout)findViewById(R.id.MainActivity)).addView(relativeLayout);
-//                                        SheenView sheenView = relativeLayout.findViewById(R.id.sheenView);
-//                                        sheenView.setContainerView(logoView);
-
-
-
-
-//                                        Animation rotate = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shimmy);
-//                                        rotate.setRepeatCount(1);
-//                                        logoView.startAnimation(rotate);
-
-//////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-//                                        new Emojisplosion()
-////                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
-//                                                .setContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
-////                                                .setxPosition(contentView.getWidth() / 2)
-////                                                .setyPosition(contentView.getHeight() / 2)
-////                                                .setxPosition(0)
-////                                                .setyPosition(0)
-//                                                .setxPositionMin(0).setxPositionMax(contentView.getWidth())
-//                                                .setyPosition(0)
-//                                                .setScale(2f)
-//                                                .setVelocity(-0.1f)
-//                                                .setTarget(contentView)
-//                                                .start();
-
-//                                        new VibrationAnimator().animate(contentView);
-
-
-////                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
-//                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
-//
-//                                            @Override
-//                                            public void onReinforcement(String reinforcement) {
-//                                                // Show some candy and make them feel good!
-//                                                CandyBar candyBar = null;
-//                                                switch (reinforcement) {
-//                                                    case "stars":
-//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
-//                                                        break;
-//                                                    case "medalStar":
-//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
-//                                                        break;
-//                                                    case "thumbsUp":
-//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
-//                                                        break;
-//                                                    default:
-//                                                        // Show nothing! This is called a neutral response,
-//                                                        // and builds up the good feelings for the next surprise!
-//                                                        break;
-//                                                }
-//                                                if (candyBar != null) {
-//                                                    candyBar.show();
-//                                                }
-//                                            }
-//
-//                                        });
-
+                                        reinforcementCall();
 
 //                                    HashMap<String, String> metaData = new HashMap<String, String>();
 //                                    metaData.put("calories", "400");
@@ -326,8 +292,12 @@ public class MainActivity extends AppCompatActivity {
                 mAdapter.notifyDataSetChanged();
             }
         } finally {
-            cursor.close();
-            db.close();
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
         }
     }
 }
