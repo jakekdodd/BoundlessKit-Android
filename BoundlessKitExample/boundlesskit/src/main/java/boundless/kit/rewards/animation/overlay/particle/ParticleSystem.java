@@ -37,10 +37,21 @@ import boundless.kit.rewards.animation.overlay.particle.modifiers.ParticleModifi
 
 public class ParticleSystem {
 
+	public static class ParticleTemplate {
+		public final Drawable drawable;
+		public final int count;
+		public ParticleTemplate(Drawable drawable, int count) {
+			this.drawable = drawable;
+			this.count = count;
+		}
+	}
+
 	private static long TIMER_TASK_INTERVAL = 33; // Default 30fps
 	private ViewGroup mParentView;
 	private int mMaxParticles;
 	private Random mRandom;
+	public boolean mRandomizeParticles = false;
+	public int mConcurrentParticlesToActivate = 1;
 
 	private ParticleField mDrawingView;
 
@@ -137,6 +148,38 @@ public class ParticleSystem {
 				mParticles.add (new Particle (bitmap));
 			}
 		}
+	}
+
+	/**
+	 * Creates a particle system with the given parameters
+	 *
+	 * @param parentView The parent view group
+	 * @param particleTemplates The drawable to use as particles
+	 * @param timeToLive The time to live for the particles
+	 */
+	public ParticleSystem(ViewGroup parentView, ArrayList<ParticleTemplate> particleTemplates, long timeToLive) {
+		this(parentView, 1, timeToLive);
+		if (particleTemplates.size() == 0) return;
+
+
+		for (int i=0; i<particleTemplates.size(); i++) {
+			ParticleTemplate template = particleTemplates.get(i);
+			Bitmap bitmap;
+			if (template.drawable instanceof BitmapDrawable) {
+				bitmap = ((BitmapDrawable) template.drawable).getBitmap();
+			}
+			else {
+				bitmap = Bitmap.createBitmap(template.drawable.getIntrinsicWidth(),
+						template.drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+				Canvas canvas = new Canvas(bitmap);
+				template.drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+				template.drawable.draw(canvas);
+			}
+			for (int j=0; j<template.count; j++) {
+				mParticles.add(new Particle(bitmap));
+			}
+		}
+		mMaxParticles = mParticles.size();
 	}
 
 	/**
@@ -687,7 +730,7 @@ public class ParticleSystem {
 	}
 
 	private void activateParticle(long delay) {
-		Particle p = mParticles.remove(0);
+		Particle p = mParticles.remove(mRandomizeParticles ? mRandom.nextInt(mParticles.size()) : 0);
 		p.init();
 		// Initialization goes before configuration, scale is required before can be configured properly
         LifetimeInitializer lifetimeHack = null; // to change lifetime after configuration
@@ -708,23 +751,24 @@ public class ParticleSystem {
 	}
 
     private int getFromRange(int minValue, int maxValue) {
-        if (minValue == maxValue) {
-            return minValue;
-        }
-        if (minValue < maxValue) {
-            return mRandom.nextInt(maxValue - minValue) + minValue;
-        }
-        else {
-            return mRandom.nextInt(minValue - maxValue) + maxValue;
-        }
-    }
+		if (minValue == maxValue) {
+			return minValue;
+		}
+		if (minValue < maxValue) {
+			return mRandom.nextInt(maxValue - minValue) + minValue;
+		} else {
+			return mRandom.nextInt(minValue - maxValue) + maxValue;
+		}
+	}
 
 	private void onUpdate(long milliseconds) {
 		while (((mEmittingTime > 0 && milliseconds < mEmittingTime)|| mEmittingTime == -1) && // This point should emit
 				!mParticles.isEmpty() && // We have particles in the pool
 				mActivatedParticles < mParticlesPerMillisecond *milliseconds) { // and we are under the number of particles that should be launched
 			// Activate a new particle
-			activateParticle(milliseconds);
+			for (int i = 0; i < mConcurrentParticlesToActivate; i++) {
+				activateParticle(milliseconds);
+			}
 		}
 		synchronized(mActiveParticles) {
 			for (int i = 0; i < mActiveParticles.size(); i++) {

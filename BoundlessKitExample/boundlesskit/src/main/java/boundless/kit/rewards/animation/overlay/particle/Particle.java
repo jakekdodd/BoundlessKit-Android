@@ -51,7 +51,7 @@ public class Particle {
 		mMatrix = new Matrix();
 		mPaint = new Paint();
 	}
-	
+
 	public Particle (Bitmap bitmap) {
 		this();
 		mImage = bitmap;

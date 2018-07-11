@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
+import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -95,30 +98,42 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
-
+        //// Emojisplosion Sample
+        //
+        // get reference to view to animate over, set values, and animate()
+        //
 //        View contentView = findViewById(android.R.id.content);
-//////                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
-//                                        new Emojisplosion()
-////                                                .setContent(MainActivity.this, "\uD83D\uDE00\n")
-//                                                .setContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(Color.BLUE, 204)))
-////                                                .setxPosition(contentView.getWidth() / 2)
-////                                                .setyPosition(contentView.getHeight() / 2)
-////                                                .setxPosition(0)
-////                                                .setyPosition(0)
-//                                                .setxPositionMin(0).setxPositionMax(contentView.getWidth())
-//                                                .setyPosition(0)
-//                                                .setScale(2f)
-//                                                .setVelocity(-0.1f)
-//                                                .setTarget(contentView)
-//                                                .start();
-
-//                                        new VibrationAnimator().animate(contentView);
+//        new Emojisplosion()
+//                .setContent(MainActivity.this, "\uD83D\uDE00\n")
+//                .setxPosition(contentView.getWidth() / 2)
+//                .setyPosition(contentView.getMeasuredHeight())
+//                .setScale(2f)
+//                .setLifetime(4000)
+//                .animate(contentView);
 
 
-//                                        RotateAnimation rotateAnimation = new RotateAnimation(getApplicationContext(), Atrbu);
+
+
+        //// Confetti Sample
+        //
+        // get reference to view to animate over, set values, and animate()
+        //
+        View contentView = findViewById(android.R.id.content);
+
+        Confetti confetti = new Confetti();
+        confetti.addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyBlue), 204)))
+                .addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.SPIRAL, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyRed), 204)))
+                .addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyYellow), 204)))
+                .addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyGreen), 204)))
+                .animate(contentView);
+
+
+
+
+//                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+
+
+
 //                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
 //
 //                                            @Override
