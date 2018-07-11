@@ -121,10 +121,10 @@ public class MainActivity extends AppCompatActivity {
         View contentView = findViewById(android.R.id.content);
 
         Confetti confetti = new Confetti();
-        confetti.addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyBlue), 204)))
-                .addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.SPIRAL, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyRed), 204)))
-                .addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyYellow), 204)))
-                .addBurstContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyGreen), 204)))
+        confetti.addContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyBlue), 204)))
+                .addContent(new ConfettoDrawable(ConfettoDrawable.Shape.SPIRAL, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyRed), 204)))
+                .addContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyYellow), 204)))
+                .addContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyGreen), 204)))
                 .animate(contentView);
 
 

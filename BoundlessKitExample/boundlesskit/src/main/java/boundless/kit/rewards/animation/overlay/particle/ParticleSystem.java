@@ -730,6 +730,8 @@ public class ParticleSystem {
 	}
 
 	private void activateParticle(long delay) {
+		if (mParticles.size() == 0) return;
+
 		Particle p = mParticles.remove(mRandomizeParticles ? mRandom.nextInt(mParticles.size()) : 0);
 		p.init();
 		// Initialization goes before configuration, scale is required before can be configured properly
