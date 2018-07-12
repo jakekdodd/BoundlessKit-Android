@@ -30,28 +30,42 @@ import boundless.kit.rewards.animation.overlay.particle.initializers.ParticleIni
 import boundless.kit.rewards.animation.overlay.particle.initializers.RotationInitializer;
 import boundless.kit.rewards.animation.overlay.particle.initializers.RotationSpeedInitializer;
 import boundless.kit.rewards.animation.overlay.particle.initializers.ScaleInitializer;
+import boundless.kit.rewards.animation.overlay.particle.initializers.SpeedByComponentsInitializer;
 import boundless.kit.rewards.animation.overlay.particle.initializers.SpeedModuleAndRangeInitializer;
-import boundless.kit.rewards.animation.overlay.particle.initializers.SpeeddByComponentsInitializer;
 import boundless.kit.rewards.animation.overlay.particle.modifiers.AlphaModifier;
 import boundless.kit.rewards.animation.overlay.particle.modifiers.ParticleModifier;
 
 public class ParticleSystem {
 
-	public static class ParticleTemplate {
+	public static class DrawableParticleTemplate {
 		public final Drawable drawable;
 		public final int count;
-		public ParticleTemplate(Drawable drawable, int count) {
+		public DrawableParticleTemplate(Drawable drawable, int count) {
 			this.drawable = drawable;
 			this.count = count;
 		}
 	}
 
+	public static class BlurredDrawableParticleTemplate extends DrawableParticleTemplate {
+		public final float scale;
+		public final int radius;
+		public BlurredDrawableParticleTemplate(Drawable drawable, int count, float scale, int radius) {
+			super(drawable, count);
+			this.scale = scale;
+			this.radius = radius;
+		}
+		public BlurredDrawableParticleTemplate(DrawableParticleTemplate template, float scale, int radius) {
+			this(template.drawable, template.count, scale, radius);
+		}
+	}
+
+
 	private static long TIMER_TASK_INTERVAL = 33; // Default 30fps
 	private ViewGroup mParentView;
 	private int mMaxParticles;
 	private Random mRandom;
-	public boolean mRandomizeParticles = false;
-	public int mConcurrentParticlesToActivate = 1;
+	private boolean mRandomizeParticles = false;
+	private int mConcurrentParticlesToActivate = 1;
 
 	private ParticleField mDrawingView;
 
@@ -63,9 +77,11 @@ public class ParticleSystem {
 	private float mParticlesPerMillisecond;
 	private int mActivatedParticles;
 	private long mEmittingTime;
+	private int mStartDelay;
 
 	private List<ParticleModifier> mModifiers;
 	private List<ParticleInitializer> mInitializers;
+	private boolean mManuallyStartAnimator = false;
 	private ValueAnimator mAnimator;
 	private Timer mTimer;
     private final ParticleTimerTask mTimerTask = new ParticleTimerTask(this);
@@ -157,26 +173,36 @@ public class ParticleSystem {
 	 * @param particleTemplates The drawable to use as particles
 	 * @param timeToLive The time to live for the particles
 	 */
-	public ParticleSystem(ViewGroup parentView, ArrayList<ParticleTemplate> particleTemplates, long timeToLive) {
+	public ParticleSystem(ViewGroup parentView, ArrayList<? extends DrawableParticleTemplate> particleTemplates, long timeToLive) {
 		this(parentView, 1, timeToLive);
 		if (particleTemplates.size() == 0) return;
 
 
 		for (int i=0; i<particleTemplates.size(); i++) {
-			ParticleTemplate template = particleTemplates.get(i);
-			Bitmap bitmap;
-			if (template.drawable instanceof BitmapDrawable) {
-				bitmap = ((BitmapDrawable) template.drawable).getBitmap();
-			}
-			else {
-				bitmap = Bitmap.createBitmap(template.drawable.getIntrinsicWidth(),
-						template.drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-				Canvas canvas = new Canvas(bitmap);
-				template.drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-				template.drawable.draw(canvas);
-			}
-			for (int j=0; j<template.count; j++) {
-				mParticles.add(new Particle(bitmap));
+			DrawableParticleTemplate template = particleTemplates.get(i);
+			if (template.drawable instanceof AnimationDrawable) {
+				AnimationDrawable animation = (AnimationDrawable) template.drawable;
+				for (int j=0; j<mMaxParticles; j++) {
+					mParticles.add (new AnimatedParticle (animation));
+				}
+			} else {
+				Bitmap bitmap;
+				if (template.drawable instanceof BitmapDrawable) {
+					bitmap = ((BitmapDrawable) template.drawable).getBitmap();
+				} else {
+					bitmap = Bitmap.createBitmap(template.drawable.getIntrinsicWidth(),
+							template.drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+					Canvas canvas = new Canvas(bitmap);
+					template.drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+					template.drawable.draw(canvas);
+				}
+				if (template instanceof BlurredDrawableParticleTemplate) {
+					BlurredDrawableParticleTemplate blurredTemplate = (BlurredDrawableParticleTemplate) template;
+					bitmap = blurBitmap(bitmap, blurredTemplate.scale, blurredTemplate.radius);
+				}
+				for (int j = 0; j < template.count; j++) {
+					mParticles.add(new Particle(bitmap));
+				}
 			}
 		}
 		mMaxParticles = mParticles.size();
@@ -300,6 +326,34 @@ public class ParticleSystem {
 		TIMER_TASK_INTERVAL = Math.round(1000 / fps);
 	}
 
+	public ValueAnimator getAnimator() {
+	    return mAnimator;
+    }
+	/**
+	 * Delays the Particle system
+	 *
+	 * @param delay the time in milliseconds to delay
+	 */
+	public ParticleSystem setStartDelay(int delay) {
+		mStartDelay = delay;
+		return this;
+	}
+
+	public ParticleSystem setConcurrentBirths(int concurrentBirths) {
+		mConcurrentParticlesToActivate = concurrentBirths;
+		return this;
+	}
+
+	public ParticleSystem setRandomParticleSelection(boolean isRandom) {
+		mRandomizeParticles = isRandom;
+		return this;
+	}
+
+	public ParticleSystem setManuallyStartAnimator(boolean manuallyStartAnimator) {
+	    mManuallyStartAnimator = manuallyStartAnimator;
+	    return this;
+    }
+
 	/**
 	 * Adds a modifier to the Particle system, it will be executed on each update.
 	 *
@@ -346,7 +400,7 @@ public class ParticleSystem {
      * @return This.
      */
 	public ParticleSystem setSpeedByComponentsRange(float speedMinX, float speedMaxX, float speedMinY, float speedMaxY) {
-        mInitializers.add(new SpeeddByComponentsInitializer(dpToPx(speedMinX), dpToPx(speedMaxX),
+        mInitializers.add(new SpeedByComponentsInitializer(dpToPx(speedMinX), dpToPx(speedMaxX),
 				dpToPx(speedMinY), dpToPx(speedMaxY)));
 		return this;
 	}
@@ -653,6 +707,7 @@ public class ParticleSystem {
 	private void startAnimator(Interpolator interpolator, long animationTime) {
 		mAnimator = ValueAnimator.ofInt(0, (int) animationTime);
 		mAnimator.setDuration(animationTime);
+		mAnimator.setStartDelay(mStartDelay);
 		mAnimator.addUpdateListener(new AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -678,7 +733,9 @@ public class ParticleSystem {
 			}
         });
 		mAnimator.setInterpolator(interpolator);
-		mAnimator.start();
+		if (!mManuallyStartAnimator) {
+            mAnimator.start();
+        }
 	}
 
 	private void configureEmitter(View emitter, int gravity) {
@@ -829,5 +886,225 @@ public class ParticleSystem {
 		for (int i = 1; i <= framesCount; i++) {
 			onUpdate(frameTimeInMs * i + 1);
 		}
+	}
+
+
+	/*
+	 * Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
+	 */
+
+	private Bitmap blurDrawable(Drawable drawable, float scale, int radius) {
+		Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+				drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+		drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+		drawable.draw(canvas);
+		return blurBitmap(bitmap, scale, radius);
+	}
+
+	private Bitmap blurBitmap(Bitmap sentBitmap, float scale, int radius) {
+
+		int width = Math.round(sentBitmap.getWidth() * scale);
+		int height = Math.round(sentBitmap.getHeight() * scale);
+		sentBitmap = Bitmap.createScaledBitmap(sentBitmap, width, height, false);
+
+		Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
+
+		if (radius < 1) {
+			return (null);
+		}
+
+		int w = bitmap.getWidth();
+		int h = bitmap.getHeight();
+
+		int[] pix = new int[w * h];
+		bitmap.getPixels(pix, 0, w, 0, 0, w, h);
+
+		int wm = w - 1;
+		int hm = h - 1;
+		int wh = w * h;
+		int div = radius + radius + 1;
+
+		int r[] = new int[wh];
+		int g[] = new int[wh];
+		int b[] = new int[wh];
+		int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
+		int vmin[] = new int[Math.max(w, h)];
+
+		int divsum = (div + 1) >> 1;
+		divsum *= divsum;
+		int dv[] = new int[256 * divsum];
+		for (i = 0; i < 256 * divsum; i++) {
+			dv[i] = (i / divsum);
+		}
+
+		yw = yi = 0;
+
+		int[][] stack = new int[div][3];
+		int stackpointer;
+		int stackstart;
+		int[] sir;
+		int rbs;
+		int r1 = radius + 1;
+		int routsum, goutsum, boutsum;
+		int rinsum, ginsum, binsum;
+
+		for (y = 0; y < h; y++) {
+			rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+			for (i = -radius; i <= radius; i++) {
+				p = pix[yi + Math.min(wm, Math.max(i, 0))];
+				sir = stack[i + radius];
+				sir[0] = (p & 0xff0000) >> 16;
+				sir[1] = (p & 0x00ff00) >> 8;
+				sir[2] = (p & 0x0000ff);
+				rbs = r1 - Math.abs(i);
+				rsum += sir[0] * rbs;
+				gsum += sir[1] * rbs;
+				bsum += sir[2] * rbs;
+				if (i > 0) {
+					rinsum += sir[0];
+					ginsum += sir[1];
+					binsum += sir[2];
+				} else {
+					routsum += sir[0];
+					goutsum += sir[1];
+					boutsum += sir[2];
+				}
+			}
+			stackpointer = radius;
+
+			for (x = 0; x < w; x++) {
+
+				r[yi] = dv[rsum];
+				g[yi] = dv[gsum];
+				b[yi] = dv[bsum];
+
+				rsum -= routsum;
+				gsum -= goutsum;
+				bsum -= boutsum;
+
+				stackstart = stackpointer - radius + div;
+				sir = stack[stackstart % div];
+
+				routsum -= sir[0];
+				goutsum -= sir[1];
+				boutsum -= sir[2];
+
+				if (y == 0) {
+					vmin[x] = Math.min(x + radius + 1, wm);
+				}
+				p = pix[yw + vmin[x]];
+
+				sir[0] = (p & 0xff0000) >> 16;
+				sir[1] = (p & 0x00ff00) >> 8;
+				sir[2] = (p & 0x0000ff);
+
+				rinsum += sir[0];
+				ginsum += sir[1];
+				binsum += sir[2];
+
+				rsum += rinsum;
+				gsum += ginsum;
+				bsum += binsum;
+
+				stackpointer = (stackpointer + 1) % div;
+				sir = stack[(stackpointer) % div];
+
+				routsum += sir[0];
+				goutsum += sir[1];
+				boutsum += sir[2];
+
+				rinsum -= sir[0];
+				ginsum -= sir[1];
+				binsum -= sir[2];
+
+				yi++;
+			}
+			yw += w;
+		}
+		for (x = 0; x < w; x++) {
+			rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
+			yp = -radius * w;
+			for (i = -radius; i <= radius; i++) {
+				yi = Math.max(0, yp) + x;
+
+				sir = stack[i + radius];
+
+				sir[0] = r[yi];
+				sir[1] = g[yi];
+				sir[2] = b[yi];
+
+				rbs = r1 - Math.abs(i);
+
+				rsum += r[yi] * rbs;
+				gsum += g[yi] * rbs;
+				bsum += b[yi] * rbs;
+
+				if (i > 0) {
+					rinsum += sir[0];
+					ginsum += sir[1];
+					binsum += sir[2];
+				} else {
+					routsum += sir[0];
+					goutsum += sir[1];
+					boutsum += sir[2];
+				}
+
+				if (i < hm) {
+					yp += w;
+				}
+			}
+			yi = x;
+			stackpointer = radius;
+			for (y = 0; y < h; y++) {
+				// Preserve alpha channel: ( 0xff000000 & pix[yi] )
+				pix[yi] = ( 0xff000000 & pix[yi] ) | ( dv[rsum] << 16 ) | ( dv[gsum] << 8 ) | dv[bsum];
+
+				rsum -= routsum;
+				gsum -= goutsum;
+				bsum -= boutsum;
+
+				stackstart = stackpointer - radius + div;
+				sir = stack[stackstart % div];
+
+				routsum -= sir[0];
+				goutsum -= sir[1];
+				boutsum -= sir[2];
+
+				if (x == 0) {
+					vmin[y] = Math.min(y + r1, hm) * w;
+				}
+				p = x + vmin[y];
+
+				sir[0] = r[p];
+				sir[1] = g[p];
+				sir[2] = b[p];
+
+				rinsum += sir[0];
+				ginsum += sir[1];
+				binsum += sir[2];
+
+				rsum += rinsum;
+				gsum += ginsum;
+				bsum += binsum;
+
+				stackpointer = (stackpointer + 1) % div;
+				sir = stack[stackpointer];
+
+				routsum += sir[0];
+				goutsum += sir[1];
+				boutsum += sir[2];
+
+				rinsum -= sir[0];
+				ginsum -= sir[1];
+				binsum -= sir[2];
+
+				yi += w;
+			}
+		}
+
+		bitmap.setPixels(pix, 0, w, 0, 0, w, h);
+
+		return (bitmap);
 	}
 }
