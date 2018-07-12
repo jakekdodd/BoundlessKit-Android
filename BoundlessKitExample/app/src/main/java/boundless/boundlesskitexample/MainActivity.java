@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -31,7 +29,7 @@ import java.util.ArrayList;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
+import boundless.kit.rewards.animation.overlay.Confetti;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -40,7 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> mAdapter;
 
     private View rootView;
+    private View contentView;
     private ImageView logoView;
+
+    Confetti confetti;
 
     private void reinforcementCall() {
 
@@ -116,16 +117,9 @@ public class MainActivity extends AppCompatActivity {
 
         //// Confetti Sample
         //
-        // get reference to view to animate over, set values, and animate()
+        // Create confetti animation object in `onCreate()` to avoid UI lag
         //
-        View contentView = findViewById(android.R.id.content);
-
-        Confetti confetti = new Confetti();
-        confetti.addContent(new ConfettoDrawable(ConfettoDrawable.Shape.CIRCLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyBlue), 204)))
-                .addContent(new ConfettoDrawable(ConfettoDrawable.Shape.SPIRAL, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this, R.color.MyRed), 204)))
-                .addContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyYellow), 204)))
-                .addContent(new ConfettoDrawable(ConfettoDrawable.Shape.RECTANGLE, 50, 50, ColorUtils.setAlphaComponent(ContextCompat.getColor(MainActivity.this,R.color.MyGreen), 204)))
-                .animate(contentView);
+        confetti.start();
 
 
 
@@ -170,12 +164,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        contentView = findViewById(android.R.id.content);
         logoView = findViewById(R.id.header_icon);
 
         mHelper = new TaskDbHelper(MainActivity.this);
         mTaskListView = findViewById(R.id.list_todo);
         updateUI();
         BoundlessKit.debugMode = true;
+
+
+        // convenience function to create confetti demo. Done here to avoid lag on UI thread
+        confetti = Confetti.demo(contentView);
     }
 
     @Override

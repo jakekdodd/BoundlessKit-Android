@@ -23,16 +23,15 @@ public class ConfettoDrawable extends Drawable {
     private Path path;
     private Paint strokePaint;
 
-    public ConfettoDrawable(Shape shape, int width, int height, final int color) {
+    public ConfettoDrawable(Shape shape, int width, int height, int color) {
         super();
         this.shape = shape;
         this.height = height;
         this.width = width;
-        strokePaint = new Paint() {{
-            setFlags(Paint.ANTI_ALIAS_FLAG);
-            setColor(color);
-        }};
-        path = new Path();
+        this.path = new Path();
+        this.strokePaint = new Paint();
+        this.strokePaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        this.strokePaint.setColor(color);
 
         switch (shape) {
             case RECTANGLE:

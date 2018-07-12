@@ -32,10 +32,10 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private int ratePerSecond = 3;
     private float scale = 1f;
     private float scaleChange = 1.2f;
-    private float velocity = 0.003f;
+    private float velocity = 0.00f;
     private float velocityRange = 0.001f;
     private float xAcceleration = 0.00002f;
-    private float yAcceleration = -0.00005f;
+    private float yAcceleration = -0.005f;
     private float shootingAngle = -90f;
     private float shootingAngleRange = 45f;
     private float rotationSpeed = 10f;
