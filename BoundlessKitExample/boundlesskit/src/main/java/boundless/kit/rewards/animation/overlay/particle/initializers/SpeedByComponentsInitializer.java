@@ -4,14 +4,14 @@ import java.util.Random;
 
 import boundless.kit.rewards.animation.overlay.particle.Particle;
 
-public class SpeeddByComponentsInitializer implements ParticleInitializer {
+public class SpeedByComponentsInitializer implements ParticleInitializer {
 
 	private float mMinSpeedX;
 	private float mMaxSpeedX;
 	private float mMinSpeedY;
 	private float mMaxSpeedY;
 
-	public SpeeddByComponentsInitializer(float speedMinX, float speedMaxX, float speedMinY, float speedMaxY) {
+	public SpeedByComponentsInitializer(float speedMinX, float speedMaxX, float speedMinY, float speedMaxY) {
 		mMinSpeedX = speedMinX;
 		mMaxSpeedX = speedMaxX;
 		mMinSpeedY = speedMinY;
