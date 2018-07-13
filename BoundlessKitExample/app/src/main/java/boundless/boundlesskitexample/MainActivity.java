@@ -32,6 +32,7 @@ import java.util.Arrays;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
+import boundless.kit.rewards.animation.overlay.CandyBar;
 import boundless.kit.rewards.animation.overlay.Confetti;
 import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
 
@@ -48,6 +49,31 @@ public class MainActivity extends AppCompatActivity {
     Confetti confetti;
 
     private void reinforcementCall() {
+        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
+            @Override
+            public void onReinforcement(String reinforcement) {
+//                switch (reinforcement) {
+//                    case "stars":
+//                        // Show some reward and make them feel good!
+//                        break;
+//                    case "medalStar":
+//
+//                        break;
+//                    case "thumbsUp":
+//
+//                        break;
+//                    default:
+//                        // Show nothing! This is called a neutral response,
+//                        // and builds up the good feelings for the next surprise!
+//                        break;
+//                }
+                
+                showReward();
+            }
+        });
+    }
+
+    private void showReward() {
 
         //// Pulse Sample
         //
@@ -107,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
         //
         // get reference to view to animate over, set values, and animate()
         //
-//        View contentView = findViewById(android.R.id.content);
 //        new Emojisplosion()
 //                .setContent(MainActivity.this, "\uD83D\uDE00\n")
 //                .setxPosition(contentView.getWidth() / 2)
@@ -121,46 +146,26 @@ public class MainActivity extends AppCompatActivity {
 
         //// Confetti Sample
         //
-        // Create confetti animation object in `onCreate()` to avoid UI lag
+        // Create confetti animation object in `onCreate()` for better memory usage
         //
-        confetti.start();
+//        confetti.start();
 
 
 
 
-//                                        new Emojisplosion().setContent(MainActivity.this.getResources().getDrawable(R.drawable.red_balloon))
+        //// CandyBar Sample
+        //
+        //
+        //
 
-
-
-//                                        BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
-//
-//                                            @Override
-//                                            public void onReinforcement(String reinforcement) {
-//                                                // Show some candy and make them feel good!
-//                                                CandyBar candyBar = null;
-//                                                switch (reinforcement) {
-//                                                    case "stars":
-//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.STARS, "Out of this world!", "We knew you could do it", Color.parseColor("#ffcc00"), CandyBar.LENGTH_SHORT);
-//                                                        break;
-//                                                    case "medalStar":
-//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.MEDALSTAR, "Great job!", "Run finished", Color.parseColor("#339933"), CandyBar.LENGTH_SHORT);
-//                                                        break;
-//                                                    case "thumbsUp":
-//                                                        candyBar = new CandyBar(findViewById(android.R.id.content).getRootView(), CandyBar.Candy.THUMBSUP, "You go!", Color.parseColor("#336699"), CandyBar.LENGTH_SHORT);
-//                                                        break;
-//                                                    default:
-//                                                        // Show nothing! This is called a neutral response,
-//                                                        // and builds up the good feelings for the next surprise!
-//                                                        break;
-//                                                }
-//                                                if (candyBar != null) {
-//                                                    candyBar.show();
-//                                                }
-//                                            }
-//
-//                                        });
-
-
+        // Show some candy and make them feel good!
+        CandyBar candyBar = new CandyBar(contentView.getRootView(),
+                R.drawable.stars,
+                "Out of this world!",
+                "We knew you could do it",
+                Color.parseColor("#ffcc00"),
+                CandyBar.LENGTH_LONG);
+        candyBar.show();
     }
 
     @Override

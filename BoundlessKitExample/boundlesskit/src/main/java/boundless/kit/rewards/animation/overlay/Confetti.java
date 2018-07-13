@@ -276,5 +276,5 @@ public class Confetti extends BaseViewAnimator<Confetti> {
                 (int)duration
         );
     }
-    
+
 }
