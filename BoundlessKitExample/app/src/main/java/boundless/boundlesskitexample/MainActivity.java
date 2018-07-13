@@ -5,7 +5,9 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,11 +27,13 @@ import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
 import boundless.kit.rewards.animation.overlay.Confetti;
+import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -174,7 +178,23 @@ public class MainActivity extends AppCompatActivity {
 
 
         // convenience function to create confetti demo. Done here to avoid lag on UI thread
-        confetti = Confetti.demo(contentView);
+        confetti = new Confetti().addConfetti(
+                50,
+                50,
+                Arrays.asList(
+                        ConfettoDrawable.Shape.RECTANGLE,
+                        ConfettoDrawable.Shape.RECTANGLE,
+                        ConfettoDrawable.Shape.SPIRAL,
+                        ConfettoDrawable.Shape.CIRCLE
+                ),
+                Arrays.asList(
+                        ColorUtils.setAlphaComponent(Color.parseColor("#4d81fb"), 204),
+                        ColorUtils.setAlphaComponent(Color.parseColor("#4ac4fb"), 204),
+                        ColorUtils.setAlphaComponent(Color.parseColor("#9243f9"), 204),
+                        ColorUtils.setAlphaComponent(Color.parseColor("#fdc33b"), 204),
+                        ColorUtils.setAlphaComponent(Color.parseColor("#f7332f"), 204)
+                )
+        ).setTarget(contentView);
     }
 
     @Override

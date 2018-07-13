@@ -18,5 +18,5 @@ public class AccelerationModifier implements ParticleModifier {
         particle.mCurrentX += mVelocityX * milliseconds * milliseconds;
         particle.mCurrentY += mVelocityY * milliseconds * milliseconds;
     }
-    
+
 }
