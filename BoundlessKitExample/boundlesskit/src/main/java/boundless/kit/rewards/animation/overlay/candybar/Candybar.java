@@ -46,56 +46,38 @@ import boundless.kit.R;
 
 public final class Candybar {
 
-
     public static abstract class Callback {
-
         public static final int DISMISS_EVENT_SWIPE = 0;
-
         public static final int DISMISS_EVENT_ACTION = 1;
-
         public static final int DISMISS_EVENT_TIMEOUT = 2;
-
         public static final int DISMISS_EVENT_MANUAL = 3;
-
         public static final int DISMISS_EVENT_CONSECUTIVE = 4;
 
-
-        @IntDef({
-                DISMISS_EVENT_SWIPE, DISMISS_EVENT_ACTION, DISMISS_EVENT_TIMEOUT,
-                DISMISS_EVENT_MANUAL, DISMISS_EVENT_CONSECUTIVE
-        })
+        @IntDef({DISMISS_EVENT_SWIPE, DISMISS_EVENT_ACTION, DISMISS_EVENT_TIMEOUT, DISMISS_EVENT_MANUAL, DISMISS_EVENT_CONSECUTIVE})
         @Retention(RetentionPolicy.SOURCE)
-        public @interface DismissEvent {
-        }
+        public @interface DismissEvent { }
 
+        public void onDismissed(Candybar candybar, @DismissEvent int event) { }
 
-        public void onDismissed(Candybar candybar, @DismissEvent int event) {
-
-        }
-
-
-        public void onShown(Candybar candybar) {
-
-        }
+        public void onShown(Candybar candybar) { }
     }
-
-
-    @IntDef({LENGTH_INDEFINITE, LENGTH_SHORT, LENGTH_LONG})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Duration {
-    }
-
-
-    public static final int LENGTH_INDEFINITE = -2;
-
-
-    public static final int LENGTH_SHORT = -1;
-
-
-    public static final int LENGTH_LONG = 0;
 
     private static final int ANIMATION_DURATION = 250;
     private static final int ANIMATION_FADE_DURATION = 180;
+
+    public static final int LENGTH_INDEFINITE = -2;
+    public static final int LENGTH_SHORT = -1;
+    public static final int LENGTH_LONG = 0;
+    @IntDef({LENGTH_INDEFINITE, LENGTH_SHORT, LENGTH_LONG})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Duration { }
+
+    public static final int DIRECTION_TOP = 0;
+    public static final int DIRECTION_BOTTOM = 1;
+    @IntDef({DIRECTION_TOP, DIRECTION_BOTTOM})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Direction { }
+
 
     private static final Handler sHandler;
     private static final int MSG_SHOW = 0;
@@ -121,21 +103,22 @@ public final class Candybar {
     private final ViewGroup mParent;
     private final Context mContext;
     private final CandybarLayout mView;
+    private final int mDirection;
     private int mDuration;
     private Callback mCallback;
 
-    private Candybar(ViewGroup parent) {
+    private Candybar(ViewGroup parent, @Direction int direction) {
         mParent = parent;
         mContext = parent.getContext();
+        mDirection = direction;
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        mView = (CandybarLayout) inflater.inflate(R.layout.candybar_top_layout, mParent, false);
+        mView = (CandybarLayout) inflater.inflate((mDirection == DIRECTION_TOP) ? R.layout.candybar_top_layout : R.layout.candybar_bottom_layout, mParent, false);
     }
 
 
     @NonNull
-    public static Candybar make(@NonNull View view, @NonNull CharSequence text,
-                                @Duration int duration) {
-        Candybar candybar = new Candybar(findSuitableParent(view));
+    public static Candybar make(@NonNull View view, @Direction int direction, @NonNull CharSequence text, @Duration int duration) {
+        Candybar candybar = new Candybar(findSuitableParent(view), direction);
         candybar.setText(text);
         candybar.setDuration(duration);
         return candybar;
@@ -143,30 +126,24 @@ public final class Candybar {
 
 
     @NonNull
-    public static Candybar make(@NonNull View view, @StringRes int resId, @Duration int duration) {
-        return make(view, view.getResources()
-                .getText(resId), duration);
+    public static Candybar make(@NonNull View view, @Direction int direction, @StringRes int resId, @Duration int duration) {
+        return make(view, direction, view.getResources().getText(resId), duration);
     }
 
     private static ViewGroup findSuitableParent(View view) {
         ViewGroup fallback = null;
         do {
             if (view instanceof CoordinatorLayout) {
-
                 return (ViewGroup) view;
             } else if (view instanceof FrameLayout) {
                 if (view.getId() == android.R.id.content) {
-
-
                     return (ViewGroup) view;
                 } else {
-
                     fallback = (ViewGroup) view;
                 }
             }
 
             if (view != null) {
-
                 final ViewParent parent = view.getParent();
                 view = parent instanceof View ? (View) parent : null;
             }
@@ -238,14 +215,11 @@ public final class Candybar {
 
     private Drawable fitDrawable(Drawable drawable, int sizePx) {
         if (drawable.getIntrinsicWidth() != sizePx || drawable.getIntrinsicHeight() != sizePx) {
-
             if (drawable instanceof BitmapDrawable) {
-
                 drawable = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(getBitmap(drawable), sizePx, sizePx, true));
             }
         }
         drawable.setBounds(0, 0, sizePx, sizePx);
-
         return drawable;
     }
 
@@ -258,8 +232,6 @@ public final class Candybar {
         return px;
     }
 
-
-
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
@@ -269,7 +241,6 @@ public final class Candybar {
         vectorDrawable.draw(canvas);
         return bitmap;
     }
-
 
     private static Bitmap getBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
@@ -352,6 +323,12 @@ public final class Candybar {
     @Duration
     public int getDuration() {
         return mDuration;
+    }
+
+
+    @Direction
+    public int getDirection() {
+        return mDirection;
     }
 
 
@@ -484,7 +461,8 @@ public final class Candybar {
     }
 
     private void animateViewIn() {
-        mView.setTranslationY(-mView.getHeight());
+        float startingYTranslation = mView.getHeight() * ((mDirection == DIRECTION_TOP) ? -1 : 1);
+        mView.setTranslationY(startingYTranslation);
         ViewCompat.animate(mView)
                 .translationY(0f)
                 .setInterpolator(new FastOutSlowInInterpolator())
@@ -509,8 +487,9 @@ public final class Candybar {
     }
 
     private void animateViewOut(final int event) {
+        float endingYTranslation = mView.getHeight() * ((mDirection == DIRECTION_TOP) ? -1 : 1);
         ViewCompat.animate(mView)
-                .translationY(-mView.getHeight())
+                .translationY(endingYTranslation)
                 .setInterpolator(new FastOutSlowInInterpolator())
                 .setDuration(ANIMATION_DURATION)
                 .setListener(new ViewPropertyAnimatorListenerAdapter() {
@@ -666,7 +645,7 @@ public final class Candybar {
         }
 
         void animateChildrenIn(int delay, int duration) {
-            ViewCompat.setAlpha(mMessageView, 0f);
+            mMessageView.setAlpha(0f);
             ViewCompat.animate(mMessageView)
                     .alpha(1f)
                     .setDuration(duration)

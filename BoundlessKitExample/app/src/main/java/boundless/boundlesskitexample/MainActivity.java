@@ -165,13 +165,15 @@ public class MainActivity extends AppCompatActivity {
 //                Color.parseColor("#ffcc00"),
 //                CandyBar.LENGTH_LONG);
 //        candyBar.show();
-        Candybar snackbar = Candybar.make(contentView, "A Snackbar is a lightweight material design method for providing feedback to a user, while optionally providing an action to the user.", Candybar.LENGTH_LONG);
+        Candybar snackbar = Candybar.make(contentView, (flagFlip ^= true) ? Candybar.DIRECTION_BOTTOM : Candybar.DIRECTION_TOP, "A Snackbar is a lightweight material design method for providing feedback to a user, while optionally providing an action to the user.", Candybar.LENGTH_LONG);
 //        View snackbarView = snackbar.getView();
 //        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
 //        TextView textView = (TextView) snackbarView.findViewById(R.id.snackbar_text);
 //        textView.setTextColor(Color.YELLOW);
         snackbar.show();
     }
+
+    boolean flagFlip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
