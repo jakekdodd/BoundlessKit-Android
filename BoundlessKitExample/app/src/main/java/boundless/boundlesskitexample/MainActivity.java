@@ -32,9 +32,9 @@ import java.util.Arrays;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.overlay.CandyBar;
 import boundless.kit.rewards.animation.overlay.Confetti;
 import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
+import boundless.kit.rewards.animation.overlay.candybar.Candybar;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 //                switch (reinforcement) {
 //                    case "stars":
 //                        // Show some reward and make them feel good!
+                showReward();
 //                        break;
 //                    case "medalStar":
 //
@@ -67,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
 //                        // and builds up the good feelings for the next surprise!
 //                        break;
 //                }
-                
-                showReward();
             }
         });
     }
@@ -159,13 +158,19 @@ public class MainActivity extends AppCompatActivity {
         //
 
         // Show some candy and make them feel good!
-        CandyBar candyBar = new CandyBar(contentView.getRootView(),
-                R.drawable.stars,
-                "Out of this world!",
-                "We knew you could do it",
-                Color.parseColor("#ffcc00"),
-                CandyBar.LENGTH_LONG);
-        candyBar.show();
+//        CandyBar candyBar = new CandyBar(contentView.getRootView(),
+//                R.drawable.stars,
+//                "Out of this world!",
+//                "We knew you could do it",
+//                Color.parseColor("#ffcc00"),
+//                CandyBar.LENGTH_LONG);
+//        candyBar.show();
+        Candybar snackbar = Candybar.make(contentView, "A Snackbar is a lightweight material design method for providing feedback to a user, while optionally providing an action to the user.", Candybar.LENGTH_LONG);
+//        View snackbarView = snackbar.getView();
+//        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
+//        TextView textView = (TextView) snackbarView.findViewById(R.id.snackbar_text);
+//        textView.setTextColor(Color.YELLOW);
+        snackbar.show();
     }
 
     @Override
