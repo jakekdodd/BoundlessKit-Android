@@ -65,7 +65,6 @@ public class ParticleSystem {
 	private int mMaxParticles;
 	private Random mRandom;
 	private boolean mRandomizeParticles = false;
-	private int mConcurrentParticlesToActivate = 1;
 
 	private ParticleField mDrawingView;
 
@@ -329,6 +328,10 @@ public class ParticleSystem {
 	public ValueAnimator getAnimator() {
 	    return mAnimator;
     }
+
+    public boolean isRunning() {
+		return mAnimator != null && mAnimator.isRunning();
+	}
 	/**
 	 * Delays the Particle system
 	 *
@@ -336,11 +339,6 @@ public class ParticleSystem {
 	 */
 	public ParticleSystem setStartDelay(int delay) {
 		mStartDelay = delay;
-		return this;
-	}
-
-	public ParticleSystem setConcurrentBirths(int concurrentBirths) {
-		mConcurrentParticlesToActivate = concurrentBirths;
 		return this;
 	}
 
@@ -825,9 +823,7 @@ public class ParticleSystem {
 				!mParticles.isEmpty() && // We have particles in the pool
 				mActivatedParticles < mParticlesPerMillisecond *milliseconds) { // and we are under the number of particles that should be launched
 			// Activate a new particle
-			for (int i = 0; i < mConcurrentParticlesToActivate; i++) {
 				activateParticle(milliseconds);
-			}
 		}
 		synchronized(mActiveParticles) {
 			for (int i = 0; i < mActiveParticles.size(); i++) {
