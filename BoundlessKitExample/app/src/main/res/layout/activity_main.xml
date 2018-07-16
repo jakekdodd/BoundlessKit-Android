@@ -20,7 +20,7 @@
         android:contentDescription="@string/boundlessmind_logo"
         android:src="@mipmap/brain"
         />
-    <boundless.kit.rewards.animation.overlay.SheenView
+    <boundless.kit.reward.overlay.SheenView
         xmlns:boundless="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sheen"
         android:layout_width="0dp"

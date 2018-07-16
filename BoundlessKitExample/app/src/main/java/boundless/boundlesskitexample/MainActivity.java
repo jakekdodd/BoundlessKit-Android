@@ -33,15 +33,15 @@ import java.util.Arrays;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
-import boundless.kit.rewards.animation.attention.PulseAnimator;
-import boundless.kit.rewards.animation.attention.RotationAnimator;
-import boundless.kit.rewards.animation.attention.ShimmyAnimator;
-import boundless.kit.rewards.animation.attention.VibrationAnimator;
-import boundless.kit.rewards.animation.overlay.Confetti;
-import boundless.kit.rewards.animation.overlay.Emojisplosion;
-import boundless.kit.rewards.animation.overlay.SheenView;
-import boundless.kit.rewards.animation.overlay.candybar.Candybar;
-import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
+import boundless.kit.reward.attention.PulseAnimator;
+import boundless.kit.reward.attention.RotationAnimator;
+import boundless.kit.reward.attention.ShimmyAnimator;
+import boundless.kit.reward.attention.VibrationAnimator;
+import boundless.kit.reward.overlay.Confetti;
+import boundless.kit.reward.overlay.Emojisplosion;
+import boundless.kit.reward.overlay.SheenView;
+import boundless.kit.reward.overlay.candybar.Candybar;
+import boundless.kit.reward.overlay.particle.ConfettoDrawable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private ListView mTaskListView;
     private ArrayAdapter<String> mAdapter;
 
-    private View rootView;
     private View contentView;
     private ImageView logoView;
 

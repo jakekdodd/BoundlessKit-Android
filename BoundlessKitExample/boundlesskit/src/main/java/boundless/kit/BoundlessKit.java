@@ -12,8 +12,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
-import boundless.kit.data.BoundlessAction;
-import boundless.kit.data.SyncCoordinator;
+import boundless.kit.internal.data.BoundlessAction;
+import boundless.kit.internal.data.SyncCoordinator;
 
 public class BoundlessKit extends ContextWrapper {
     /**
@@ -70,19 +70,17 @@ public class BoundlessKit extends ContextWrapper {
      */
     public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
         AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
-            private BoundlessKit boundlessKit = getInstance(context);
             @Override
             protected String doInBackground(Void... voids) {
-                return boundlessKit.syncCoordinator.removeReinforcementDecisionFor(context, actionID);
+                return BoundlessKit.getInstance(context).syncCoordinator.removeReinforcementDecisionFor(context, actionID);
             }
 
             @Override
             protected void onPostExecute(String reinforcementDecision) {
                 callback.onReinforcement(reinforcementDecision);
                 BoundlessAction action = new BoundlessAction(actionID, reinforcementDecision, metaData);
-                boundlessKit.syncCoordinator.storeReportedAction(action);
+                BoundlessKit.getInstance(context).syncCoordinator.storeReportedAction(action);
             }
-
         }.execute();
     }
 
