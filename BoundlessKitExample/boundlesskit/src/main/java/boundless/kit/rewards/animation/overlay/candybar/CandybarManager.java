@@ -27,6 +27,12 @@ import java.lang.ref.WeakReference;
  */
 class CandybarManager {
 
+    interface Callback {
+        void show();
+
+        void dismiss(int event);
+    }
+
     private static final int MSG_TIMEOUT = 0;
 
     private static final int SHORT_DURATION_MS = 1500;
@@ -60,12 +66,6 @@ class CandybarManager {
                 return false;
             }
         });
-    }
-
-    interface Callback {
-        void show();
-
-        void dismiss(int event);
     }
 
     public void show(int duration, Callback callback) {
@@ -212,17 +212,12 @@ class CandybarManager {
     }
 
     private void scheduleTimeoutLocked(CandybarRecord r) {
-        if (r.duration == Candybar.LENGTH_INDEFINITE) {
+        if (r.duration == -1) {
             // If we're set to indefinite, we don't want to set a timeout
             return;
         }
 
-        int durationMs = LONG_DURATION_MS;
-        if (r.duration > 0) {
-            durationMs = r.duration;
-        } else if (r.duration == Candybar.LENGTH_SHORT) {
-            durationMs = SHORT_DURATION_MS;
-        }
+        int durationMs = r.duration;
         mHandler.removeCallbacksAndMessages(r);
         mHandler.sendMessageDelayed(Message.obtain(mHandler, MSG_TIMEOUT, r), durationMs);
     }

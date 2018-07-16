@@ -2,9 +2,7 @@ package boundless.kit.rewards.animation.overlay.candybar;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
@@ -14,28 +12,20 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.SwipeDismissBehavior;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.Button;
+import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.lang.annotation.Retention;
@@ -46,39 +36,224 @@ import boundless.kit.R;
 
 public final class Candybar {
 
+    public static final int DIRECTION_TOP = 0;
+    public static final int DIRECTION_BOTTOM = 1;
+
+    @IntDef({DIRECTION_TOP, DIRECTION_BOTTOM}) @Retention(RetentionPolicy.SOURCE)
+    public @interface Direction { }
+
+    private final ViewGroup mParent;
+    private final Context mContext;
+    private final CandybarLayout mView;
+    private final int mDirection;
+    private int mDuration;
+    private Interpolator mInterpolator = new FastOutSlowInInterpolator();
+    private boolean mDismissOnTap;
+    private Callback mCallback;
+
+    /**
+     *
+     * @param view View to display Candybar on top of.
+     * @param direction Top or bottom of the screen (DIRECTION_TOP or DIRECTION_BOTTOM)
+     * @param text Text copy for the body
+     * @param duration Time, in milliseconds, to dismiss the Candybar after show() animation.
+     */
+    public Candybar(@NonNull View view, @Direction int direction, @NonNull CharSequence text, int duration) {
+        mParent = findSuitableParent(view);
+        mContext = mParent.getContext();
+        mDirection = direction;
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        mView = (CandybarLayout) inflater.inflate((mDirection == DIRECTION_TOP) ? R.layout.candybar_top_layout : R.layout.candybar_bottom_layout, mParent, false);
+        setText(text);
+        setDuration(duration);
+    }
+
+    /**
+     * Sets the icon image used on either the left or right of the Candybar
+     *
+     * @param drawable Drawable image to be used as icon
+     * @param leftSide If true icon is on the left, if false the icon is on the right side.
+     * @return The object used for Constructor Chaining
+     */
+    public Candybar setIcon(Drawable drawable, boolean leftSide) {
+        if (drawable == null) return this;
+        final TextView tv = mView.getMessageView();
+        final Drawable[] compoundDrawables = tv.getCompoundDrawables();
+        tv.setCompoundDrawables(leftSide ? drawable : compoundDrawables[0], compoundDrawables[1], leftSide ? compoundDrawables[2] : drawable, compoundDrawables[3]);
+        return this;
+    }
+
+    /**
+     * Sets the icon image used on either the left or right of the Candybar
+     *
+     * @param drawable Drawable image to be used as icon
+     * @param sizeDp Size of the icon. Set to -1 for original size.
+     * @param leftSide If true icon is on the left, if false the icon is on the right side.
+     * @return The object used for Constructor Chaining
+     */
+    public Candybar setIcon(Drawable drawable, float sizeDp, boolean leftSide) {
+        return this.setIcon(fitDrawable(drawable, (int) convertDpToPixel(sizeDp, mContext)), leftSide);
+    }
+
+    /**
+     * Sets the size of the padding between the icon and the text.
+     *
+     * @param padding Size of the padding between the icon and the text.
+     * @return The object used for Constructor Chaining
+     */
+    public Candybar setIconPadding(int padding) {
+        final TextView tv = mView.getMessageView();
+        tv.setCompoundDrawablePadding(padding);
+        return this;
+    }
+
+    /**
+     *
+     * @param message The copy to display
+     * @return The object used for Constructor Chaining
+     */
+    @NonNull
+    public Candybar setText(@NonNull CharSequence message) {
+        final TextView tv = mView.getMessageView();
+        tv.setText(message);
+        return this;
+    }
+
+    /**
+     *
+     * @param color The text color. Default is white.
+     * @return The object used for Constructor Chaining
+     */
+    @NonNull
+    public Candybar setTextColor(int color) {
+        getTextView().setTextColor(color);
+        return this;
+    }
+
+    /**
+     *
+     * @param size Set the text size to the given value, interpreted as "scaled pixel" units. This size is adjusted based on the current density and user font size preference.
+     * @return The object used for Constructor Chaining
+     */
+    @NonNull
+    public Candybar setTextSize(float size) {
+        getTextView().setTextSize(size);
+        return this;
+    }
+
+    /**
+     *
+     * @param color Set the background color for Candybar view
+     * @return The object used for Constructor Chaining
+     */
+    @NonNull
+    public Candybar setBackgroundColor(int color) {
+        mView.setBackgroundColor(color);
+        return this;
+    }
+
+    /**
+     *
+     * @param alpha Set the transparency for Candybar view
+     * @return The object used for Constructor Chaining
+     */
+    @NonNull
+    public Candybar setAlpha(float alpha) {
+        mView.setAlpha(alpha);
+        return this;
+    }
+
+    /**
+     *
+     * @param duration The time, in milliseconds, to wait after show() to dismiss() the view.
+     *                 If set to -1, the view will wait until tapped to dismiss.
+     * @return The object used for Constructor Chaining
+     */
+    @NonNull
+    public Candybar setDuration(int duration) {
+        mDuration = duration;
+        return this;
+    }
+
+    /**
+     *
+     * @param interpolator The rate of change used for animating the view in and out of the screen
+     * @return The object used for Constructor Chaining
+     */
+    @NonNull
+    public Candybar setInterpolator(Interpolator interpolator) {
+        mInterpolator = interpolator;
+        return this;
+    }
+
+    @NonNull
+    public Candybar setHeight(int pixels) {
+        getTextView().setHeight(pixels);
+        return this;
+    }
+
+    @NonNull
+    public Candybar setDismissOnTap(boolean dismissOnTap) {
+        mDismissOnTap = dismissOnTap;
+        return this;
+    }
+
+    /**
+     * Animate the Candybar view onto the screen and reward the user.
+     * After the determined duration, Candybar automatically dismisses itself.
+     */
+    public void show() {
+        CandybarManager.getInstance().show(mDuration, mManagerCallback);
+    }
+
+    /**
+     * Manually dismiss the Candybar. After animating out, the view removes itself from its parent.
+     */
+    public void dismiss() {
+        CandybarManager.getInstance().dismiss(mManagerCallback, Callback.DISMISS_EVENT_MANUAL);
+    }
+
+    @NonNull
+    public View getView() {
+        return mView;
+    }
+
+    @NonNull
+    public TextView getTextView() {
+        return (TextView) mView.findViewById(R.id.candybar_text);
+    }
+
+    public boolean isShown() {
+        return CandybarManager.getInstance().isCurrentOrNext(mManagerCallback);
+    }
+
+    /*
+    Callback functionality. Use `candybar.setCallback(new Callback())` to set an event callback.
+     */
+
+    @NonNull
+    public Candybar setCallback(Callback callback) {
+        mCallback = callback;
+        return this;
+    }
+
     public static abstract class Callback {
-        public static final int DISMISS_EVENT_SWIPE = 0;
-        public static final int DISMISS_EVENT_ACTION = 1;
+        public static final int DISMISS_EVENT_TAP = 1;
         public static final int DISMISS_EVENT_TIMEOUT = 2;
         public static final int DISMISS_EVENT_MANUAL = 3;
         public static final int DISMISS_EVENT_CONSECUTIVE = 4;
 
-        @IntDef({DISMISS_EVENT_SWIPE, DISMISS_EVENT_ACTION, DISMISS_EVENT_TIMEOUT, DISMISS_EVENT_MANUAL, DISMISS_EVENT_CONSECUTIVE})
-        @Retention(RetentionPolicy.SOURCE)
+        @IntDef({DISMISS_EVENT_TAP, DISMISS_EVENT_TIMEOUT, DISMISS_EVENT_MANUAL, DISMISS_EVENT_CONSECUTIVE}) @Retention(RetentionPolicy.SOURCE)
         public @interface DismissEvent { }
 
-        public void onDismissed(Candybar candybar, @DismissEvent int event) { }
-
         public void onShown(Candybar candybar) { }
+
+        public void onDismissed(Candybar candybar, @DismissEvent int event) { }
     }
 
-    private static final int ANIMATION_DURATION = 250;
-    private static final int ANIMATION_FADE_DURATION = 180;
-
-    public static final int LENGTH_INDEFINITE = -2;
-    public static final int LENGTH_SHORT = -1;
-    public static final int LENGTH_LONG = 0;
-    @IntDef({LENGTH_INDEFINITE, LENGTH_SHORT, LENGTH_LONG})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Duration { }
-
-    public static final int DIRECTION_TOP = 0;
-    public static final int DIRECTION_BOTTOM = 1;
-    @IntDef({DIRECTION_TOP, DIRECTION_BOTTOM})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Direction { }
-
-
+    /*
+    Code handling Looper for animating
+     */
     private static final Handler sHandler;
     private static final int MSG_SHOW = 0;
     private static final int MSG_DISMISS = 1;
@@ -100,36 +275,163 @@ public final class Candybar {
         });
     }
 
-    private final ViewGroup mParent;
-    private final Context mContext;
-    private final CandybarLayout mView;
-    private final int mDirection;
-    private int mDuration;
-    private Callback mCallback;
+    /*
+    Instance of CandybarManager that will ensure only one Candybar is shown at a time
+     */
+    private final CandybarManager.Callback mManagerCallback = new CandybarManager.Callback() {
+        @Override
+        public void show() {
+            sHandler.sendMessage(sHandler.obtainMessage(MSG_SHOW, Candybar.this));
+        }
 
-    private Candybar(ViewGroup parent, @Direction int direction) {
-        mParent = parent;
-        mContext = parent.getContext();
-        mDirection = direction;
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        mView = (CandybarLayout) inflater.inflate((mDirection == DIRECTION_TOP) ? R.layout.candybar_top_layout : R.layout.candybar_bottom_layout, mParent, false);
+        @Override
+        public void dismiss(int event) {
+            sHandler.sendMessage(sHandler.obtainMessage(MSG_DISMISS, event, 0, Candybar.this));
+        }
+    };
+
+    /*
+        Animation code
+         */
+    private int mAnimationDuration = 250;
+    private int mAnimationFadeDuration = 180;
+
+    /**
+     *
+     * @param mAnimationDuration The time taken to animate the Candybar background view onto the screen.
+     * @return The object used for Constructor Chaining
+     */
+    public Candybar setmAnimationDuration(int mAnimationDuration) {
+        this.mAnimationDuration = mAnimationDuration;
+        return this;
     }
 
-
-    @NonNull
-    public static Candybar make(@NonNull View view, @Direction int direction, @NonNull CharSequence text, @Duration int duration) {
-        Candybar candybar = new Candybar(findSuitableParent(view), direction);
-        candybar.setText(text);
-        candybar.setDuration(duration);
-        return candybar;
+    /**
+     *
+     * @param mAnimationFadeDuration The time to animate the Candybar content (icon & text) onto the view.
+     * @return The object used for Constructor Chaining
+     */
+    public Candybar setmAnimationFadeDuration(int mAnimationFadeDuration) {
+        this.mAnimationFadeDuration = mAnimationFadeDuration;
+        return this;
     }
 
+    private void showView() {
+        if (mView.getParent() == null) {
+            mParent.addView(mView);
+        }
 
-    @NonNull
-    public static Candybar make(@NonNull View view, @Direction int direction, @StringRes int resId, @Duration int duration) {
-        return make(view, direction, view.getResources().getText(resId), duration);
+        mView.setOnAttachStateChangeListener(new CandybarLayout.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                if (isShown()) {
+                    sHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onViewHidden(Callback.DISMISS_EVENT_MANUAL);
+                        }
+                    });
+                }
+            }
+        });
+
+        if (ViewCompat.isLaidOut(mView)) {
+            animateViewIn();
+        } else {
+            mView.setOnLayoutChangeListener(new CandybarLayout.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View view, int left, int top, int right, int bottom) {
+                    animateViewIn();
+                    mView.setOnLayoutChangeListener(null);
+                }
+            });
+        }
+
+        mView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP && mDismissOnTap) {
+                    animateViewOut(Callback.DISMISS_EVENT_TAP);
+                    view.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
+    private void animateViewIn() {
+        float startingYTranslation = mView.getHeight() * ((mDirection == DIRECTION_TOP) ? -1 : 1);
+        mView.setTranslationY(startingYTranslation);
+        ViewCompat.animate(mView)
+                .translationY(0f)
+                .setInterpolator(mInterpolator)
+                .setDuration(mAnimationDuration)
+                .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(View view) {
+                        mView.animateChildrenIn(mAnimationDuration - mAnimationFadeDuration,
+                                mAnimationFadeDuration);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(View view) {
+                        if (mCallback != null) {
+                            mCallback.onShown(Candybar.this);
+                        }
+                        CandybarManager.getInstance()
+                                .onShown(mManagerCallback);
+                    }
+                })
+                .start();
+    }
+
+    private void animateViewOut(final int event) {
+        float endingYTranslation = mView.getHeight() * ((mDirection == DIRECTION_TOP) ? -1 : 1);
+        ViewCompat.animate(mView)
+                .translationY(endingYTranslation)
+                .setInterpolator(mInterpolator)
+                .setDuration(mAnimationDuration)
+                .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(View view) {
+                        mView.animateChildrenOut(0, mAnimationFadeDuration);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(View view) {
+                        onViewHidden(event);
+                    }
+                })
+                .start();
+    }
+
+    private void hideView(int event) {
+        if (mView.getVisibility() != View.VISIBLE) {
+            onViewHidden(event);
+        } else {
+            animateViewOut(event);
+        }
+    }
+
+    private void onViewHidden(int event) {
+        CandybarManager.getInstance().onDismissed(mManagerCallback);
+        if (mCallback != null) {
+            mCallback.onDismissed(this, event);
+        }
+        final ViewParent parent = mView.getParent();
+        if (parent instanceof ViewGroup) {
+            ((ViewGroup) parent).removeView(mView);
+        }
+    }
+
+    /*
+    Helper methods for insertion node finding and view sizing
+     */
     private static ViewGroup findSuitableParent(View view) {
         ViewGroup fallback = null;
         do {
@@ -153,66 +455,6 @@ public final class Candybar {
         return fallback;
     }
 
-
-    @Deprecated
-    public Candybar addIcon(int resource_id, int size) {
-        final TextView tv = mView.getMessageView();
-
-        tv.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(((BitmapDrawable) (mContext.getResources()
-                .getDrawable(resource_id))).getBitmap(), size, size, true)), null, null, null);
-
-        return this;
-    }
-
-    public Candybar setIconPadding(int padding) {
-        final TextView tv = mView.getMessageView();
-        tv.setCompoundDrawablePadding(padding);
-        return this;
-    }
-
-
-    public Candybar setIconLeft(@DrawableRes int drawableRes, float sizeDp) {
-        final TextView tv = mView.getMessageView();
-        Drawable drawable = ContextCompat.getDrawable(mContext, drawableRes);
-        if (drawable != null) {
-            drawable = fitDrawable(drawable, (int) convertDpToPixel(sizeDp, mContext));
-        } else {
-            throw new IllegalArgumentException("resource_id is not a valid drawable!");
-        }
-        final Drawable[] compoundDrawables = tv.getCompoundDrawables();
-        tv.setCompoundDrawables(drawable, compoundDrawables[1], compoundDrawables[2], compoundDrawables[3]);
-        return this;
-    }
-
-
-    public Candybar setIconRight(@DrawableRes int drawableRes, float sizeDp) {
-        final TextView tv = mView.getMessageView();
-        Drawable drawable = ContextCompat.getDrawable(mContext, drawableRes);
-        if (drawable != null) {
-            drawable = fitDrawable(drawable, (int) convertDpToPixel(sizeDp, mContext));
-        } else {
-            throw new IllegalArgumentException("resource_id is not a valid drawable!");
-        }
-        final Drawable[] compoundDrawables = tv.getCompoundDrawables();
-        tv.setCompoundDrawables(compoundDrawables[0], compoundDrawables[1], drawable, compoundDrawables[3]);
-        return this;
-    }
-
-    /**
-     * Overrides the max width of this candybar's layout. This is typically not necessary; the candybar
-     * width will be according to Google's Material guidelines. Specifically, the max width will be
-     *
-     * To allow the candybar to have a width equal to the parent view, set a value <= 0.
-     *
-     * @param maxWidth  the max width in pixels
-     * @return this Candybar
-     */
-    public Candybar setMaxWidth(int maxWidth) {
-        mView.mMaxWidth = maxWidth;
-
-        return this;
-    }
-
     private Drawable fitDrawable(Drawable drawable, int sizePx) {
         if (drawable.getIntrinsicWidth() != sizePx || drawable.getIntrinsicHeight() != sizePx) {
             if (drawable instanceof BitmapDrawable) {
@@ -222,8 +464,6 @@ public final class Candybar {
         drawable.setBounds(0, 0, sizePx, sizePx);
         return drawable;
     }
-
-
 
     private static float convertDpToPixel(float dp, Context context) {
         Resources resources = context.getResources();
@@ -249,522 +489,6 @@ public final class Candybar {
             return getBitmap((VectorDrawable) drawable);
         } else {
             throw new IllegalArgumentException("unsupported drawable type");
-        }
-    }
-
-
-
-    @NonNull
-    public Candybar setAction(@StringRes int resId, View.OnClickListener listener) {
-        return setAction(mContext.getText(resId), listener);
-    }
-
-
-    @NonNull
-    public Candybar setAction(CharSequence text, final View.OnClickListener listener) {
-        final TextView tv = mView.getActionView();
-
-        if (TextUtils.isEmpty(text) || listener == null) {
-            tv.setVisibility(View.GONE);
-            tv.setOnClickListener(null);
-        } else {
-            tv.setVisibility(View.VISIBLE);
-            tv.setText(text);
-            tv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    listener.onClick(view);
-
-                    dispatchDismiss(Callback.DISMISS_EVENT_ACTION);
-                }
-            });
-        }
-        return this;
-    }
-
-
-    @NonNull
-    public Candybar setActionTextColor(ColorStateList colors) {
-        final TextView tv = mView.getActionView();
-        tv.setTextColor(colors);
-        return this;
-    }
-
-
-    @NonNull
-    public Candybar setActionTextColor(@ColorInt int color) {
-        final TextView tv = mView.getActionView();
-        tv.setTextColor(color);
-        return this;
-    }
-
-
-    @NonNull
-    public Candybar setText(@NonNull CharSequence message) {
-        final TextView tv = mView.getMessageView();
-        tv.setText(message);
-        return this;
-    }
-
-
-    @NonNull
-    public Candybar setText(@StringRes int resId) {
-        return setText(mContext.getText(resId));
-    }
-
-
-    @NonNull
-    public Candybar setDuration(@Duration int duration) {
-        mDuration = duration;
-        return this;
-    }
-
-
-    @Duration
-    public int getDuration() {
-        return mDuration;
-    }
-
-
-    @Direction
-    public int getDirection() {
-        return mDirection;
-    }
-
-
-    @NonNull
-    public View getView() {
-        return mView;
-    }
-
-
-    public void show() {
-        CandybarManager.getInstance()
-                .show(mDuration, mManagerCallback);
-    }
-
-
-    public void dismiss() {
-        dispatchDismiss(Callback.DISMISS_EVENT_MANUAL);
-    }
-
-    private void dispatchDismiss(@Callback.DismissEvent int event) {
-        CandybarManager.getInstance()
-                .dismiss(mManagerCallback, event);
-    }
-
-
-    @NonNull
-    public Candybar setCallback(Callback callback) {
-        mCallback = callback;
-        return this;
-    }
-
-
-    public boolean isShown() {
-        return CandybarManager.getInstance()
-                .isCurrent(mManagerCallback);
-    }
-
-
-    public boolean isShownOrQueued() {
-        return CandybarManager.getInstance()
-                .isCurrentOrNext(mManagerCallback);
-    }
-
-    private final CandybarManager.Callback mManagerCallback = new CandybarManager.Callback() {
-        @Override
-        public void show() {
-            sHandler.sendMessage(sHandler.obtainMessage(MSG_SHOW, Candybar.this));
-        }
-
-        @Override
-        public void dismiss(int event) {
-            sHandler.sendMessage(sHandler.obtainMessage(MSG_DISMISS, event, 0, Candybar.this));
-        }
-    };
-
-    final void showView() {
-        if (mView.getParent() == null) {
-            final ViewGroup.LayoutParams lp = mView.getLayoutParams();
-
-            if (lp instanceof CoordinatorLayout.LayoutParams) {
-
-
-                final Behavior behavior = new Behavior();
-                behavior.setStartAlphaSwipeDistance(0.1f);
-                behavior.setEndAlphaSwipeDistance(0.6f);
-                behavior.setSwipeDirection(SwipeDismissBehavior.SWIPE_DIRECTION_START_TO_END);
-                behavior.setListener(new SwipeDismissBehavior.OnDismissListener() {
-                    @Override
-                    public void onDismiss(View view) {
-                        dispatchDismiss(Callback.DISMISS_EVENT_SWIPE);
-                    }
-
-                    @Override
-                    public void onDragStateChanged(int state) {
-                        switch (state) {
-                            case SwipeDismissBehavior.STATE_DRAGGING:
-                            case SwipeDismissBehavior.STATE_SETTLING:
-
-                                CandybarManager.getInstance()
-                                        .cancelTimeout(mManagerCallback);
-                                break;
-                            case SwipeDismissBehavior.STATE_IDLE:
-
-                                CandybarManager.getInstance()
-                                        .restoreTimeout(mManagerCallback);
-                                break;
-                        }
-                    }
-                });
-                ((CoordinatorLayout.LayoutParams) lp).setBehavior(behavior);
-            }
-            mParent.addView(mView);
-        }
-
-        mView.setOnAttachStateChangeListener(new CandybarLayout.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                if (isShownOrQueued()) {
-
-
-
-
-                    sHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onViewHidden(Callback.DISMISS_EVENT_MANUAL);
-                        }
-                    });
-                }
-            }
-        });
-
-        if (ViewCompat.isLaidOut(mView)) {
-
-            animateViewIn();
-        } else {
-
-            mView.setOnLayoutChangeListener(new CandybarLayout.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View view, int left, int top, int right, int bottom) {
-                    animateViewIn();
-                    mView.setOnLayoutChangeListener(null);
-                }
-            });
-        }
-    }
-
-    private void animateViewIn() {
-        float startingYTranslation = mView.getHeight() * ((mDirection == DIRECTION_TOP) ? -1 : 1);
-        mView.setTranslationY(startingYTranslation);
-        ViewCompat.animate(mView)
-                .translationY(0f)
-                .setInterpolator(new FastOutSlowInInterpolator())
-                .setDuration(ANIMATION_DURATION)
-                .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(View view) {
-                        mView.animateChildrenIn(ANIMATION_DURATION - ANIMATION_FADE_DURATION,
-                                ANIMATION_FADE_DURATION);
-                    }
-
-                    @Override
-                    public void onAnimationEnd(View view) {
-                        if (mCallback != null) {
-                            mCallback.onShown(Candybar.this);
-                        }
-                        CandybarManager.getInstance()
-                                .onShown(mManagerCallback);
-                    }
-                })
-                .start();
-    }
-
-    private void animateViewOut(final int event) {
-        float endingYTranslation = mView.getHeight() * ((mDirection == DIRECTION_TOP) ? -1 : 1);
-        ViewCompat.animate(mView)
-                .translationY(endingYTranslation)
-                .setInterpolator(new FastOutSlowInInterpolator())
-                .setDuration(ANIMATION_DURATION)
-                .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(View view) {
-                        mView.animateChildrenOut(0, ANIMATION_FADE_DURATION);
-                    }
-
-                    @Override
-                    public void onAnimationEnd(View view) {
-                        onViewHidden(event);
-                    }
-                })
-                .start();
-    }
-
-    final void hideView(int event) {
-        if (mView.getVisibility() != View.VISIBLE || isBeingDragged()) {
-            onViewHidden(event);
-        } else {
-            animateViewOut(event);
-        }
-    }
-
-    private void onViewHidden(int event) {
-
-        CandybarManager.getInstance()
-                .onDismissed(mManagerCallback);
-
-        if (mCallback != null) {
-            mCallback.onDismissed(this, event);
-        }
-
-        final ViewParent parent = mView.getParent();
-        if (parent instanceof ViewGroup) {
-            ((ViewGroup) parent).removeView(mView);
-        }
-    }
-
-
-    private boolean isBeingDragged() {
-        final ViewGroup.LayoutParams lp = mView.getLayoutParams();
-
-        if (lp instanceof CoordinatorLayout.LayoutParams) {
-            final CoordinatorLayout.LayoutParams cllp = (CoordinatorLayout.LayoutParams) lp;
-            final CoordinatorLayout.Behavior behavior = cllp.getBehavior();
-
-            if (behavior instanceof SwipeDismissBehavior) {
-                return ((SwipeDismissBehavior) behavior).getDragState()
-                        != SwipeDismissBehavior.STATE_IDLE;
-            }
-        }
-        return false;
-    }
-
-
-    public static class CandybarLayout extends LinearLayout {
-        private TextView mMessageView;
-        private Button mActionView;
-
-        private int mMaxWidth;
-        private int mMaxInlineActionWidth;
-
-        interface OnLayoutChangeListener {
-            void onLayoutChange(View view, int left, int top, int right, int bottom);
-        }
-
-        interface OnAttachStateChangeListener {
-            void onViewAttachedToWindow(View v);
-
-            void onViewDetachedFromWindow(View v);
-        }
-
-        private OnLayoutChangeListener mOnLayoutChangeListener;
-        private OnAttachStateChangeListener mOnAttachStateChangeListener;
-
-        public CandybarLayout(Context context) {
-            this(context, null);
-        }
-
-        public CandybarLayout(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SnackbarLayout);
-            mMaxWidth = a.getDimensionPixelSize(R.styleable.SnackbarLayout_android_maxWidth, -1);
-            mMaxInlineActionWidth = a.getDimensionPixelSize(
-                    R.styleable.SnackbarLayout_maxActionInlineWidth, -1);
-            if (a.hasValue(R.styleable.SnackbarLayout_elevation)) {
-                ViewCompat.setElevation(this, a.getDimensionPixelSize(
-                        R.styleable.SnackbarLayout_elevation, 0));
-            }
-            a.recycle();
-
-            setClickable(true);
-
-
-
-
-            LayoutInflater.from(context)
-                    .inflate(R.layout.candybar_layout_include, this);
-
-            ViewCompat.setAccessibilityLiveRegion(this,
-                    ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE);
-        }
-
-        @Override
-        protected void onFinishInflate() {
-            super.onFinishInflate();
-            mMessageView = (TextView) findViewById(R.id.candybar_text);
-            mActionView = (Button) findViewById(R.id.candybar_action);
-        }
-
-        TextView getMessageView() {
-            return mMessageView;
-        }
-
-        Button getActionView() {
-            return mActionView;
-        }
-
-        @Override
-        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-            if (mMaxWidth > 0 && getMeasuredWidth() > mMaxWidth) {
-                widthMeasureSpec = MeasureSpec.makeMeasureSpec(mMaxWidth, MeasureSpec.EXACTLY);
-                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            }
-
-            final int multiLineVPadding = getResources().getDimensionPixelSize(
-                    R.dimen.design_snackbar_padding_vertical_2lines);
-            final int singleLineVPadding = getResources().getDimensionPixelSize(
-                    R.dimen.design_snackbar_padding_vertical);
-            final boolean isMultiLine = mMessageView.getLayout()
-                    .getLineCount() > 1;
-
-            boolean remeasure = false;
-            if (isMultiLine && mMaxInlineActionWidth > 0
-                    && mActionView.getMeasuredWidth() > mMaxInlineActionWidth) {
-                if (updateViewsWithinLayout(VERTICAL, multiLineVPadding,
-                        multiLineVPadding - singleLineVPadding)) {
-                    remeasure = true;
-                }
-            } else {
-                final int messagePadding = isMultiLine ? multiLineVPadding : singleLineVPadding;
-                if (updateViewsWithinLayout(HORIZONTAL, messagePadding, messagePadding)) {
-                    remeasure = true;
-                }
-            }
-
-            if (remeasure) {
-                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            }
-        }
-
-        void animateChildrenIn(int delay, int duration) {
-            mMessageView.setAlpha(0f);
-            ViewCompat.animate(mMessageView)
-                    .alpha(1f)
-                    .setDuration(duration)
-                    .setStartDelay(delay)
-                    .start();
-
-            if (mActionView.getVisibility() == VISIBLE) {
-                mActionView.setAlpha(0f);
-                ViewCompat.animate(mActionView)
-                        .alpha(1f)
-                        .setDuration(duration)
-                        .setStartDelay(delay)
-                        .start();
-            }
-        }
-
-        void animateChildrenOut(int delay, int duration) {
-            mMessageView.setAlpha(1f);
-            ViewCompat.animate(mMessageView)
-                    .alpha(0f)
-                    .setDuration(duration)
-                    .setStartDelay(delay)
-                    .start();
-
-            if (mActionView.getVisibility() == VISIBLE) {
-                mActionView.setAlpha(1f);
-                ViewCompat.animate(mActionView)
-                        .alpha(0f)
-                        .setDuration(duration)
-                        .setStartDelay(delay)
-                        .start();
-            }
-        }
-
-        @Override
-        protected void onLayout(boolean changed, int l, int t, int r, int b) {
-            super.onLayout(changed, l, t, r, b);
-            if (changed && mOnLayoutChangeListener != null) {
-                mOnLayoutChangeListener.onLayoutChange(this, l, t, r, b);
-            }
-        }
-
-        @Override
-        protected void onAttachedToWindow() {
-            super.onAttachedToWindow();
-            if (mOnAttachStateChangeListener != null) {
-                mOnAttachStateChangeListener.onViewAttachedToWindow(this);
-            }
-        }
-
-        @Override
-        protected void onDetachedFromWindow() {
-            super.onDetachedFromWindow();
-            if (mOnAttachStateChangeListener != null) {
-                mOnAttachStateChangeListener.onViewDetachedFromWindow(this);
-            }
-        }
-
-        void setOnLayoutChangeListener(OnLayoutChangeListener onLayoutChangeListener) {
-            mOnLayoutChangeListener = onLayoutChangeListener;
-        }
-
-        void setOnAttachStateChangeListener(OnAttachStateChangeListener listener) {
-            mOnAttachStateChangeListener = listener;
-        }
-
-        private boolean updateViewsWithinLayout(final int orientation,
-                                                final int messagePadTop, final int messagePadBottom) {
-            boolean changed = false;
-            if (orientation != getOrientation()) {
-                setOrientation(orientation);
-                changed = true;
-            }
-            if (mMessageView.getPaddingTop() != messagePadTop
-                    || mMessageView.getPaddingBottom() != messagePadBottom) {
-                updateTopBottomPadding(mMessageView, messagePadTop, messagePadBottom);
-                changed = true;
-            }
-            return changed;
-        }
-
-        private static void updateTopBottomPadding(View view, int topPadding, int bottomPadding) {
-            if (ViewCompat.isPaddingRelative(view)) {
-                ViewCompat.setPaddingRelative(view,
-                        ViewCompat.getPaddingStart(view), topPadding,
-                        ViewCompat.getPaddingEnd(view), bottomPadding);
-            } else {
-                view.setPadding(view.getPaddingLeft(), topPadding,
-                        view.getPaddingRight(), bottomPadding);
-            }
-        }
-    }
-
-    final class Behavior extends SwipeDismissBehavior<CandybarLayout> {
-        @Override
-        public boolean canSwipeDismissView(@NonNull View child) {
-            return child instanceof CandybarLayout;
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(CoordinatorLayout parent, CandybarLayout child,
-                                             MotionEvent event) {
-
-
-            if (parent.isPointInChildBounds(child, (int) event.getX(), (int) event.getY())) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        CandybarManager.getInstance()
-                                .cancelTimeout(mManagerCallback);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        CandybarManager.getInstance()
-                                .restoreTimeout(mManagerCallback);
-                        break;
-                }
-            }
-
-            return super.onInterceptTouchEvent(parent, child, event);
         }
     }
 }

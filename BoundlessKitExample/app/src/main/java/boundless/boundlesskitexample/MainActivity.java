@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -33,8 +34,8 @@ import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
 import boundless.kit.rewards.animation.overlay.Confetti;
-import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
 import boundless.kit.rewards.animation.overlay.candybar.Candybar;
+import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -73,29 +74,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showReward() {
-
-        //// Pulse Sample
-        //
-        // Create an animator instance, set values, and animate()
-        //
-//        new PulseAnimator()
-//                .setCount(3)
-//                .animate(findViewById(R.id.list_title));
-
-
-
-
-        //// Rotation Sample
-        //
-        // Create an animator instance, set values, and animate()
-        //
-//        new RotationAnimator()
-//                .setCount(2)
-//                .animate(findViewById(R.id.list_title));
-
-
-
-
         //// Shimmy Sample
         //
         // Create an animator instance, set values, and animate()
@@ -108,13 +86,44 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        //// Vibration Sample
+        //// Pulse Sample
         //
         // Create an animator instance, set values, and animate()
         //
-//        new VibrationAnimator()
-//                .setScale(1.2f)
+//        new PulseAnimator()
+//                .setCount(3)
 //                .animate(findViewById(R.id.list_title));
+//
+//
+//
+//
+//        //// Vibration Sample
+//        //
+//        // Create an animator instance, set values, and animate()
+//        //
+////        new VibrationAnimator()
+////                .setScale(1.2f)
+////                .animate(findViewById(R.id.list_title));
+
+
+
+
+        //// Rotation Sample
+        //
+        // Create an animator instance, set values, and animate()
+        //
+//        new RotationAnimator()
+//                .setCount(2)
+//                .animate(findViewById(R.id.list_title));
+//
+//
+//
+//
+//        //// Glow Sample
+//        //
+//        // Create an animator instance, set values, and animate()
+//        //
+
 
 
 
@@ -154,33 +163,25 @@ public class MainActivity extends AppCompatActivity {
 
         //// CandyBar Sample
         //
+        // Create a Candybar view, similar to the Snackbar view in Android, over the main content view.
+        // Customize text, color, or add an icon
         //
-        //
-
-        // Show some candy and make them feel good!
-//        CandyBar candyBar = new CandyBar(contentView.getRootView(),
-//                R.drawable.stars,
-//                "Out of this world!",
-//                "We knew you could do it",
-//                Color.parseColor("#ffcc00"),
-//                CandyBar.LENGTH_LONG);
-//        candyBar.show();
-        Candybar snackbar = Candybar.make(contentView, (flagFlip ^= true) ? Candybar.DIRECTION_BOTTOM : Candybar.DIRECTION_TOP, "A Snackbar is a lightweight material design method for providing feedback to a user, while optionally providing an action to the user.", Candybar.LENGTH_LONG);
-//        View snackbarView = snackbar.getView();
-//        snackbarView.setBackgroundColor(Color.parseColor("#CC00CC"));
-//        TextView textView = (TextView) snackbarView.findViewById(R.id.snackbar_text);
-//        textView.setTextColor(Color.YELLOW);
-        snackbar.show();
+        Candybar candybar = new Candybar(contentView,
+                Candybar.DIRECTION_TOP,
+                "Knocked it out of the park! "+ ("\u26be\ufe0f")+ ("\ud83d\ude80"),
+                3200);
+        candybar.setBackgroundColor(Color.parseColor("#336633"))
+                .setDismissOnTap(true)
+                .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.stars), 48, true)
+                .show();
     }
-
-    boolean flagFlip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        contentView = findViewById(android.R.id.content);
+        contentView = findViewById(R.id.MainActivity);
         logoView = findViewById(R.id.header_icon);
 
         mHelper = new TaskDbHelper(MainActivity.this);
