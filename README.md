@@ -1,8 +1,8 @@
 # What is BoundlessKit?
 
-[![Bintray](https://img.shields.io/bintray/v/cuddergambino/maven/BoundlessKit.svg?maxAge=2592000?style=plastic)](https://bintray.com/cuddergambino/maven/BoundlessKit)
+[![Bintray](https://img.shields.io/bintray/v/cuddergambino/maven/BoundlessKit.svg?maxAge=2592000?style=plastic)](https://bintray.com/cuddergambino/maven/boundlesskit)
 
-[![Maven Central](https://img.shields.io/maven-central/v/boundless/BoundlessKit.svg?maxAge=2592000)](https://bintray.com/cuddergambino/maven/BoundlessKit)
+[![Maven Central](https://img.shields.io/maven-central/v/boundless/BoundlessKit.svg?maxAge=2592000)](https://bintray.com/cuddergambino/maven/boundlesskit)
 
 [![Maintenance](https://img.shields.io/maintenance/yes/2017.svg?maxAge=2592000)](mailto:oss@boundless.ai)
 
