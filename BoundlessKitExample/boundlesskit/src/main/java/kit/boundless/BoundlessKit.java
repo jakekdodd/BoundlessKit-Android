@@ -1,9 +1,5 @@
 package kit.boundless;
 
-/**
- * Created by cuddergambino on 6/1/16.
- */
-
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.AsyncTask;
