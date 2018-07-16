@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/MainActivity"
     android:layout_width="match_parent"
@@ -8,19 +9,26 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="boundless.boundlesskitexample.MainActivity">
+    tools:context="kit.boundlesskitexample.MainActivity">
 
     <ImageView
         android:id="@+id/header_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:src="@mipmap/brain" />
+        android:contentDescription="@string/boundlessmind_logo"
+        android:src="@mipmap/brain"
+        />
+    <kit.boundless.reward.overlay.SheenView
+        xmlns:boundless="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sheen"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        boundless:animationDuration="1000"
+        boundless:animateOver="@id/header_icon"
+        boundless:animateRightToLeft="false"
+        boundless:imageHorizontalFlip="false" />
 
     <TextView
         android:id="@+id/list_title"
@@ -30,7 +38,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:textAlignment="center"
-        android:text="Opaque"
+        android:text="@string/listTitle"
         android:textSize="50sp"
         android:textStyle="italic|bold"
         android:layout_below="@id/header_icon"/>
@@ -40,4 +48,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/list_title"/>
+
 </RelativeLayout>

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TodoList</string>
+    <string name="boundlessmind_logo">BoundlessMind Logo</string>
+    <string name="listTitle">Opaque</string>
 </resources>
