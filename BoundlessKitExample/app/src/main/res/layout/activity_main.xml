@@ -9,7 +9,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="boundless.boundlesskitexample.MainActivity">
+    tools:context="kit.boundlesskitexample.MainActivity">
 
     <ImageView
         android:id="@+id/header_icon"
@@ -20,7 +20,7 @@
         android:contentDescription="@string/boundlessmind_logo"
         android:src="@mipmap/brain"
         />
-    <boundless.kit.reward.overlay.SheenView
+    <kit.boundless.reward.overlay.SheenView
         xmlns:boundless="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sheen"
         android:layout_width="0dp"
