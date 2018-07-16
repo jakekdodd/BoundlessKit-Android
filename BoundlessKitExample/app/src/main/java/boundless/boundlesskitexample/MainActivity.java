@@ -33,7 +33,13 @@ import java.util.Arrays;
 import boundless.boundlesskitexample.db.TaskContract;
 import boundless.boundlesskitexample.db.TaskDbHelper;
 import boundless.kit.BoundlessKit;
+import boundless.kit.rewards.animation.attention.PulseAnimator;
+import boundless.kit.rewards.animation.attention.RotationAnimator;
+import boundless.kit.rewards.animation.attention.ShimmyAnimator;
+import boundless.kit.rewards.animation.attention.VibrationAnimator;
 import boundless.kit.rewards.animation.overlay.Confetti;
+import boundless.kit.rewards.animation.overlay.Emojisplosion;
+import boundless.kit.rewards.animation.overlay.SheenView;
 import boundless.kit.rewards.animation.overlay.candybar.Candybar;
 import boundless.kit.rewards.animation.overlay.particle.ConfettoDrawable;
 
@@ -47,141 +53,154 @@ public class MainActivity extends AppCompatActivity {
     private View contentView;
     private ImageView logoView;
 
-    Confetti confetti;
+    /*
+    An enum made for demonstartion of out-of-the-box rewards provided in BoundlessKit.
+    In your app, you could make an enum consisting of your reward decisions that were configured on the developer dashboard.
+     */
+    enum RewardSample { shimmy, pulse, vibrate, rotate, sheen, emojisplosion, confetti, candybar}
+    RewardSample rewardSample = RewardSample.confetti;
 
+    /*
+    Create a method like this in your app. It has 2 purposes
+    1) Request a reinforcement decision from BoundlessKit
+    2) Depending on the decision, show a reward
+     */
     private void reinforcementCall() {
         BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
             @Override
             public void onReinforcement(String reinforcement) {
-//                switch (reinforcement) {
-//                    case "stars":
-//                        // Show some reward and make them feel good!
+                switch (reinforcement) {
+                    case "stars":
+                        rewardSample = RewardSample.confetti;
+                        break;
+                    case "medalStar":
+                        rewardSample = RewardSample.emojisplosion;
+                        break;
+                    case "thumbsUp":
+                        rewardSample = RewardSample.vibrate;
+                        break;
+                    default:
+                        // Show nothing! This is called a neutral response,
+                        // and builds up the good feelings for the next surprise!
+                        return;
+                }
+
+                // Show some reward and make them feel good!
                 showReward();
-//                        break;
-//                    case "medalStar":
-//
-//                        break;
-//                    case "thumbsUp":
-//
-//                        break;
-//                    default:
-//                        // Show nothing! This is called a neutral response,
-//                        // and builds up the good feelings for the next surprise!
-//                        break;
-//                }
+
             }
         });
     }
 
+    /*
+    This method is just for demonstration, and does not need to be in your app.
+    This method cycles through a few of the out-of-the-box rewards. Change the values inside the reinforcementCall() switch statement to sample the others.
+     */
     private void showReward() {
-        //// Shimmy Sample
-        //
-        // Create an animator instance, set values, and animate()
-        //
-//        new ShimmyAnimator()
-//                .setCount(3)
-//                .setHorizontally(true)
-//                .animate(findViewById(R.id.list_title));
+        switch (rewardSample) {
+            case shimmy:
+                //// Shimmy Sample
+                //
+                // Create an animator instance, set values, and animate()
+                //
+                new ShimmyAnimator()
+                        .setCount(3)
+                        .setHorizontally(true)
+                        .animate(findViewById(R.id.list_title));
 
 
+                break;
+            case pulse:
+                //// Pulse Sample
+                //
+                // Create an animator instance, set values, and animate()
+                //
+                new PulseAnimator()
+                        .setCount(3)
+                        .animate(findViewById(R.id.list_title));
 
 
-        //// Pulse Sample
-        //
-        // Create an animator instance, set values, and animate()
-        //
-//        new PulseAnimator()
-//                .setCount(3)
-//                .animate(findViewById(R.id.list_title));
-//
-//
-//
-//
-//        //// Vibration Sample
-//        //
-//        // Create an animator instance, set values, and animate()
-//        //
-////        new VibrationAnimator()
-////                .setScale(1.2f)
-////                .animate(findViewById(R.id.list_title));
+                break;
+            case vibrate:
+                //// Vibration Sample
+                //
+                // Create an animator instance, set values, and animate()
+                //
+                new VibrationAnimator()
+                        .setScale(0.8f)
+                        .animate(logoView);
 
 
+                break;
+            case rotate:
+                //// Rotation Sample
+                //
+                // Create an animator instance, set values, and animate()
+                //
+                new RotationAnimator()
+                        .setCount(2)
+                        .animate(findViewById(R.id.list_title));
 
 
-        //// Rotation Sample
-        //
-        // Create an animator instance, set values, and animate()
-        //
-//        new RotationAnimator()
-//                .setCount(2)
-//                .animate(findViewById(R.id.list_title));
-//
-//
-//
-//
-//        //// Glow Sample
-//        //
-//        // Create an animator instance, set values, and animate()
-//        //
+                break;
+            case sheen:
+                //// Sheen Sample
+                //
+                // add SheenView to activity layout, after view to animate over
+                //
+                ((SheenView) findViewById(R.id.sheen)).start();
 
 
+                break;
+            case emojisplosion:
+                //// Emojisplosion Sample
+                //
+                // get reference to view to animate over, set values, and animate()
+                //
+                new Emojisplosion()
+                        .setContent(MainActivity.this, "\uD83D\uDE00\n")
+                        .setxPosition(contentView.getWidth() / 2)
+                        .setyPosition(contentView.getMeasuredHeight())
+                        .setScale(2f)
+                        .setLifetime(4000)
+                        .animate(contentView);
 
 
-
-        //// Sheen Sample
-        //
-        // add SheenView to activity layout, after view to animate over
-        //
-//        ((SheenView)findViewById(R.id.sheen)).start();
-
-
-
-
-        //// Emojisplosion Sample
-        //
-        // get reference to view to animate over, set values, and animate()
-        //
-//        new Emojisplosion()
-//                .setContent(MainActivity.this, "\uD83D\uDE00\n")
-//                .setxPosition(contentView.getWidth() / 2)
-//                .setyPosition(contentView.getMeasuredHeight())
-//                .setScale(2f)
-//                .setLifetime(4000)
-//                .animate(contentView);
+                break;
+            case confetti:
+                //// Confetti Sample
+                //
+                // Create confetti animation object in `onCreate()` for better memory usage
+                //
+                confetti.start();
 
 
-
-
-        //// Confetti Sample
-        //
-        // Create confetti animation object in `onCreate()` for better memory usage
-        //
-//        confetti.start();
-
-
-
-
-        //// CandyBar Sample
-        //
-        // Create a Candybar view, similar to the Snackbar view in Android, over the main content view.
-        // Customize text, color, or add an icon
-        //
-        Candybar candybar = new Candybar(contentView,
-                Candybar.DIRECTION_TOP,
-                "Knocked it out of the park! "+ ("\u26be\ufe0f")+ ("\ud83d\ude80"),
-                3200);
-        candybar.setBackgroundColor(Color.parseColor("#336633"))
-                .setDismissOnTap(true)
-                .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.stars), 48, true)
-                .show();
+                break;
+            case candybar:
+                //// CandyBar Sample
+                //
+                // Create a Candybar view, similar to the Snackbar view in Android, over the main content view.
+                // Customize text, color, or add an icon
+                //
+                Candybar candybar = new Candybar(contentView,
+                        Candybar.DIRECTION_TOP,
+                        "Knocked it out of the park! " + ("\u26be\ufe0f") + ("\ud83d\ude80"),
+                        3200);
+                candybar.setBackgroundColor(Color.parseColor("#336633"))
+                        .setDismissOnTap(true)
+                        .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.stars), 48, true)
+                        .show();
+        }
     }
+
+    Confetti confetti;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        contentView = findViewById(R.id.MainActivity);
+        contentView = findViewById(android.R.id.content);
         logoView = findViewById(R.id.header_icon);
 
         mHelper = new TaskDbHelper(MainActivity.this);
