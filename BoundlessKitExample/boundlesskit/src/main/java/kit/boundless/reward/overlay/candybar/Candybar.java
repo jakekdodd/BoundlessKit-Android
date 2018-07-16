@@ -308,7 +308,7 @@ public final class Candybar {
 
     /**
      *
-     * @param mAnimationFadeDuration The time to animate the Candybar content (icon & text) onto the view.
+     * @param mAnimationFadeDuration The time to animate the Candybar content (icon and text) onto the view.
      * @return The object used for Constructor Chaining
      */
     public Candybar setmAnimationFadeDuration(int mAnimationFadeDuration) {

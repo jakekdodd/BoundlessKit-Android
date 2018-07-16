@@ -8,12 +8,12 @@ ext {
     libraryName = 'BoundlessKit'
     artifact = 'boundlesskit'
 
-    libraryDescription = 'A wrapper for Boundless AI on Android'
+    libraryDescription = 'A wrapper for Boundless AI on Android. Includes out-of-the-box rewards to delight your users.'
 
     siteUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android'
     gitUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android.git'
 
-    libraryVersion = '4.0.7'
+    libraryVersion = '4.0.8'
 
     developerId = 'cuddergambino'
     developerName = 'Akash Desai'

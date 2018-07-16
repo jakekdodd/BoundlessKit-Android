@@ -1,10 +1,11 @@
 # What is BoundlessKit?
+ [ ![Download](https://api.bintray.com/packages/cuddergambino/maven/boundlesskit/images/download.svg) ](https://bintray.com/cuddergambino/maven/boundlesskit/_latestVersion)
+ 
+[![Bintray](https://img.shields.io/bintray/v/cuddergambino/maven/boundlesskit.svg?maxAge=2592000?style=plastic)](https://bintray.com/cuddergambino/maven/boundlesskit)
 
-[![Bintray](https://img.shields.io/bintray/v/cuddergambino/maven/BoundlessKit.svg?maxAge=2592000?style=plastic)](https://bintray.com/cuddergambino/maven/boundlesskit)
+[![Maven Central](https://img.shields.io/maven-central/v/boundless/boundlesskit.svg?maxAge=2592000)](https://bintray.com/cuddergambino/maven/boundlesskit)
 
-[![Maven Central](https://img.shields.io/maven-central/v/boundless/BoundlessKit.svg?maxAge=2592000)](https://bintray.com/cuddergambino/maven/boundlesskit)
-
-[![Maintenance](https://img.shields.io/maintenance/yes/2017.svg?maxAge=2592000)](mailto:oss@boundless.ai)
+[![Maintenance](https://img.shields.io/maintenance/yes/2018.svg?maxAge=2592000)](mailto:oss@boundless.ai)
 
 
 BoundlessKit provides wrappers for accessing BoundlessAI and expressive UI reinforcements for your app.
@@ -27,7 +28,7 @@ A simple "To Do List" Android App is included in this repo to demonstrate how Bo
     }
     
   dependencies {
-        compile 'boundless:BoundlessKit:4.0.5'
+        compile 'boundless:boundlesskit:4.0.7'
   	}
   ```
 
