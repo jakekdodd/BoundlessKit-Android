@@ -81,7 +81,13 @@ public class MainActivity extends AppCompatActivity {
                     default:
                         // Show nothing! This is called a neutral response,
                         // and builds up the good feelings for the next surprise!
-                        return;
+//                        return;
+
+
+                        // note: we are only showing a reward here to demo more rewards. In practice,
+                        // the UI should respond normally without any reward
+                        rewardSample = RewardSample.candybar;
+                        break;
                 }
 
                 // Show some reward and make them feel good!

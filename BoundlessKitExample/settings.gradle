@@ -1,1 +1,5 @@
-include ':app', ':boundlesskit'
+include ':app'
+
+
+include ':boundlesskit'
+project(':boundlesskit').projectDir = new File(settingsDir, '../boundlesskit')
