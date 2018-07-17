@@ -52,17 +52,17 @@ public class MainActivity extends AppCompatActivity {
     private View contentView;
     private ImageView logoView;
 
-    /*
-    An enum made for demonstartion of out-of-the-box rewards provided in BoundlessKit.
-    In your app, you could make an enum consisting of your reward decisions that were configured on the developer dashboard.
+    /**
+     * An enum used to demonstrate out-of-the-box rewards that are provided in BoundlessKit.
+     * In your app, you could make an enum consisting of your rewards that were configured on the developer dashboard.
      */
     enum RewardSample { shimmy, pulse, vibrate, rotate, sheen, emojisplosion, confetti, candybar}
     RewardSample rewardSample = RewardSample.confetti;
 
-    /*
-    Create a method like this in your app. It has 2 purposes
-    1) Request a reinforcement decision from BoundlessKit
-    2) Depending on the decision, show a reward
+    /**
+     * Create a method like this in your app. It has 2 purposes
+     *  1) Request a reinforcement decision from BoundlessKit
+     *  2) Depending on the decision, show a reward
      */
     private void reinforcementCall() {
         BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
@@ -97,9 +97,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*
-    This method is just for demonstration, and does not need to be in your app.
-    This method cycles through a few of the out-of-the-box rewards. Change the values inside the reinforcementCall() switch statement to sample the others.
+    /**
+     * This method is just for demonstration, and does not need to be in your app.
+     * This method cycles through a few of the out-of-the-box rewards. Change the values inside the reinforcementCall() switch statement to sample the others.
      */
     private void showReward() {
         switch (rewardSample) {
@@ -111,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
                 new ShimmyAnimator()
                         .setCount(3)
                         .setHorizontally(true)
-                        .animate(findViewById(R.id.list_title));
+                        .setTarget(findViewById(R.id.list_title))
+                        .start();
 
 
                 break;
@@ -122,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
                 //
                 new PulseAnimator()
                         .setCount(3)
-                        .animate(findViewById(R.id.list_title));
+                        .setTarget(findViewById(R.id.list_title))
+                        .start();
 
 
                 break;
@@ -133,7 +135,8 @@ public class MainActivity extends AppCompatActivity {
                 //
                 new VibrationAnimator()
                         .setScale(0.8f)
-                        .animate(logoView);
+                        .setTarget(logoView)
+                        .start();
 
 
                 break;
@@ -144,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
                 //
                 new RotationAnimator()
                         .setCount(2)
-                        .animate(findViewById(R.id.list_title));
+                        .setTarget(findViewById(R.id.list_title))
+                        .start();
 
 
                 break;
@@ -168,7 +172,8 @@ public class MainActivity extends AppCompatActivity {
                         .setyPosition(contentView.getMeasuredHeight())
                         .setScale(2f)
                         .setLifetime(4000)
-                        .animate(contentView);
+                        .setTarget(contentView)
+                        .start();
 
 
                 break;

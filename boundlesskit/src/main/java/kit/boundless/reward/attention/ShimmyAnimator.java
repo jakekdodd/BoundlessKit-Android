@@ -30,6 +30,12 @@ import android.view.View;
 
 import kit.boundless.reward.BaseViewAnimator;
 
+/**
+ * A shimmy animation changes a view's X or Y coordinate from [0, {@link #translation}, -{@link #translation}, 0] a number of times.
+ * To change the {@link #translation} value, use {@link #setTranslation(float)}.
+ * To change the orientation use {@link #setVertically(boolean)} or {@link #setHorizontally(boolean)}.
+ * To change initial animation direction, use a negative value for {@link #setTranslation(float)}.
+ */
 public class ShimmyAnimator extends BaseViewAnimator<ShimmyAnimator> {
 
     private int count = 2;
@@ -37,27 +43,42 @@ public class ShimmyAnimator extends BaseViewAnimator<ShimmyAnimator> {
     private float translation = 30;
     private boolean vertically = true;
 
+    /**
+     * Sets the number of shimmy translations.
+     * A single shimmy is a cycle where the view is moved from [0, {@link #translation}, -{@link #translation}, 0].
+     * @param count The number of shimmies. Default value is 2.
+     * @return The object used for Constructor Chaining
+     */
     public ShimmyAnimator setCount(int count) {
         this.count = count;
         return this;
     }
 
     /**
-     *
      * @param translation The number of points to move in a single direction.
      *                    To start animating in the opposite direction, pass a negative value.
-     * @return The animator for chaining
+     * @return The object used for Constructor Chaining
      */
     public ShimmyAnimator setTranslation(float translation) {
         this.translation = translation;
         return this;
     }
 
+    /**
+     * By default, {@link #vertically} is true.
+     * @param vertically If true, translation will occur along the Y-axis. If false, translation will occur along the X-axis.
+     * @return The object used for Constructor Chaining
+     */
     public ShimmyAnimator setVertically(boolean vertically) {
         this.vertically = vertically;
         return this;
     }
 
+    /**
+     * By default, {@link #vertically} is true.
+     * @param horizontally If true, translation will occur along the X-axis. If false, translation will occur along the Y-axis.
+     * @return The object used for Constructor Chaining
+     */
     public ShimmyAnimator setHorizontally(boolean horizontally) {
         return setVertically(!horizontally);
     }

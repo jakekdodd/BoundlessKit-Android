@@ -32,84 +32,98 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
 
     private AnimatorSet mAnimatorSet = new AnimatorSet();
 
-    public void animate(View target) {
-        setTarget(target);
-        start();
-    }
-
+    /**
+     * Sets the animation target. Once the target is set, use {@link #start()} to begin animation.
+     * @param target The parent view for animation.
+     * @return The object used for Constructor Chaining
+     */
     public abstract T setTarget(View target);
 
     /**
-     * start to animate
+     * Begins animation. If animation does not seem to start,
+     * make sure the target view is assigned using method {@link #setTarget(View)}.
      */
     public void start() {
         mAnimatorSet.start();
     }
 
-    public void restart() {
-        mAnimatorSet = mAnimatorSet.clone();
-        start();
-    }
-
     /**
-     * reset the view to default status
-     *
-     * @param target
+     * Returns the animator object if further customization is desired
+     * @return The animator set object
      */
-    public void reset(View target) {
-        target.setAlpha(1);
-        target.setScaleX(1);
-        target.setScaleY(1);
-        target.setTranslationX(0);
-        target.setTranslationY(0);
-        target.setRotation(0);
-        target.setRotationY(0);
-        target.setRotationX(0);
-    }
-
-
     public AnimatorSet getAnimator() {
         return mAnimatorSet;
     }
 
+    /**
+     * The animation duration
+     * @return How long, in milliseconds, the animation will take.
+     */
     public long getDuration() {
         return mAnimatorSet.getDuration();
     }
 
+    /**
+     * Set the animation duration.
+     * @param duration The time, in milliseconds, to complete animation.
+     * @return The object used for Constructor Chaining
+     */
     @SuppressWarnings("unchecked")
     public T setDuration(long duration) {
         mAnimatorSet.setDuration(duration);
         return (T)this;
     }
 
+    /**
+     * The time to begin animation after start() has been called.
+     * @return The delay time in milliseconds
+     */
     public long getStartDelay() {
         return mAnimatorSet.getStartDelay();
     }
 
+    /**
+     * Set the time to delay animation after start() has been called.
+     * @param delay The delay time in milliseconds
+     * @return The object used for Constructor Chaining
+     */
     @SuppressWarnings("unchecked")
     public T setStartDelay(long delay) {
         mAnimatorSet.setStartDelay(delay);
         return (T)this;
     }
 
-    public boolean isStarted() {
-        return mAnimatorSet.isStarted();
-    }
-
+    /**
+     * Returns true if the animation has been started and have not yet ended.
+     * Animations will not be started until after its initial delay, set through {@link #setStartDelay(long)}.
+     * @return Whether the animation has been started and not yet ended.
+     */
     public boolean isRunning() {
         return mAnimatorSet.isRunning();
     }
 
+    /**
+     * Cancels the animation causing the animation to stop in its tracks, sending an onAnimationCancel(Animator) to its listeners, followed by an onAnimationEnd(Animator) message.
+     * This method must be called on the thread that is running the animation.
+     */
     public void cancel() {
         mAnimatorSet.cancel();
     }
 
+    /**
+     * Adds a listener to the set of listeners that are sent events through the life of an animation, such as start, repeat, and end.
+     * @param listener The listener to be added to the current set of listeners for this animation.
+     * @return The object used for Constructor Chaining
+     */
     @SuppressWarnings("unchecked")
-    public T addListener(Animator.AnimatorListener l) {
-        mAnimatorSet.addListener(l);
+    public T addListener(Animator.AnimatorListener listener) {
+        mAnimatorSet.addListener(listener);
         return (T)this;
     }
 
+    /**
+     * Removes all listeners from this object.
+     */
     public void removeAllListener() {
         mAnimatorSet.removeAllListeners();
     }

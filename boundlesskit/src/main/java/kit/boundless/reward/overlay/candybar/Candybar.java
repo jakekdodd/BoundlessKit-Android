@@ -33,7 +33,11 @@ import java.lang.annotation.RetentionPolicy;
 
 import kit.boundless.R;
 
-
+/**
+ * Candybars provide lightweight reinforcement to users for an action. They show a brief message at the top or bottom of the screen. Candybars appear above all other elements on screen and only one can be displayed at a time.
+ * They automatically disappear after a timeout or after user taps on the candybar view.
+ * To be notified when a candybar has been shown or dismissed, you can provide a {@link Callback} via {@link #setCallback(Callback)}.
+ */
 public final class Candybar {
 
     public static final int DIRECTION_TOP = 0;
@@ -53,8 +57,8 @@ public final class Candybar {
 
     /**
      *
-     * @param view View to display Candybar on top of.
-     * @param direction Top or bottom of the screen (DIRECTION_TOP or DIRECTION_BOTTOM)
+     * @param view View to display Candybar on top of. Usually the activity's content view.
+     * @param direction Top or bottom of the screen ({@link #DIRECTION_TOP} or {@link #DIRECTION_TOP})
      * @param text Text copy for the body
      * @param duration Time, in milliseconds, to dismiss the Candybar after show() animation.
      */
