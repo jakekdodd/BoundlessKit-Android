@@ -1,5 +1,6 @@
 package kit.boundless.reward.overlay;
 
+import android.animation.Animator;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.ColorUtils;
@@ -44,12 +45,10 @@ public class Confetti extends BaseViewAnimator<Confetti> {
     }
 
     ParticleSystem burstParticleSystem;
-    boolean burstPhaseEnabled = true;
     ParticleSystem showerParticleSystem;
-    boolean showerPhaseEnabled = true;
     ParticleSystem blurredShowerParticleSystem;
-    boolean outOfFocusPhaseEnabled = true;
 
+    long mDuration;
     float xPositionStart = 0f;
     float xPositionEnd = 1f;
     float yPositionStart = -0.2f;
@@ -59,20 +58,15 @@ public class Confetti extends BaseViewAnimator<Confetti> {
     { setDuration(2000); }
     int ratePerSecond = 600;
 
-
-    public Confetti setBurstPhaseEnabled(boolean burstPhaseEnabled) {
-        this.burstPhaseEnabled = burstPhaseEnabled;
+    @Override
+    public Confetti setDuration(long duration) {
+        mDuration = duration;
         return this;
     }
 
-    public Confetti setShowerPhaseEnabled(boolean showerPhaseEnabled) {
-        this.showerPhaseEnabled = showerPhaseEnabled;
-        return this;
-    }
-
-    public Confetti setOutOfFocusPhaseEnabled(boolean outOfFocusPhaseEnabled) {
-        this.outOfFocusPhaseEnabled = outOfFocusPhaseEnabled;
-        return this;
+    @Override
+    public long getDuration() {
+        return mDuration;
     }
 
     public Confetti setyPositionEnd(float yPositionEnd) {
@@ -121,26 +115,31 @@ public class Confetti extends BaseViewAnimator<Confetti> {
     public Confetti setTarget(View target) {
         if (target instanceof ViewGroup) {
             this.target = (ViewGroup) target;
-            setBurst();
-            setShower();
-            setBlurredShower();
+            setBurstTarget();
+            setShowerTarget();
+            setBlurredShowerTarget();
         }
         return this;
     }
 
     @Override
     public void start() {
-        if (target == null || content.size() == 0) return;
+        if (getAnimator().isStarted() || target == null || content.size() == 0) return;
 
+        setBurstEmitter();
+        setShowerEmitter();
+        setBlurredShowerEmitter();
 
-        startBurst();
-        startShower();
-        startBlurredShower();
+        List<Animator> list = new ArrayList<>();
+        if (burstParticleSystem != null) list.add(burstParticleSystem.getAnimator());
+        if (showerParticleSystem!= null) list.add(showerParticleSystem.getAnimator());
+        if (blurredShowerParticleSystem != null) list.add(blurredShowerParticleSystem.getAnimator());
+        getAnimator().playTogether(list);
+
         super.start();
     }
 
-    private void setBurst() {
-        if (!burstPhaseEnabled) return;
+    private void setBurstTarget() {
         long lifetime = 5000;
         long lifetimeRange = 1000;
         float velocity = 0.2f;
@@ -176,10 +175,11 @@ public class Confetti extends BaseViewAnimator<Confetti> {
                 .setRandomParticleSelection(true)
         ;
     }
-    private void startBurst() {
-        if (!burstPhaseEnabled || burstParticleSystem == null || burstParticleSystem.isRunning())
+    private void setBurstEmitter() {
+        if (burstParticleSystem == null || burstParticleSystem.isRunning())
             return;
         long duration = 800;
+        burstParticleSystem.setManuallyStartAnimator(true);
         burstParticleSystem.emit(
                 (int)(xPositionStart * target.getWidth()),
                 (int)(xPositionEnd * target.getWidth()),
@@ -190,8 +190,7 @@ public class Confetti extends BaseViewAnimator<Confetti> {
         );
     }
 
-    private void setShower() {
-        if (!showerPhaseEnabled) return;
+    private void setShowerTarget() {
         long lifetime = 3000;
         long lifetimeRange = 1000;
         float velocity = 0.2f;
@@ -216,10 +215,11 @@ public class Confetti extends BaseViewAnimator<Confetti> {
                 .setStartDelay(800)
         ;
     }
-    private void startShower() {
-        if (!showerPhaseEnabled || showerParticleSystem == null || showerParticleSystem.isRunning())
+    private void setShowerEmitter() {
+        if (showerParticleSystem == null || showerParticleSystem.isRunning())
             return;
         long duration = Math.max(0, getDuration() - 800);
+        showerParticleSystem.setManuallyStartAnimator(true);
         showerParticleSystem.emit(
                 (int)(xPositionStart * target.getWidth()),
                 (int)(xPositionEnd * target.getWidth()),
@@ -230,8 +230,7 @@ public class Confetti extends BaseViewAnimator<Confetti> {
         );
     }
 
-    private void setBlurredShower() {
-        if (!outOfFocusPhaseEnabled) return;
+    private void setBlurredShowerTarget() {
         long lifetime = 3000;
         float velocity = 0.3f;
         float velocityRange = 0.15f;
@@ -263,10 +262,11 @@ public class Confetti extends BaseViewAnimator<Confetti> {
                 .setStartDelay(800)
         ;
     }
-    private void startBlurredShower() {
-        if (!outOfFocusPhaseEnabled || blurredShowerParticleSystem == null || blurredShowerParticleSystem.isRunning())
+    private void setBlurredShowerEmitter() {
+        if (blurredShowerParticleSystem == null || blurredShowerParticleSystem.isRunning())
             return;
         long duration = Math.max(0, getDuration() - 800);
+        blurredShowerParticleSystem.setManuallyStartAnimator(true);
         blurredShowerParticleSystem.emit(
                 (int)(xPositionStart * target.getWidth()),
                 (int)(xPositionEnd * target.getWidth()),

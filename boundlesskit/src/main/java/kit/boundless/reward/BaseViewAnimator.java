@@ -44,6 +44,7 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
      * make sure the target view is assigned using method {@link #setTarget(View)}.
      */
     public void start() {
+        if (mAnimatorSet.isStarted()) return;
         mAnimatorSet.start();
     }
 

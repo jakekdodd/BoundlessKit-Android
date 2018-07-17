@@ -25,6 +25,7 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private Drawable content;
     private ViewGroup target;
     { setDuration(3000); }
+    private long mDuration;
     private long lifetime = 2000;
     private long lifetimeRange = 1000;
     private long fadeIn = 500;
@@ -40,6 +41,17 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
     private float shootingAngleRange = 45f;
     private float rotationSpeed = 10f;
     private float rotationSpeedRange = 130f;
+
+    @Override
+    public Emojisplosion setDuration(long duration) {
+        mDuration = duration;
+        return this;
+    }
+
+    @Override
+    public long getDuration() {
+        return mDuration;
+    }
 
     public Emojisplosion setxPosition(int xPosition) {
         this.xPositionMin = xPosition;
@@ -176,8 +188,6 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
 
     @Override
     public void start() {
-        super.start();
-
         if (target != null && content != null) {
             particleSystem = new ParticleSystem(target, (int) (getDuration() * ratePerSecond), content, lifetime)
                     .addInitializer(new LifetimeInitializer(lifetimeRange))
@@ -188,7 +198,10 @@ public class Emojisplosion extends BaseViewAnimator<Emojisplosion> {
                     .setFadeOut(fadeOut)
                     .setRotationSpeed(rotationSpeed - 0.5f * rotationSpeedRange, rotationSpeed + 0.5f * rotationSpeedRange)
             ;
+            particleSystem.setManuallyStartAnimator(true);
             particleSystem.emit(xPositionMin, xPositionMax, yPositionMin, yPositionMax, ratePerSecond, (int) getDuration());
+            getAnimator().play(particleSystem.getAnimator());
         }
+        super.start();
     }
 }
