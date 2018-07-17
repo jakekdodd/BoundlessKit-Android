@@ -69,13 +69,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReinforcement(String reinforcement) {
                 switch (reinforcement) {
+                    case "thumbsUp":
+                        rewardSample = RewardSample.emojisplosion;
+                        break;
                     case "stars":
                         rewardSample = RewardSample.confetti;
                         break;
                     case "medalStar":
-                        rewardSample = RewardSample.emojisplosion;
-                        break;
-                    case "thumbsUp":
                         rewardSample = RewardSample.vibrate;
                         break;
                     default:

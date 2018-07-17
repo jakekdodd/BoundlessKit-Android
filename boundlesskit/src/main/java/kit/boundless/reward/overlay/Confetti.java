@@ -112,6 +112,12 @@ public class Confetti extends BaseViewAnimator<Confetti> {
         return this;
     }
 
+    /**
+     * Sets the animation target. Once the target is set, use {@link #start()} to begin animation.
+     * Note: This method may be intensive, so call it a few seconds before start() if possible.
+     * @param target The parent view for animation.
+     * @return The object used for Constructor Chaining
+     */
     public Confetti setTarget(View target) {
         if (target instanceof ViewGroup) {
             this.target = (ViewGroup) target;
