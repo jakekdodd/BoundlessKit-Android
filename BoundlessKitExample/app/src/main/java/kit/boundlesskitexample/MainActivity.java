@@ -30,18 +30,18 @@ import com.hudomju.swipe.adapter.ListViewAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import kit.boundless.reward.ConfettiAnimator;
 import kit.boundlesskitexample.db.TaskContract;
 import kit.boundlesskitexample.db.TaskDbHelper;
 import kit.boundless.BoundlessKit;
-import kit.boundless.reward.attention.PulseAnimator;
-import kit.boundless.reward.attention.RotationAnimator;
-import kit.boundless.reward.attention.ShimmyAnimator;
-import kit.boundless.reward.attention.VibrationAnimator;
-import kit.boundless.reward.overlay.Confetti;
-import kit.boundless.reward.overlay.Emojisplosion;
-import kit.boundless.reward.overlay.SheenView;
-import kit.boundless.reward.overlay.candybar.Candybar;
-import kit.boundless.reward.overlay.particle.ConfettoDrawable;
+import kit.boundless.reward.PulseAnimator;
+import kit.boundless.reward.RotationAnimator;
+import kit.boundless.reward.ShimmyAnimator;
+import kit.boundless.reward.VibrationAnimator;
+import kit.boundless.reward.EmojisplosionAnimator;
+import kit.boundless.reward.SheenView;
+import kit.boundless.reward.candybar.Candybar;
+import kit.boundless.reward.particle.ConfettoDrawable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 //
                 // get reference to view to animate over, set values, and animate()
                 //
-                new Emojisplosion()
+                new EmojisplosionAnimator()
                         .setContent(MainActivity.this, "\uD83D\uDE00\n")
                         .setxPosition(contentView.getWidth() / 2)
                         .setyPosition(contentView.getMeasuredHeight())
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    Confetti confetti;
+    ConfettiAnimator confetti;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // convenience function to create confetti demo. Done here to avoid lag on UI thread
-        confetti = new Confetti().addConfetti(
+        confetti = new ConfettiAnimator().addConfetti(
                 50,
                 50,
                 Arrays.asList(
