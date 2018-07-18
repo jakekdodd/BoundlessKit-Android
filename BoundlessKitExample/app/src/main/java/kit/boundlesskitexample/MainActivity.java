@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
      * In your app, you could make an enum consisting of your rewards that were configured on the developer dashboard.
      */
     enum RewardSample { shimmy, pulse, vibrate, rotate, sheen, emojisplosion, confetti, candybar}
-    RewardSample rewardSample = RewardSample.confetti;
+    RewardSample rewardSample = RewardSample.emojisplosion;
 
     /**
      * Create a method like this in your app. It has 2 purposes
@@ -167,12 +167,12 @@ public class MainActivity extends AppCompatActivity {
                 // get reference to view to animate over, set values, and animate()
                 //
                 new EmojisplosionAnimator()
-                        .setContent(MainActivity.this, "\uD83D\uDE00\n")
-                        .setxPosition(contentView.getWidth() / 2)
-                        .setyPosition(contentView.getMeasuredHeight())
-                        .setScale(2f)
-                        .setLifetime(4000)
                         .setTarget(contentView)
+                        .setxPosition(contentView.getWidth() / 2)
+                        .setyPosition(contentView.getMeasuredHeight() / 2)
+                        .setContent(MainActivity.this, "\uD83D\uDE00")
+                        .setScale(2f)
+                        .setVelocityRange(0.1f)
                         .start();
 
 
