@@ -14,9 +14,7 @@ import kit.boundless.reward.particle.initializers.XYAccelerationInitializer;
 import kit.boundless.reward.particle.modifiers.ScaleModifier;
 
 /**
- * An emoji animation that shoots or explodes emojis over a view.
- * Use
- *
+ * An emoji explosion animation that explodes or shoots emojis to delight and reinforce users.
  */
 public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimator> {
 
