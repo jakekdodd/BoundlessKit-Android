@@ -221,7 +221,7 @@ public class ParticleSystem {
 	 * @param timeToLive The time to live for the particles
 	 */
 	public ParticleSystem(Activity a, int maxParticles, int drawableRedId, long timeToLive) {
-		this(a, maxParticles, a.getResources().getDrawable(drawableRedId), timeToLive, android.R.id.content);
+		this(a, maxParticles, a.getDrawable(drawableRedId), timeToLive, android.R.id.content);
 	}
 
     /**
@@ -234,7 +234,7 @@ public class ParticleSystem {
      * @param parentViewId The view Id for the parent of the particle system
      */
     public ParticleSystem(Activity a, int maxParticles, int drawableRedId, long timeToLive, int parentViewId) {
-        this(a, maxParticles, a.getResources().getDrawable(drawableRedId), timeToLive, parentViewId);
+        this(a, maxParticles, a.getDrawable(drawableRedId), timeToLive, parentViewId);
     }
 
     /**
