@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                         .setyPosition(contentView.getMeasuredHeight() / 2)
                         .setContent(MainActivity.this, "\uD83D\uDE00")
                         .setScale(2f)
-                        .setVelocityRange(0.1f)
+                        .setVelocityRange(100f)
                         .start();
 
 
