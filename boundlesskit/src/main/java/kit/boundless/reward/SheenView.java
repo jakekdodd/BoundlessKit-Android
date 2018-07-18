@@ -20,6 +20,11 @@ import android.widget.RelativeLayout;
 
 import kit.boundless.R;
 
+/**
+ * Displays a shiny effect over a view.
+ * Place a SheenView in a RelativeLayout next to the view to sheen over (i.e. {@link kit.boundless.R.layout#sheen_layout_sample}).
+ * Custom attributes can be found at "kit.boundless.R.attr.SheenView".
+ */
 public class SheenView extends android.support.v7.widget.AppCompatImageView {
 
     public int framesPerSecond = 30;
@@ -34,8 +39,6 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
     private Bitmap mMask;
     private final Paint maskPaint;
     private final Paint imagePaint;
-
-
 
     public SheenView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -60,10 +63,16 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
         }
     }
 
+    /**
+     * @param viewId The sibling view to apply the sheen effect over.
+     */
     public void setAnimateOverViewId(int viewId) {
         animateOverViewId = viewId;
     }
 
+    /**
+     * Begins sheen animation.
+     */
     public void start() {
         long now = System.currentTimeMillis();
         if (now >= startTime + animationDuration && updateLayout() && updateMask()) {
