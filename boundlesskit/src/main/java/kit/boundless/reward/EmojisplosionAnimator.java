@@ -156,7 +156,7 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
 
     /**
      * Explode the screen with emoji particles!
-     * When set true, the number of emojis is determined by {@link #setRatePerSecond(int)}*{@link #setDuration(long)/1000}
+     * When set true, the number of emojis is determined by {@link #setRatePerSecond(int)} * {@link #setDuration(long)}/1000
      *
      * @param explosion If true shoots out all emojis at once, most similar to an explosion. If false, emojis are shot at {@link #ratePerSecond}.
      * @return The object used for Constructor Chaining

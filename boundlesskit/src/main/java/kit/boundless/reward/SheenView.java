@@ -22,7 +22,7 @@ import kit.boundless.R;
 
 /**
  * Displays a shiny effect over a view.
- * Place a SheenView in a RelativeLayout next to the view to sheen over (i.e. {@link kit.boundless.R.layout#sheen_layout_sample}).
+ * Place a SheenView in a RelativeLayout next to the view to sheen over (i.e. kit.boundless.R.layout#sheen_layout_sample).
  * Custom attributes can be found at "kit.boundless.R.attr.SheenView".
  */
 public class SheenView extends android.support.v7.widget.AppCompatImageView {
