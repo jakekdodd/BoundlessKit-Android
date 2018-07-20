@@ -30,18 +30,18 @@ import com.hudomju.swipe.adapter.ListViewAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import kit.boundless.reward.ConfettiAnimator;
 import kit.boundlesskitexample.db.TaskContract;
 import kit.boundlesskitexample.db.TaskDbHelper;
 import kit.boundless.BoundlessKit;
-import kit.boundless.reward.attention.PulseAnimator;
-import kit.boundless.reward.attention.RotationAnimator;
-import kit.boundless.reward.attention.ShimmyAnimator;
-import kit.boundless.reward.attention.VibrationAnimator;
-import kit.boundless.reward.overlay.Confetti;
-import kit.boundless.reward.overlay.Emojisplosion;
-import kit.boundless.reward.overlay.SheenView;
-import kit.boundless.reward.overlay.candybar.Candybar;
-import kit.boundless.reward.overlay.particle.ConfettoDrawable;
+import kit.boundless.reward.PulseAnimator;
+import kit.boundless.reward.RotationAnimator;
+import kit.boundless.reward.ShimmyAnimator;
+import kit.boundless.reward.VibrationAnimator;
+import kit.boundless.reward.EmojisplosionAnimator;
+import kit.boundless.reward.SheenView;
+import kit.boundless.reward.candybar.Candybar;
+import kit.boundless.reward.particle.ConfettoDrawable;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -52,36 +52,42 @@ public class MainActivity extends AppCompatActivity {
     private View contentView;
     private ImageView logoView;
 
-    /*
-    An enum made for demonstartion of out-of-the-box rewards provided in BoundlessKit.
-    In your app, you could make an enum consisting of your reward decisions that were configured on the developer dashboard.
+    /**
+     * An enum used to demonstrate out-of-the-box rewards that are provided in BoundlessKit.
+     * In your app, you could make an enum consisting of your rewards that were configured on the developer dashboard.
      */
     enum RewardSample { shimmy, pulse, vibrate, rotate, sheen, emojisplosion, confetti, candybar}
-    RewardSample rewardSample = RewardSample.confetti;
+    RewardSample rewardSample = RewardSample.emojisplosion;
 
-    /*
-    Create a method like this in your app. It has 2 purposes
-    1) Request a reinforcement decision from BoundlessKit
-    2) Depending on the decision, show a reward
+    /**
+     * Create a method like this in your app. It has 2 purposes
+     *  1) Request a reinforcement decision from BoundlessKit
+     *  2) Depending on the decision, show a reward
      */
     private void reinforcementCall() {
         BoundlessKit.reinforce(getApplicationContext(), "taskCompleted", null, new BoundlessKit.ReinforcementCallback() {
             @Override
             public void onReinforcement(String reinforcement) {
                 switch (reinforcement) {
+                    case "thumbsUp":
+                        rewardSample = RewardSample.emojisplosion;
+                        break;
                     case "stars":
                         rewardSample = RewardSample.confetti;
                         break;
                     case "medalStar":
-                        rewardSample = RewardSample.emojisplosion;
-                        break;
-                    case "thumbsUp":
                         rewardSample = RewardSample.vibrate;
                         break;
                     default:
                         // Show nothing! This is called a neutral response,
                         // and builds up the good feelings for the next surprise!
-                        return;
+//                        return;
+
+
+                        // note: we are only showing a reward here to demo more rewards. In practice,
+                        // the UI should respond normally without any reward
+                        rewardSample = RewardSample.candybar;
+                        break;
                 }
 
                 // Show some reward and make them feel good!
@@ -91,9 +97,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*
-    This method is just for demonstration, and does not need to be in your app.
-    This method cycles through a few of the out-of-the-box rewards. Change the values inside the reinforcementCall() switch statement to sample the others.
+    /**
+     * This method is just for demonstration, and does not need to be in your app.
+     * This method cycles through a few of the out-of-the-box rewards. Change the values inside the reinforcementCall() switch statement to sample the others.
      */
     private void showReward() {
         switch (rewardSample) {
@@ -105,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
                 new ShimmyAnimator()
                         .setCount(3)
                         .setHorizontally(true)
-                        .animate(findViewById(R.id.list_title));
+                        .setTarget(findViewById(R.id.list_title))
+                        .start();
 
 
                 break;
@@ -116,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
                 //
                 new PulseAnimator()
                         .setCount(3)
-                        .animate(findViewById(R.id.list_title));
+                        .setTarget(findViewById(R.id.list_title))
+                        .start();
 
 
                 break;
@@ -127,7 +135,8 @@ public class MainActivity extends AppCompatActivity {
                 //
                 new VibrationAnimator()
                         .setScale(0.8f)
-                        .animate(logoView);
+                        .setTarget(logoView)
+                        .start();
 
 
                 break;
@@ -138,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
                 //
                 new RotationAnimator()
                         .setCount(2)
-                        .animate(findViewById(R.id.list_title));
+                        .setTarget(findViewById(R.id.list_title))
+                        .start();
 
 
                 break;
@@ -156,13 +166,14 @@ public class MainActivity extends AppCompatActivity {
                 //
                 // get reference to view to animate over, set values, and animate()
                 //
-                new Emojisplosion()
-                        .setContent(MainActivity.this, "\uD83D\uDE00\n")
+                new EmojisplosionAnimator()
+                        .setTarget(contentView)
                         .setxPosition(contentView.getWidth() / 2)
-                        .setyPosition(contentView.getMeasuredHeight())
+                        .setyPosition(contentView.getMeasuredHeight() / 2)
+                        .setContent(MainActivity.this, "\uD83D\uDE00")
                         .setScale(2f)
-                        .setLifetime(4000)
-                        .animate(contentView);
+                        .setVelocityRange(100f)
+                        .start();
 
 
                 break;
@@ -192,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    Confetti confetti;
+    ConfettiAnimator confetti;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // convenience function to create confetti demo. Done here to avoid lag on UI thread
-        confetti = new Confetti().addConfetti(
+        confetti = new ConfettiAnimator().addConfetti(
                 50,
                 50,
                 Arrays.asList(
