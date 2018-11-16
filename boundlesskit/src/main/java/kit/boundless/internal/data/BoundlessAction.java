@@ -13,6 +13,7 @@ import java.util.TimeZone;
 public class BoundlessAction {
 
     public String actionID;
+    public @Nullable String cartridgeId = null;
     public @Nullable String reinforcementDecision = null;
     public @Nullable JSONObject metaData = null;
     public long utc;

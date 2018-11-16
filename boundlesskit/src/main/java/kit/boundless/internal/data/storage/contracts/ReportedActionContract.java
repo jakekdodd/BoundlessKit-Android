@@ -18,6 +18,7 @@ public final class ReportedActionContract implements BaseColumns {
 
     public static final String TABLE_NAME = "Reported_Actions";
     public static final String COLUMNS_NAME_ACTIONID = "actionID";
+    public static final String COLUMNS_NAME_CARTRIDGEID = "cartridgeId";
     public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementDecision";
     public static final String COLUMNS_NAME_METADATA = "metaData";
     public static final String COLUMNS_NAME_UTC = "utc";
@@ -26,6 +27,7 @@ public final class ReportedActionContract implements BaseColumns {
     public static final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
             + _ID + " INTEGER PRIMARY KEY,"
             + COLUMNS_NAME_ACTIONID + " TEXT,"
+            + COLUMNS_NAME_CARTRIDGEID + " TEXT,"
             + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT,"
             + COLUMNS_NAME_METADATA + " TEXT,"
             + COLUMNS_NAME_UTC + " INTEGER,"
@@ -36,14 +38,16 @@ public final class ReportedActionContract implements BaseColumns {
 
     public long id;
     public String actionID;
+    public String cartridgeId;
     public String reinforcementDecision;
     public @Nullable String metaData;
     public long utc;
     public long timezoneOffset;
 
-    public ReportedActionContract(long id, String actionID, String reinforcementDecision, @Nullable String metaData, long utc, long timezoneOffset) {
+    public ReportedActionContract(long id, String actionID, String cartridgeId, String reinforcementDecision, @Nullable String metaData, long utc, long timezoneOffset) {
         this.id = id;
         this.actionID = actionID;
+        this.cartridgeId = cartridgeId;
         this.reinforcementDecision = reinforcementDecision;
         this.metaData = metaData;
         this.utc = utc;
@@ -52,7 +56,13 @@ public final class ReportedActionContract implements BaseColumns {
 
     public static ReportedActionContract fromCursor(Cursor cursor) {
         return new ReportedActionContract(
-                cursor.getLong(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getLong(4), cursor.getLong(5)
+                cursor.getLong(0),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getString(3),
+                cursor.getString(4),
+                cursor.getLong(5),
+                cursor.getLong(6)
         );
     }
 

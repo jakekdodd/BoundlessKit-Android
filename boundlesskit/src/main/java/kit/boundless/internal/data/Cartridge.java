@@ -141,9 +141,9 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
      *
      * @param reinforcementDecision The decision to be stored
      */
-    public void store(String reinforcementDecision) {
+    public void store(String cartridgeId, String reinforcementDecision) {
         long rowId = SQLCartridgeDataHelper.insert(sqlDB, new ReinforcementDecisionContract(
-                0, actionID, reinforcementDecision
+                0, actionID, cartridgeId, reinforcementDecision
         ));
 //        BoundlessKit.debugLog("Cartridge", "Inserted "+reinforcementDecision+" into row "+rowId+" for action "+actionID);
     }

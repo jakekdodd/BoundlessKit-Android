@@ -139,7 +139,13 @@ class Report extends ContextWrapper implements Callable<Integer> {
     void store(BoundlessAction action) {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
-                0, action.actionID, action.reinforcementDecision, metaData, action.utc, action.timezoneOffset
+                0,
+                action.actionID,
+                action.cartridgeId,
+                action.reinforcementDecision,
+                metaData,
+                action.utc,
+                action.timezoneOffset
         ));
 //        BoundlessKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
     }
