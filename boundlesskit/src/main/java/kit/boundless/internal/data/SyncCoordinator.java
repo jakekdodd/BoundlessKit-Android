@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import kit.boundless.BoundlessKit;
+import kit.boundless.internal.api.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 8/4/16.
@@ -42,6 +43,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     public static SyncCoordinator getInstance(Context context) {
         if (sharedInstance == null) {
             sharedInstance = new SyncCoordinator(context);
+            BoundlessAPI.boot(context);
         }
         return sharedInstance;
     }

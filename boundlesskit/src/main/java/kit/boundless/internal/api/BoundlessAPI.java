@@ -2,7 +2,6 @@ package kit.boundless.internal.api;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -10,19 +9,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 import kit.boundless.BoundlessKit;
+import kit.boundless.internal.data.BoundlessCredentials;
+import kit.boundless.internal.data.Telemetry;
 import kit.boundless.internal.data.storage.contracts.BoundlessExceptionContract;
 import kit.boundless.internal.data.storage.contracts.ReportedActionContract;
 import kit.boundless.internal.data.storage.contracts.SyncOverviewContract;
 import kit.boundless.internal.data.storage.contracts.TrackedActionContract;
-import kit.boundless.internal.data.Telemetry;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -40,24 +37,24 @@ public class BoundlessAPI extends ContextWrapper {
 
     private Telemetry telemetry;
 
-    private final String APIURL = "https://api.usedopamine.com/v4/";
-
-    private final String clientSDKVersion = "4.0.5";
-    private final String clientOS = "Android";
-    private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
-
-    private JSONObject credentials = new JSONObject();
+    private BoundlessCredentials credentials;
 
     private enum CallType {
+        BOOT("app/boot"),
         TRACK("app/track"),
         REPORT("app/report"),
         REFRESH("app/refresh"),
         SYNC("telemetry/sync");
 
-        private final String pathExtension;
+        static final String pathBase = "https://reinforce.boundless.ai/v6/";
+        final String pathExtension;
 
         private CallType(final String value) {
             this.pathExtension = value;
+        }
+
+        String getPath() {
+            return pathBase + pathExtension;
         }
     }
 
@@ -73,71 +70,30 @@ public class BoundlessAPI extends ContextWrapper {
 
         telemetry = Telemetry.getSharedInstance(context);
 
-        // Basic configuration
-        try {
-            credentials.put("clientOS", clientOS);
-            credentials.put("clientOSVersion", clientOSVersion);
-            credentials.put("clientSDKVersion", clientSDKVersion);
-            credentials.put("primaryIdentity", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Telemetry.storeException(e);
-        }
-
         // Read credentials from ("res/raw/boundlessproperties.json")
         int credentialResourceID = context.getResources().getIdentifier("boundlessproperties", "raw", context.getPackageName());
-        if (credentialResourceID != 0) {
-            BoundlessKit.debugLog("BoundlessAPI", "Found boundlessproperties.json");
-        } else {
-            BoundlessKit.debugLog("BoundlessAPI", "Nonfatal Error - Could not find raw/boundlessproperties.json");
-            return;
-        }
-
-        String credentialsString;
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            InputStream inputStream = context.getResources().openRawResource(credentialResourceID);
-            for (int character = inputStream.read(); character != -1; character = inputStream.read()) {
-                byteArrayOutputStream.write(character);
-            }
-            credentialsString = byteArrayOutputStream.toString();
-            inputStream.close();
-            byteArrayOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            BoundlessKit.debugLog("BoundlessAPI", "Could not read read boundlessproperties.json");
-            Telemetry.storeException(e);
-            return;
-        }
-        setCredentials(credentialsString);
+        credentials = BoundlessCredentials.valueOf(context, credentialResourceID);
     }
 
     /**
-     * Extracts credentials from the given JSON. Credentials are obtained from dashboard.boundless.ai
+     * This method sends a Boot {@link CallType}.
      *
-     * @param context                   Context
-     * @param credentialsJSONString     A JSON formatted string
+     * @param
      */
-    public static void setCredentials(Context context, String credentialsJSONString) {
-        getInstance(context).setCredentials(credentialsJSONString);
-    }
-
-    public void setCredentials(String credentialsJSONString) {
+    public static
+    @Nullable
+    JSONObject boot(Context context) {
         try {
-            JSONObject credentialsJSON = new JSONObject(credentialsJSONString);
-            credentials.put("appID", credentialsJSON.getString("appID"));
-            credentials.put("versionID", credentialsJSON.getString("versionID"));
-            if (credentialsJSON.has("secret")) {
-                credentials.put("secret", credentialsJSON.getString("secret"));
-            } else if (credentialsJSON.has("productionSecret") ^ credentialsJSON.has("developmentSecret")) {
-                credentials.put("secret", credentialsJSON.optString("productionSecret", credentialsJSON.optString("developmentSecret")));
-            } else {
-                credentials.put("secret", credentialsJSON.getString(credentialsJSON.getBoolean("inProduction") ? "productionSecret" : "developmentSecret"));
-            }
+            JSONObject payload = new JSONObject();
+            payload.put("initialBoot", true);
+            payload.put("currentVersion", "001");
+            payload.put("currentConfig", "0");
+
+            return getInstance(context).send(CallType.BOOT, payload);
         } catch (JSONException e) {
             e.printStackTrace();
-            BoundlessKit.debugLog("BoundlessAPI", "Error - invalid credentials json");
             Telemetry.storeException(e);
+            return null;
         }
     }
 
@@ -252,17 +208,14 @@ public class BoundlessAPI extends ContextWrapper {
     @Nullable
     JSONObject send(final CallType type, JSONObject payload) {
 
-        String url = APIURL + type.pathExtension;
+        String url = type.getPath();
         String payloadString;
         try {
-            long utc = System.currentTimeMillis();
-            payload.put("utc", utc);
-            payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
-
-            Iterator<String> credentialsKeys = credentials.keys();
+            JSONObject credentialsJSON = credentials.asJSONObject();
+            Iterator<String> credentialsKeys = credentialsJSON.keys();
             while (credentialsKeys.hasNext()) {
                 String key = credentialsKeys.next();
-                payload.put(key, credentials.get(key));
+                payload.put(key, credentialsJSON.get(key));
             }
 
             payloadString = payload.toString(2);
