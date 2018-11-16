@@ -112,7 +112,7 @@ public class BoundlessAPI extends ContextWrapper {
             for (int i = 0; i < actions.size(); i++) {
                 trackedActions.put(actions.get(i).toJSON());
             }
-            payload.put("actions", trackedActions);
+            payload.put("tracks", trackedActions);
 
             return getInstance(context).send(CallType.TRACK, payload);
         } catch (JSONException e) {
