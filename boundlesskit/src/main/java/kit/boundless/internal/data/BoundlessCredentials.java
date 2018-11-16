@@ -23,6 +23,7 @@ public class BoundlessCredentials {
     final String clientSDKVersion = "4.1.0";
 
     final String appId;
+    final String versionId;
     boolean inProduction;
     final String developmentSecret;
     final String productionSecret;
@@ -31,8 +32,9 @@ public class BoundlessCredentials {
     }
     String primaryIdentity;
 
-    public BoundlessCredentials(Context context, String appId, boolean inProduction, String developmentSecret, String productionSecret) {
+    public BoundlessCredentials(Context context, String appId, String versionId, boolean inProduction, String developmentSecret, String productionSecret) {
         this.appId = appId;
+        this.versionId = versionId;
         this.inProduction = inProduction;
         this.developmentSecret = developmentSecret;
         this.productionSecret = productionSecret;
@@ -57,6 +59,7 @@ public class BoundlessCredentials {
         jsonObject.put("clientSDKVersion", clientSDKVersion);
 
         jsonObject.put("appId", appId);
+        jsonObject.put("versionId", versionId);
         jsonObject.put("inProduction", inProduction);
         jsonObject.put("secret", inProduction ? productionSecret : developmentSecret);
         jsonObject.put("primaryIdentity", primaryIdentity);
@@ -82,7 +85,8 @@ public class BoundlessCredentials {
             boolean inProduction = jsonObject.getBoolean("inProduction");
             String developmentSecret = jsonObject.getString("developmentSecret");
             String productionSecret = jsonObject.getString("productionSecret");
-            return new BoundlessCredentials(context, appId, inProduction, developmentSecret, productionSecret);
+            String versionId = jsonObject.getString("versionID");
+            return new BoundlessCredentials(context, appId, versionId, inProduction, developmentSecret, productionSecret);
         } catch (JSONException e) {
             e.printStackTrace();
             BoundlessKit.debugLog("BoundlessCredentials", "Error - invalid JSON string for credentials");

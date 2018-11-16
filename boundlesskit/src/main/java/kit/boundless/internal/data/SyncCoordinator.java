@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.api.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 8/4/16.
@@ -25,6 +24,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     private static SyncCoordinator sharedInstance;
 
     private Telemetry telemetry;
+    private Boot boot;
     private Track track;
     private Report report;
     private HashMap<String, Cartridge> cartridges;
@@ -43,7 +43,6 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     public static SyncCoordinator getInstance(Context context) {
         if (sharedInstance == null) {
             sharedInstance = new SyncCoordinator(context);
-            BoundlessAPI.boot(context);
         }
         return sharedInstance;
     }
@@ -52,6 +51,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         super(base);
 
         telemetry = Telemetry.getSharedInstance(base);
+        boot = Boot.getSharedInstance(base);
         track = Track.getSharedInstance(base);
         report = Report.getSharedInstance(base);
         cartridges = new HashMap<>();
@@ -134,40 +134,65 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 break;
                             }
                         }
+                        boolean bootShouldSync = !boot.didSync;
                         boolean reportShouldSync = (someCartridgeToSync != null) || report.isTriggered();
                         boolean trackShouldSync = reportShouldSync || track.isTriggered();
 
-                        if (trackShouldSync) {
-                            String syncCause;
+                        if (bootShouldSync || trackShouldSync) {
+                            String syncCause = bootShouldSync ? "Will send boot call.\n" : "";
                             if (someCartridgeToSync != null) {
-                                syncCause = "Cartridge " + someCartridgeToSync.actionID + " needs to sync.";
+                                syncCause += "Cartridge " + someCartridgeToSync.actionID + " needs to sync.";
                             } else if (reportShouldSync) {
-                                syncCause = "Report needs to sync.";
-                            } else {
-                                syncCause = "Track needs to sync.";
+                                syncCause += "Report needs to sync.";
+                            } else if (trackShouldSync) {
+                                syncCause += "Track needs to sync.";
                             }
+                            BoundlessKit.debugLog("SyncCoordinator", "Sync cause:" + syncCause);
 
                             Future<Integer> apiCall;
                             Integer apiResponse;
                             telemetry.startRecordingSync(syncCause, track, report, cartridges);
 
-                            // Track syncing
-                            //
-                            apiCall = syncerExecutor.submit(track);
-                            if (BoundlessKit.debugMode) {
-                                while (!apiCall.isDone()) {
-                                    BoundlessKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
-                                    Thread.sleep(200);
+                            // Boot syncing
+                            if (bootShouldSync) {
+                                apiCall = syncerExecutor.submit(boot);
+                                if (BoundlessKit.debugMode) {
+                                    while (!apiCall.isDone()) {
+                                        BoundlessKit.debugLog("SyncCoordinator", "Waiting for boot syncer to be done...");
+                                        Thread.sleep(200);
+                                    }
+                                }
+                                apiResponse = apiCall.get();
+                                if (apiResponse == 200) {
+                                    BoundlessKit.debugLog("Boot", "Boot Syncer is done!");
+                                    Thread.sleep(1000);
+                                } else if (apiResponse < 0) {
+                                    BoundlessKit.debugLog("SyncCoordinator", "Boot failed during sync cycle. Halting sync cycle early.");
+                                    telemetry.stopRecordingSync(false);
+                                    return null;
                                 }
                             }
-                            apiResponse = apiCall.get();
-                            if (apiResponse == 200) {
-                                BoundlessKit.debugLog("SyncCoordinator", "Track Syncer is done!");
-                                Thread.sleep(1000);
-                            } else if (apiResponse < 0) {
-                                BoundlessKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
-                                telemetry.stopRecordingSync(false);
-                                return null;
+
+
+                            // Track syncing
+                            //
+                            if (trackShouldSync) {
+                                apiCall = syncerExecutor.submit(track);
+                                if (BoundlessKit.debugMode) {
+                                    while (!apiCall.isDone()) {
+                                        BoundlessKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
+                                        Thread.sleep(200);
+                                    }
+                                }
+                                apiResponse = apiCall.get();
+                                if (apiResponse == 200) {
+                                    BoundlessKit.debugLog("SyncCoordinator", "Track Syncer is done!");
+                                    Thread.sleep(1000);
+                                } else if (apiResponse < 0) {
+                                    BoundlessKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
+                                    telemetry.stopRecordingSync(false);
+                                    return null;
+                                }
                             }
 
                             // Report syncing
