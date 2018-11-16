@@ -153,7 +153,7 @@ public class BoundlessAPI extends ContextWrapper {
         try {
             JSONObject payload = new JSONObject();
 
-            payload.put("actionID", actionID);
+            payload.put("actionName", actionID);
 
             return getInstance(context).send(CallType.REFRESH, payload);
         } catch (JSONException e) {
@@ -249,7 +249,7 @@ public class BoundlessAPI extends ContextWrapper {
                     break;
 
                 case REFRESH:
-                    String actionID = payload.optString("actionID");
+                    String actionID = payload.optString("actionName");
                     telemetry.setResponseForCartridgeSync(actionID, -1, e.getMessage(), startTime);
                     break;
 
@@ -282,7 +282,7 @@ public class BoundlessAPI extends ContextWrapper {
                 break;
 
             case REFRESH:
-                String actionID = payload.optString("actionID");
+                String actionID = payload.optString("actionName");
                 telemetry.setResponseForCartridgeSync(actionID, status, errorsString, startTime);
                 break;
 

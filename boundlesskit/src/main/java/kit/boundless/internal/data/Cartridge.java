@@ -30,7 +30,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
         return "boundless.boundlesskit.synchronization.cartridge." + actionID;
     }
 
-    private static final String actionIDKey = "actionID";
+    private static final String actionIDKey = "actionName";
     private static final String sizeKey = "size";
     private static final String capacityToSyncKey = "capacityToSync";
     private static final String initialSizeKey = "initialSize";
@@ -184,22 +184,25 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
 
                         JSONObject apiResponse = BoundlessAPI.refresh(this, actionID);
                         if (apiResponse != null) {
-                            int statusCode = apiResponse.optInt("status", -2);
-                            if (statusCode == 200) {
-                                BoundlessKit.debugLog("Cartridge", "Replacing cartridge for " + actionID + "...");
-
-                                JSONArray reinforcementCartridge = apiResponse.getJSONArray("reinforcementCartridge");
-                                long expiresIn = apiResponse.getLong("expiresIn");
-
-                                SQLCartridgeDataHelper.deleteAllFor(sqlDB, actionID);
-                                for (int i = 0; i < reinforcementCartridge.length(); i++) {
-                                    store(reinforcementCartridge.getString(i));
-                                }
-                                updateTriggers(reinforcementCartridge.length(), System.currentTimeMillis(), expiresIn);
+                            String error = apiResponse.optString("error");
+                            if (!error.isEmpty()) {
+                                BoundlessKit.debugLog("Cartridge", "Got error:" + error);
+                                return -1;
                             }
-                            return statusCode;
+
+                            BoundlessKit.debugLog("Cartridge", "Replacing cartridge for " + actionID + "...");
+                            JSONArray reinforcementCartridge = apiResponse.getJSONArray("reinforcements");
+                            long expiresIn = apiResponse.getLong("ttl");
+                            String  cartridgeId = apiResponse.getString("cartridgeId");
+
+                            SQLCartridgeDataHelper.deleteAllFor(sqlDB, actionID);
+                            for (int i = 0; i < reinforcementCartridge.length(); i++) {
+                                store(cartridgeId, reinforcementCartridge.getJSONObject(i).getString("reinforcementName"));
+                            }
+                            updateTriggers(reinforcementCartridge.length(), System.currentTimeMillis(), expiresIn);
+                            return 200;
                         } else {
-                            BoundlessKit.debugLog("ReportSyncer", "Something went wrong making the call...");
+                            BoundlessKit.debugLog("Cartridge", "Something went wrong making the call...");
                             return -1;
                         }
                     } finally {
