@@ -52,7 +52,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
         super(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
         preferences = getSharedPreferences(preferencesName, 0);
-        sizeToSync = preferences.getInt(sizeToSyncKey, 15);
+        sizeToSync = preferences.getInt(sizeToSyncKey, 20);
         timerStartsAt = preferences.getLong(timerStartsAtKey, System.currentTimeMillis());
         timerExpiresIn = preferences.getLong(timerExpiresInKey, 172800000);
     }
@@ -178,14 +178,18 @@ class Report extends ContextWrapper implements Callable<Integer> {
                             BoundlessKit.debugLog("ReportSyncer", sqlActions.size() + " reported actions to be synced.");
                             JSONObject apiResponse = BoundlessAPI.report(this, sqlActions);
                             if (apiResponse != null) {
-                                int statusCode = apiResponse.optInt("status", -2);
-                                if (statusCode == 200) {
-                                    for (int i = 0; i < sqlActions.size(); i++) {
-                                        remove(sqlActions.get(i));
-                                    }
-                                    updateTriggers(null, System.currentTimeMillis(), null);
+                                String error = apiResponse.optString("error");
+                                if (!error.isEmpty()) {
+                                    BoundlessKit.debugLog("ReportSyncer", "Got error:" + error);
+                                    return -1;
                                 }
-                                return statusCode;
+
+                                for (int i = 0; i < sqlActions.size(); i++) {
+                                    remove(sqlActions.get(i));
+                                }
+
+                                updateTriggers(null, System.currentTimeMillis(), null);
+                                return 200;
                             } else {
                                 BoundlessKit.debugLog("ReportSyncer", "Something went wrong making the call...");
                                 return -1;

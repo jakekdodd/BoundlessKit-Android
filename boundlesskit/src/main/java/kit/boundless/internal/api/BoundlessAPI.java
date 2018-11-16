@@ -132,12 +132,7 @@ public class BoundlessAPI extends ContextWrapper {
     JSONObject report(Context context, ArrayList<ReportedActionContract> actions) {
         try {
             JSONObject payload = new JSONObject();
-
-            JSONArray reportedActions = new JSONArray();
-            for (int i = 0; i < actions.size(); i++) {
-                reportedActions.put(actions.get(i).toJSON());
-            }
-            payload.put("actions", reportedActions);
+            payload.put("reports", ReportedActionContract.valuesToJSON(actions));
 
             return getInstance(context).send(CallType.REPORT, payload);
         } catch (JSONException e) {

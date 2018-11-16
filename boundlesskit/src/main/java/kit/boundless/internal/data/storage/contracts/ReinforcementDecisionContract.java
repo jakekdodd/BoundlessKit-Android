@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
 public final class ReinforcementDecisionContract implements BaseColumns {
 
     public static final String TABLE_NAME = "Reinforcement_Decisions";
-    public static final String COLUMNS_NAME_ACTIONID = "actionID";
+    public static final String COLUMNS_NAME_ACTIONID = "actionName";
     public static final String COLUMNS_NAME_REINFORCEMENTCARTRIDGEID = "cartridgeId";
     public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementDecision";
 

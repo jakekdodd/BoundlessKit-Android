@@ -26,7 +26,7 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
 
     public static long insert(SQLiteDatabase db, ReportedActionContract item) {
         ContentValues values = new ContentValues();
-        values.put(ReportedActionContract.COLUMNS_NAME_ACTIONID, item.actionID);
+        values.put(ReportedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionID);
         values.put(ReportedActionContract.COLUMNS_NAME_CARTRIDGEID, item.cartridgeId);
         values.put(ReportedActionContract.COLUMNS_NAME_REINFORCEMENTDECISION, item.reinforcementDecision);
         values.put(ReportedActionContract.COLUMNS_NAME_METADATA, item.metaData);
