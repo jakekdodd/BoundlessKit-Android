@@ -135,20 +135,21 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
      * @param successfulSync Whether a successful sync was made with the BoundlessAPI
      */
     public void stopRecordingSync(boolean successfulSync) {
-        synchronized (syncOverviewLock) {
-            if (currentSyncOverview != null) {
-                currentSyncOverview.finish();
-                currentSyncOverview.store(this);
-                currentSyncOverview = null;
-                BoundlessKit.debugLog("Telemetry", "Saved a sync overview, totalling " + SQLSyncOverviewDataHelper.count(sqlDB) + " overviews");
-            } else {
-                BoundlessKit.debugLog("Telemetry", "No recording has started. Did you remember to execute startRecordingSync() at the beginning of the sync performance?");
-            }
-        }
-
-        if (successfulSync) {
-            syncerExecutor.submit(this);
-        }
+        // endpoint no longer exists?
+//        synchronized (syncOverviewLock) {
+//            if (currentSyncOverview != null) {
+//                currentSyncOverview.finish();
+//                currentSyncOverview.store(this);
+//                currentSyncOverview = null;
+//                BoundlessKit.debugLog("Telemetry", "Saved a sync overview, totalling " + SQLSyncOverviewDataHelper.count(sqlDB) + " overviews");
+//            } else {
+//                BoundlessKit.debugLog("Telemetry", "No recording has started. Did you remember to execute startRecordingSync() at the beginning of the sync performance?");
+//            }
+//        }
+//
+//        if (successfulSync) {
+//            syncerExecutor.submit(this);
+//        }
     }
 
     @Override
