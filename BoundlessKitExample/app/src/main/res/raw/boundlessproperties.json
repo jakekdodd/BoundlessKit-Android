@@ -1,7 +1,7 @@
 {
-  "appID":"570ffc491b4c6e9869482fbf",
-  "developmentSecret": "d388c7074d8a283bff1f01eb932c1c9e6bec3b10",
-  "productionSecret": "20af24a85fa00938a5247709fed395c31c89b142",
-  "inProduction": false,
-  "versionID": "testing"
+  "appID":"5bedfa774110320100e95923",
+  "developmentSecret":"820efd01b135573962bbbb6a8bcbee7cbcd0551f",
+  "productionSecret":"05a48c5002219750ef15a713c87559ba00367823",
+  "inProduction":false,
+  "versionID":"001"
 }
