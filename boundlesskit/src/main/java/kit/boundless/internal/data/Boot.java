@@ -27,10 +27,14 @@ class Boot extends ContextWrapper implements Callable<Integer> {
 
     private static final String initialBootKey = "initialBoot";
     private static final String configIdKey = "configId";
+    private static final String reinforcementEnabledKey = "reinforcementEnabled";
+    private static final String trackingEnabledKey = "trackingEnabled";
 
     public boolean didSync;
     public boolean initialBoot;
     public String configId;
+    public boolean  reinforcementEnabled;
+    public boolean trackingEnabled;
 
     private final Object apiSyncLock = new Object();
     private Boolean syncInProgress = false;
@@ -50,12 +54,16 @@ class Boot extends ContextWrapper implements Callable<Integer> {
         preferences = getSharedPreferences(preferencesName(), 0);
         initialBoot = preferences.getBoolean(initialBootKey, true);
         configId = preferences.getString(configIdKey, "0");
+        reinforcementEnabled = preferences.getBoolean(reinforcementEnabledKey, true);
+        trackingEnabled = preferences.getBoolean(trackingEnabledKey, true);
     }
 
     void update() {
         preferences.edit()
                 .putBoolean(initialBootKey, initialBoot)
                 .putString(configIdKey, configId)
+                .putBoolean(reinforcementEnabledKey, reinforcementEnabled)
+                .putBoolean(trackingEnabledKey, trackingEnabled)
                 .apply();
     }
 
@@ -69,6 +77,8 @@ class Boot extends ContextWrapper implements Callable<Integer> {
         try {
             json.put(initialBootKey, initialBoot);
             json.put(configIdKey, configId);
+            json.put(reinforcementEnabledKey, reinforcementEnabled);
+            json.put(trackingEnabledKey, trackingEnabled);
         } catch (JSONException e) {
             e.printStackTrace();
             Telemetry.storeException(e);
@@ -106,6 +116,8 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                                 JSONObject configJSON = apiResponse.optJSONObject("config");
                                 if (configJSON != null) {
                                     configId = configJSON.getString("configID");
+                                    reinforcementEnabled = configJSON.getBoolean("reinforcementEnabled");
+                                    trackingEnabled = configJSON.getBoolean("trackingEnabled");
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();

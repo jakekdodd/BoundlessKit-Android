@@ -72,8 +72,12 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      * @param action A tracked action
      */
     public void storeTrackedAction(BoundlessAction action) {
-        track.store(action);
-        performSync();
+        if (boot.trackingEnabled) {
+            track.store(action);
+            performSync();
+            return;
+        }
+        BoundlessKit.debugLog("SyncCoordinator", "Tracking disabled");
     }
 
     /**
@@ -82,8 +86,12 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      * @param action A reinforced action
      */
     public void storeReportedAction(BoundlessAction action) {
-        report.store(action);
-        performSync();
+        if (boot.reinforcementEnabled) {
+            report.store(action);
+            performSync();
+            return;
+        }
+        BoundlessKit.debugLog("SyncCoordinator", "Reinforcements disabled");
     }
 
     /**
@@ -94,14 +102,18 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      * @return A reinforcement decision
      */
     public String removeReinforcementDecisionFor(Context context, String actionID) {
-        Cartridge cartridge = cartridges.get(actionID);
-        if (cartridge == null) {
-            cartridge = new Cartridge(this, actionID);
-            cartridges.put(actionID, cartridge);
-            preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
-            BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionID + " for the first time!");
+        if (boot.reinforcementEnabled) {
+            Cartridge cartridge = cartridges.get(actionID);
+            if (cartridge == null) {
+                cartridge = new Cartridge(this, actionID);
+                cartridges.put(actionID, cartridge);
+                preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
+                BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionID + " for the first time!");
+            }
+            return cartridge.remove();
         }
-        return cartridge.remove();
+        BoundlessKit.debugLog("SyncCoordinator", "Reinforcements disabled");
+        return BoundlessAction.NEUTRAL_DECISION;
     }
 
     /**

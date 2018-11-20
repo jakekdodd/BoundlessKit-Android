@@ -12,6 +12,8 @@ import java.util.TimeZone;
 
 public class BoundlessAction {
 
+    final static String NEUTRAL_DECISION = "neutralResponse";
+
     public String actionID;
     public @Nullable String cartridgeId = null;
     public @Nullable String reinforcementDecision = null;

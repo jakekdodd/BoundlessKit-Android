@@ -154,7 +154,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
      * @return A reinforcement decision for a user's action
      */
     public String remove() {
-        String reinforcementDecision = "neutralResponse";
+        String reinforcementDecision = BoundlessAction.NEUTRAL_DECISION;
 
         if (isFresh()) {
             ReinforcementDecisionContract rdc = SQLCartridgeDataHelper.findFirstFor(sqlDB, actionID);
