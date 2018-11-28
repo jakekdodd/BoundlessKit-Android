@@ -17,7 +17,7 @@
         android:id="@+id/sheen"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        boundless:animationDuration="1000"
+        boundless:animationDuration="3200"
         boundless:animateRightToLeft="false"
         boundless:imageHorizontalFlip="false" />
 
