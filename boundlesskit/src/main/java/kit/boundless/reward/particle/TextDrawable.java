@@ -49,7 +49,7 @@ public class TextDrawable extends Drawable {
     @Override
     public void draw(@NonNull Canvas canvas) {
         Rect bounds = getBounds();
-        canvas.drawText(text, 0, text.length(), bounds.left, bounds.bottom, paint);
+        canvas.drawText(text, 0, text.length(), bounds.left, (int) (bounds.bottom * 0.8), paint);
     }
     @Override
     public int getOpacity() {
