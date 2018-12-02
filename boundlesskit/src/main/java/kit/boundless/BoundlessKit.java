@@ -94,7 +94,7 @@ public class BoundlessKit extends ContextWrapper {
 
     public static void debugLog(String tag, String msg) {
         if (debugMode) {
-            Log.v(tag, msg);
+            Log.v("BoundlessKit", tag + ":" + msg);
         }
     }
 }
