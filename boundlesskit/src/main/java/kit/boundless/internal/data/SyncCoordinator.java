@@ -66,6 +66,13 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         BoundlessKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
     }
 
+    public void mapExternalId(String externalId) {
+        BoundlessKit.debugLog("SyncCoordinator","Mapping externalID:" + externalId + "...");
+        boot.externalId = externalId;
+        boot.didSync = false;
+        performSync();
+    }
+
     /**
      * Stores a tracked action to be synced.
      *
