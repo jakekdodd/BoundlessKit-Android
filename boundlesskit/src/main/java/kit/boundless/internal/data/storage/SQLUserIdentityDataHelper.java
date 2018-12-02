@@ -47,7 +47,6 @@ public class SQLUserIdentityDataHelper extends SQLDataHelper {
             if (cursor.moveToFirst()) {
                 result = UserIdentityContract.fromCursor(cursor);
             }
-            BoundlessKit.debugLog("SQLUserIdentityDataHelper", "Found rows:" + cursor.getCount());
         } finally {
             if (cursor != null) { cursor.close(); }
         }
