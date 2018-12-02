@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class SQLiteDataStore extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "boundless.boundlesskit.sqlite";
 
     private static SQLiteDataStore sharedInstance = null;
@@ -32,6 +32,7 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
         SQLCartridgeDataHelper.createTable(db);
         SQLSyncOverviewDataHelper.createTable(db);
         SQLBoundlessExceptionDataHelper.createTable(db);
+        SQLUserIdentityDataHelper.createTable(db);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -40,6 +41,7 @@ public class SQLiteDataStore extends SQLiteOpenHelper {
         SQLCartridgeDataHelper.dropTable(db);
         SQLSyncOverviewDataHelper.dropTable(db);
         SQLBoundlessExceptionDataHelper.dropTable(db);
+        SQLUserIdentityDataHelper.dropTable(db);
         onCreate(db);
     }
 

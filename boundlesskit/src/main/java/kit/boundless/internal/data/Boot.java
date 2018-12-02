@@ -13,9 +13,9 @@ import java.util.concurrent.Callable;
 
 import kit.boundless.BoundlessKit;
 import kit.boundless.internal.api.BoundlessAPI;
-import kit.boundless.internal.data.storage.SQLAppStateDataHelper;
+import kit.boundless.internal.data.storage.SQLUserIdentityDataHelper;
 import kit.boundless.internal.data.storage.SQLiteDataStore;
-import kit.boundless.internal.data.storage.contracts.AppStateContract;
+import kit.boundless.internal.data.storage.contracts.UserIdentityContract;
 
 class Boot extends ContextWrapper implements Callable<Integer> {
 
@@ -63,6 +63,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
         configId = preferences.getString(configIdKey, "0");
         reinforcementEnabled = preferences.getBoolean(reinforcementEnabledKey, true);
         trackingEnabled = preferences.getBoolean(trackingEnabledKey, true);
+        externalId = Settings.Secure.getString(base.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     void update() {
@@ -75,24 +76,25 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                 .apply();
     }
 
-    /**
-     * This function returns a snapshot of this instance as a JSONObject.
-     *
-     * @return A JSONObject containing the size and sync triggers
-     */
-    public JSONObject valueToJSON() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put(initialBootKey, initialBoot);
-            json.put(configIdKey, configId);
-            json.put(reinforcementEnabledKey, reinforcementEnabled);
-            json.put(trackingEnabledKey, trackingEnabled);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Telemetry.storeException(e);
-        }
-        return json;
-    }
+//    /**
+//     * This function returns a snapshot of this instance as a JSONObject.
+//     *
+//     * @return A JSONObject containing the size and sync triggers
+//     */
+//    public JSONObject valueToJSON() {
+//        JSONObject json = new JSONObject();
+//        try {
+//            json.put(initialBootKey, initialBoot);
+//            json.put(versionIdKey, versionId);
+//            json.put(configIdKey, configId);
+//            json.put(reinforcementEnabledKey, reinforcementEnabled);
+//            json.put(trackingEnabledKey, trackingEnabled);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            Telemetry.storeException(e);
+//        }
+//        return json;
+//    }
 
     @Override
     public Integer call() throws Exception {
@@ -114,7 +116,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                                 initialBoot,
                                 versionId,
                                 configId,
-                                SQLAppStateDataHelper.getUserInternalId(sqlDB),
+                                SQLUserIdentityDataHelper.getInternalId(sqlDB),
                                 externalId);
                         if (apiResponse != null) {
                             String error = apiResponse.optString("error");
@@ -140,9 +142,9 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                                 }
 
                                 String internalId = apiResponse.optString("internalId");
-                                if (internalId != null && !internalId.equals(SQLAppStateDataHelper.getUserInternalId(sqlDB))) {
-                                    SQLAppStateDataHelper.delete(sqlDB);
-                                    SQLAppStateDataHelper.insert(sqlDB, new AppStateContract(
+                                if (internalId != null && !internalId.equals(SQLUserIdentityDataHelper.getInternalId(sqlDB))) {
+                                    SQLUserIdentityDataHelper.delete(sqlDB);
+                                    SQLUserIdentityDataHelper.insert(sqlDB, new UserIdentityContract(
                                             0,
                                             internalId
                                     ));
