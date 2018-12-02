@@ -81,6 +81,10 @@ public class BoundlessKit extends ContextWrapper {
     }
 
     public static boolean debugMode = false;
+    public static void mapExternalUserId(final Context context, final String externalUserId) {
+        getInstance(context).syncCoordinator.mapExternalId(externalUserId);
+    }
+
     /**
      * By default debug mode is set to `false`.
      * When debug mode is enabled, the data sent to and received from

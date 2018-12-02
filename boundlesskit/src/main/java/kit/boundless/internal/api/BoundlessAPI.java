@@ -82,12 +82,14 @@ public class BoundlessAPI extends ContextWrapper {
      */
     public static
     @Nullable
-    JSONObject boot(Context context) {
+    JSONObject boot(Context context, boolean initialBoot, String currentVersion, String currentConfig, @Nullable String internalId, @Nullable String externalId) {
         try {
             JSONObject payload = new JSONObject();
-            payload.put("initialBoot", true);
-            payload.put("currentVersion", "001");
-            payload.put("currentConfig", "0");
+            payload.put("initialBoot", initialBoot);
+            payload.put("currentVersion", currentVersion);
+            payload.put("currentConfig", currentConfig);
+            payload.put("internalId", internalId);
+            payload.put("externalId", externalId);
 
             return getInstance(context).send(CallType.BOOT, payload);
         } catch (JSONException e) {
