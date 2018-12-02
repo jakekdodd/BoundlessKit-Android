@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.Settings;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +13,9 @@ import java.util.concurrent.Callable;
 
 import kit.boundless.BoundlessKit;
 import kit.boundless.internal.api.BoundlessAPI;
+import kit.boundless.internal.data.storage.SQLAppStateDataHelper;
 import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.data.storage.contracts.AppStateContract;
 
 class Boot extends ContextWrapper implements Callable<Integer> {
 
@@ -26,15 +29,18 @@ class Boot extends ContextWrapper implements Callable<Integer> {
     }
 
     private static final String initialBootKey = "initialBoot";
+    private static final String versionIdKey = "versionId";
     private static final String configIdKey = "configId";
     private static final String reinforcementEnabledKey = "reinforcementEnabled";
     private static final String trackingEnabledKey = "trackingEnabled";
 
     public boolean didSync;
     public boolean initialBoot;
+    public String versionId;
     public String configId;
     public boolean  reinforcementEnabled;
     public boolean trackingEnabled;
+    public String externalId;
 
     private final Object apiSyncLock = new Object();
     private Boolean syncInProgress = false;
@@ -53,6 +59,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
         preferences = getSharedPreferences(preferencesName(), 0);
         initialBoot = preferences.getBoolean(initialBootKey, true);
+        versionId = preferences.getString(versionIdKey, "0");
         configId = preferences.getString(configIdKey, "0");
         reinforcementEnabled = preferences.getBoolean(reinforcementEnabledKey, true);
         trackingEnabled = preferences.getBoolean(trackingEnabledKey, true);
@@ -61,6 +68,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
     void update() {
         preferences.edit()
                 .putBoolean(initialBootKey, initialBoot)
+                .putString(versionIdKey, versionId)
                 .putString(configIdKey, configId)
                 .putBoolean(reinforcementEnabledKey, reinforcementEnabled)
                 .putBoolean(trackingEnabledKey, trackingEnabled)
@@ -101,7 +109,13 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                         syncInProgress = true;
                         BoundlessKit.debugLog("Boot", "Beginning sync for boot");
 
-                        JSONObject apiResponse = BoundlessAPI.boot(this);
+                        JSONObject apiResponse = BoundlessAPI.boot(
+                                this,
+                                initialBoot,
+                                versionId,
+                                configId,
+                                SQLAppStateDataHelper.getUserInternalId(sqlDB),
+                                externalId);
                         if (apiResponse != null) {
                             String error = apiResponse.optString("error");
                             if (!error.isEmpty()) {
@@ -118,6 +132,20 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                                     configId = configJSON.getString("configID");
                                     reinforcementEnabled = configJSON.getBoolean("reinforcementEnabled");
                                     trackingEnabled = configJSON.getBoolean("trackingEnabled");
+                                }
+
+                                JSONObject versionJSON = apiResponse.optJSONObject("version");
+                                if (versionJSON != null) {
+                                    versionId = versionJSON.getString("versionID");
+                                }
+
+                                String internalId = apiResponse.optString("internalId");
+                                if (internalId != null && !internalId.equals(SQLAppStateDataHelper.getUserInternalId(sqlDB))) {
+                                    SQLAppStateDataHelper.delete(sqlDB);
+                                    SQLAppStateDataHelper.insert(sqlDB, new AppStateContract(
+                                            0,
+                                            internalId
+                                    ));
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
