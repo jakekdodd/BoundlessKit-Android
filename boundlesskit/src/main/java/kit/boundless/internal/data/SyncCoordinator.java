@@ -56,7 +56,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         report = Report.getSharedInstance(base);
         cartridges = new HashMap<>();
 
-        preferences = getSharedPreferences(preferencesName, 0);
+        preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
         Set<String> actionIDs = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
         BoundlessKit.debugLog("SyncCoordinator", "Loading known actionsIDS...");
         for (String actionID : actionIDs) {

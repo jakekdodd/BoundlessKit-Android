@@ -53,7 +53,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
         this.actionID = actionID;
 
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
-        preferences = getSharedPreferences(preferencesName(), 0);
+        preferences = getSharedPreferences(preferencesName(), Context.MODE_PRIVATE);
         initialSize = preferences.getInt(initialSizeKey, 0);
         timerStartsAt = preferences.getLong(timerStartsAtKey, 0);
         timerExpiresIn = preferences.getLong(timerExpiresInKey, 0);

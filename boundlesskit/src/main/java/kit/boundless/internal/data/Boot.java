@@ -57,7 +57,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
         didSync = false;
 
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
-        preferences = getSharedPreferences(preferencesName(), 0);
+        preferences = getSharedPreferences(preferencesName(), Context.MODE_PRIVATE);
         initialBoot = preferences.getBoolean(initialBootKey, true);
         versionId = preferences.getString(versionIdKey, "0");
         configId = preferences.getString(configIdKey, "0");

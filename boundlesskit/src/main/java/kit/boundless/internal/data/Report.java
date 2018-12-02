@@ -51,7 +51,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
     private Report(Context base) {
         super(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
-        preferences = getSharedPreferences(preferencesName, 0);
+        preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
         sizeToSync = preferences.getInt(sizeToSyncKey, 20);
         timerStartsAt = preferences.getLong(timerStartsAtKey, System.currentTimeMillis());
         timerExpiresIn = preferences.getLong(timerExpiresInKey, 172800000);
