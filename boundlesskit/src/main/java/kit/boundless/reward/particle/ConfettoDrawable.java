@@ -1,11 +1,13 @@
 package kit.boundless.reward.particle;
 
+import android.annotation.TargetApi;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -23,6 +25,7 @@ public class ConfettoDrawable extends Drawable {
     private Path path;
     private Paint strokePaint;
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public ConfettoDrawable(Shape shape, int width, int height, int color) {
         super();
         this.shape = shape;

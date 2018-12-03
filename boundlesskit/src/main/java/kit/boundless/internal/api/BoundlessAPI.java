@@ -106,9 +106,11 @@ public class BoundlessAPI extends ContextWrapper {
     }
 
     /**
-     * This method sends a Track {@link CallType}.
+     * This method sends a Track API request.
      *
+     * @param context The context
      * @param actions The actions to send
+     * @return The api response as JSON.
      */
     public static
     @Nullable
@@ -131,9 +133,11 @@ public class BoundlessAPI extends ContextWrapper {
     }
 
     /**
-     * This method sends a Report {@link CallType}.
+     * This method sends a Report API request.
      *
+     * @param context The context
      * @param actions The actions to send
+     * @return The api response as JSON.
      */
     public static
     @Nullable
@@ -151,9 +155,11 @@ public class BoundlessAPI extends ContextWrapper {
     }
 
     /**
-     * This method sends a Refresh {@link CallType}.
+     * This method sends a Refresh API request.
      *
+     * @param context The context
      * @param actionId The actionId for the cartridge to reload
+     * @return The api response as JSON.
      */
     public static
     @Nullable
@@ -173,9 +179,12 @@ public class BoundlessAPI extends ContextWrapper {
     }
 
     /**
-     * This method sends Telemetry Sync {@link CallType}.
+     * This method sends Telemetry Sync API request.
      *
+     * @param context The context
      * @param syncOverviews The sync overviews to send
+     * @param exceptions Any exceptions caught during execution.
+     * @return The api response as JSON.
      */
     public static
     @Nullable
@@ -205,8 +214,9 @@ public class BoundlessAPI extends ContextWrapper {
     /**
      * This method sends a request to the BoundlessAPI.
      *
-     * @param type    The {@link CallType} to send
+     * @param type    The  API request type to send
      * @param payload JSON data to send
+     * @return The api response as JSON.
      */
     private
     @Nullable
