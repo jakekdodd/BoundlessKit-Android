@@ -2,7 +2,6 @@ package kit.boundless.internal.api;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.provider.Settings.Secure;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -10,19 +9,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 import kit.boundless.BoundlessKit;
+import kit.boundless.internal.data.BoundlessCredentials;
+import kit.boundless.internal.data.Telemetry;
 import kit.boundless.internal.data.storage.contracts.BoundlessExceptionContract;
 import kit.boundless.internal.data.storage.contracts.ReportedActionContract;
 import kit.boundless.internal.data.storage.contracts.SyncOverviewContract;
 import kit.boundless.internal.data.storage.contracts.TrackedActionContract;
-import kit.boundless.internal.data.Telemetry;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -40,24 +37,24 @@ public class BoundlessAPI extends ContextWrapper {
 
     private Telemetry telemetry;
 
-    private final String APIURL = "https://api.usedopamine.com/v4/";
-
-    private final String clientSDKVersion = "4.0.5";
-    private final String clientOS = "Android";
-    private final int clientOSVersion = android.os.Build.VERSION.SDK_INT;
-
-    private JSONObject credentials = new JSONObject();
+    private BoundlessCredentials credentials;
 
     private enum CallType {
+        BOOT("app/boot"),
         TRACK("app/track"),
         REPORT("app/report"),
         REFRESH("app/refresh"),
         SYNC("telemetry/sync");
 
-        private final String pathExtension;
+        static final String pathBase = "https://reinforce.boundless.ai/v6/";
+        final String pathExtension;
 
         private CallType(final String value) {
             this.pathExtension = value;
+        }
+
+        String getPath() {
+            return pathBase + pathExtension;
         }
     }
 
@@ -73,71 +70,38 @@ public class BoundlessAPI extends ContextWrapper {
 
         telemetry = Telemetry.getSharedInstance(context);
 
-        // Basic configuration
-        try {
-            credentials.put("clientOS", clientOS);
-            credentials.put("clientOSVersion", clientOSVersion);
-            credentials.put("clientSDKVersion", clientSDKVersion);
-            credentials.put("primaryIdentity", Secure.getString(context.getContentResolver(), Secure.ANDROID_ID));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Telemetry.storeException(e);
-        }
-
         // Read credentials from ("res/raw/boundlessproperties.json")
         int credentialResourceID = context.getResources().getIdentifier("boundlessproperties", "raw", context.getPackageName());
-        if (credentialResourceID != 0) {
-            BoundlessKit.debugLog("BoundlessAPI", "Found boundlessproperties.json");
-        } else {
-            BoundlessKit.debugLog("BoundlessAPI", "Nonfatal Error - Could not find raw/boundlessproperties.json");
-            return;
-        }
-
-        String credentialsString;
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            InputStream inputStream = context.getResources().openRawResource(credentialResourceID);
-            for (int character = inputStream.read(); character != -1; character = inputStream.read()) {
-                byteArrayOutputStream.write(character);
-            }
-            credentialsString = byteArrayOutputStream.toString();
-            inputStream.close();
-            byteArrayOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            BoundlessKit.debugLog("BoundlessAPI", "Could not read read boundlessproperties.json");
-            Telemetry.storeException(e);
-            return;
-        }
-        setCredentials(credentialsString);
+        credentials = BoundlessCredentials.valueOf(context, credentialResourceID);
     }
 
     /**
-     * Extracts credentials from the given JSON. Credentials are obtained from dashboard.boundless.ai
+     * Sends an api call to retrieve configuration details like reinforced actionIds and reinforcementEnabled.
      *
-     * @param context                   Context
-     * @param credentialsJSONString     A JSON formatted string
+     * @param context The context
+     * @param initialBoot Whether this is the first time the device has made a boot call. If true, the asks the api to include the newest config details even if the sdk already has the newest configId. Will reset any manual modifications to the config.
+     * @param currentVersion The current experiment versionId. If a new version is available, the response will include the new version details.
+     * @param currentConfig The current configuration configId. If a new config is available, the response will include the new config details.
+     * @param internalId An experiment id for the user.
+     * @param externalId A localized id for the user. Can be set by the client.
+     * @return The api response as JSON.
      */
-    public static void setCredentials(Context context, String credentialsJSONString) {
-        getInstance(context).setCredentials(credentialsJSONString);
-    }
-
-    public void setCredentials(String credentialsJSONString) {
+    public static
+    @Nullable
+    JSONObject boot(Context context, boolean initialBoot, String currentVersion, String currentConfig, @Nullable String internalId, @Nullable String externalId) {
         try {
-            JSONObject credentialsJSON = new JSONObject(credentialsJSONString);
-            credentials.put("appID", credentialsJSON.getString("appID"));
-            credentials.put("versionID", credentialsJSON.getString("versionID"));
-            if (credentialsJSON.has("secret")) {
-                credentials.put("secret", credentialsJSON.getString("secret"));
-            } else if (credentialsJSON.has("productionSecret") ^ credentialsJSON.has("developmentSecret")) {
-                credentials.put("secret", credentialsJSON.optString("productionSecret", credentialsJSON.optString("developmentSecret")));
-            } else {
-                credentials.put("secret", credentialsJSON.getString(credentialsJSON.getBoolean("inProduction") ? "productionSecret" : "developmentSecret"));
-            }
+            JSONObject payload = new JSONObject();
+            payload.put("initialBoot", initialBoot);
+            payload.put("currentVersion", currentVersion);
+            payload.put("currentConfig", currentConfig);
+            payload.put("internalId", internalId);
+            payload.put("externalId", externalId);
+
+            return getInstance(context).send(CallType.BOOT, payload);
         } catch (JSONException e) {
             e.printStackTrace();
-            BoundlessKit.debugLog("BoundlessAPI", "Error - invalid credentials json");
             Telemetry.storeException(e);
+            return null;
         }
     }
 
@@ -156,7 +120,7 @@ public class BoundlessAPI extends ContextWrapper {
             for (int i = 0; i < actions.size(); i++) {
                 trackedActions.put(actions.get(i).toJSON());
             }
-            payload.put("actions", trackedActions);
+            payload.put("tracks", trackedActions);
 
             return getInstance(context).send(CallType.TRACK, payload);
         } catch (JSONException e) {
@@ -176,12 +140,7 @@ public class BoundlessAPI extends ContextWrapper {
     JSONObject report(Context context, ArrayList<ReportedActionContract> actions) {
         try {
             JSONObject payload = new JSONObject();
-
-            JSONArray reportedActions = new JSONArray();
-            for (int i = 0; i < actions.size(); i++) {
-                reportedActions.put(actions.get(i).toJSON());
-            }
-            payload.put("actions", reportedActions);
+            payload.put("reports", ReportedActionContract.valuesToJSON(actions));
 
             return getInstance(context).send(CallType.REPORT, payload);
         } catch (JSONException e) {
@@ -194,15 +153,16 @@ public class BoundlessAPI extends ContextWrapper {
     /**
      * This method sends a Refresh {@link CallType}.
      *
-     * @param actionID The actionID for the cartridge to reload
+     * @param actionId The actionId for the cartridge to reload
      */
     public static
     @Nullable
-    JSONObject refresh(Context context, String actionID) {
+    JSONObject refresh(Context context, String actionId) {
         try {
             JSONObject payload = new JSONObject();
 
-            payload.put("actionID", actionID);
+            payload.put(
+                    "actionName", actionId);
 
             return getInstance(context).send(CallType.REFRESH, payload);
         } catch (JSONException e) {
@@ -252,17 +212,14 @@ public class BoundlessAPI extends ContextWrapper {
     @Nullable
     JSONObject send(final CallType type, JSONObject payload) {
 
-        String url = APIURL + type.pathExtension;
+        String url = type.getPath();
         String payloadString;
         try {
-            long utc = System.currentTimeMillis();
-            payload.put("utc", utc);
-            payload.put("timezoneOffset", TimeZone.getDefault().getOffset(utc));
-
-            Iterator<String> credentialsKeys = credentials.keys();
+            JSONObject credentialsJSON = credentials.asJSONObject();
+            Iterator<String> credentialsKeys = credentialsJSON.keys();
             while (credentialsKeys.hasNext()) {
                 String key = credentialsKeys.next();
-                payload.put(key, credentials.get(key));
+                payload.put(key, credentialsJSON.get(key));
             }
 
             payloadString = payload.toString(2);
@@ -301,8 +258,8 @@ public class BoundlessAPI extends ContextWrapper {
                     break;
 
                 case REFRESH:
-                    String actionID = payload.optString("actionID");
-                    telemetry.setResponseForCartridgeSync(actionID, -1, e.getMessage(), startTime);
+                    String actionId = payload.optString("actionName");
+                    telemetry.setResponseForCartridgeSync(actionId, -1, e.getMessage(), startTime);
                     break;
 
                 case SYNC:
@@ -334,8 +291,8 @@ public class BoundlessAPI extends ContextWrapper {
                 break;
 
             case REFRESH:
-                String actionID = payload.optString("actionID");
-                telemetry.setResponseForCartridgeSync(actionID, status, errorsString, startTime);
+                String actionId = payload.optString("actionName");
+                telemetry.setResponseForCartridgeSync(actionId, status, errorsString, startTime);
                 break;
 
             case SYNC:

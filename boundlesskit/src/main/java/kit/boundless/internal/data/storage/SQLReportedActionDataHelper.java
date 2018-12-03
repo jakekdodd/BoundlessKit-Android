@@ -5,10 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
+
 import kit.boundless.BoundlessKit;
 import kit.boundless.internal.data.storage.contracts.ReportedActionContract;
-
-import java.util.ArrayList;
 
 /**
  * Created by cuddergambino on 8/9/16.
@@ -26,7 +26,8 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
 
     public static long insert(SQLiteDatabase db, ReportedActionContract item) {
         ContentValues values = new ContentValues();
-        values.put(ReportedActionContract.COLUMNS_NAME_ACTIONID, item.actionID);
+        values.put(ReportedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionId);
+        values.put(ReportedActionContract.COLUMNS_NAME_CARTRIDGEID, item.cartridgeId);
         values.put(ReportedActionContract.COLUMNS_NAME_REINFORCEMENTDECISION, item.reinforcementDecision);
         values.put(ReportedActionContract.COLUMNS_NAME_METADATA, item.metaData);
         values.put(ReportedActionContract.COLUMNS_NAME_UTC, item.utc);
@@ -47,7 +48,7 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(ReportedActionContract.TABLE_NAME,
-                    new String[] {ReportedActionContract._ID, ReportedActionContract.COLUMNS_NAME_ACTIONID, ReportedActionContract.COLUMNS_NAME_REINFORCEMENTDECISION, ReportedActionContract.COLUMNS_NAME_METADATA, ReportedActionContract.COLUMNS_NAME_UTC, ReportedActionContract.COLUMNS_NAME_TIMEZONEOFFSET},
+                    new String[] {ReportedActionContract._ID, ReportedActionContract.COLUMNS_NAME_ACTIONNAME, ReportedActionContract.COLUMNS_NAME_CARTRIDGEID, ReportedActionContract.COLUMNS_NAME_CARTRIDGEID, ReportedActionContract.COLUMNS_NAME_METADATA, ReportedActionContract.COLUMNS_NAME_UTC, ReportedActionContract.COLUMNS_NAME_TIMEZONEOFFSET},
                     ReportedActionContract._ID + "=?",
                     new String[] {String.valueOf(item.id) }, null, null, null, null
             );
@@ -67,7 +68,7 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
                 do {
                     ReportedActionContract action = ReportedActionContract.fromCursor(cursor);
                     actions.add(action);
-                    BoundlessKit.debugLog("SQLReportedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " reinforcementDecision:" + action.reinforcementDecision + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
+                    BoundlessKit.debugLog("SQLReportedActionDataHelper", "Found row:" + action.id + " actionId:" + action.actionId + " reinforcementDecision:" + action.reinforcementDecision + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
         } finally {

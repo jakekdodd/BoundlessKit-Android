@@ -12,22 +12,25 @@ import java.util.TimeZone;
 
 public class BoundlessAction {
 
-    public String actionID;
+    final public static String NEUTRAL_DECISION = "neutralResponse";
+
+    public String actionId;
+    public @Nullable String cartridgeId = null;
     public @Nullable String reinforcementDecision = null;
     public @Nullable JSONObject metaData = null;
     public long utc;
     public long timezoneOffset;
 
-    public BoundlessAction(String actionID, @Nullable String reinforcementDecision, @Nullable JSONObject metaData, long utc, long timezoneOffset) {
-        this.actionID = actionID;
+    public BoundlessAction(String actionId, @Nullable String reinforcementDecision, @Nullable JSONObject metaData, long utc, long timezoneOffset) {
+        this.actionId = actionId;
         this.reinforcementDecision = reinforcementDecision;
         this.metaData = metaData;
         this.utc = utc;
         this.timezoneOffset = timezoneOffset;
     }
 
-    public BoundlessAction(String actionID, @Nullable String reinforcementDecision, @Nullable  JSONObject metaData) {
-        this(actionID, reinforcementDecision, metaData, System.currentTimeMillis(), TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+    public BoundlessAction(String actionId, @Nullable String reinforcementDecision, @Nullable  JSONObject metaData) {
+        this(actionId, reinforcementDecision, metaData, System.currentTimeMillis(), TimeZone.getDefault().getOffset(System.currentTimeMillis()));
     }
 
 }

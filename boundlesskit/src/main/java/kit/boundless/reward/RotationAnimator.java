@@ -10,7 +10,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 public class RotationAnimator extends BaseViewAnimator<RotationAnimator> {
 
     private int count = 2;
-    { setDuration(10000); }
+    { setDuration(1000); }
     private boolean ccw = true;
 
     /**

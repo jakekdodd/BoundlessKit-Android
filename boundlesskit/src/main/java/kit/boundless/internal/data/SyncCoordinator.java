@@ -24,11 +24,12 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     private static SyncCoordinator sharedInstance;
 
     private Telemetry telemetry;
+    private Boot boot;
     private Track track;
     private Report report;
     private HashMap<String, Cartridge> cartridges;
 
-    // static reference to known actionIDs
+    // static reference to known actionIds
     private SharedPreferences preferences;
     private final String preferencesName = "boundless.boundlesskit.synchronization.synccoordinator";
     private final String preferencesActionIDSet = "actionidset";
@@ -50,18 +51,26 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         super(base);
 
         telemetry = Telemetry.getSharedInstance(base);
+        boot = Boot.getSharedInstance(base);
         track = Track.getSharedInstance(base);
         report = Report.getSharedInstance(base);
         cartridges = new HashMap<>();
 
-        preferences = getSharedPreferences(preferencesName, 0);
-        Set<String> actionIDs = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
+        preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
+        Set<String> actionIds = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
         BoundlessKit.debugLog("SyncCoordinator", "Loading known actionsIDS...");
-        for (String actionID : actionIDs) {
-            cartridges.put(actionID, new Cartridge(base, actionID));
-            BoundlessKit.debugLog("SyncCoordinator", "Loaded cartridge for actionID:" + actionID);
+        for (String actionId : actionIds) {
+            cartridges.put(actionId, new Cartridge(base, actionId));
+            BoundlessKit.debugLog("SyncCoordinator", "Loaded cartridge for actionId:" + actionId);
         }
         BoundlessKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
+    }
+
+    public void mapExternalId(String externalId) {
+        BoundlessKit.debugLog("SyncCoordinator","Mapping externalID:" + externalId + "...");
+        boot.externalId = externalId;
+        boot.didSync = false;
+        performSync();
     }
 
     /**
@@ -70,8 +79,12 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      * @param action A tracked action
      */
     public void storeTrackedAction(BoundlessAction action) {
-        track.store(action);
-        performSync();
+        if (boot.trackingEnabled) {
+            track.store(action);
+            performSync();
+            return;
+        }
+        BoundlessKit.debugLog("SyncCoordinator", "Tracking disabled");
     }
 
     /**
@@ -80,26 +93,34 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      * @param action A reinforced action
      */
     public void storeReportedAction(BoundlessAction action) {
-        report.store(action);
-        performSync();
+        if (boot.reinforcementEnabled) {
+            report.store(action);
+            performSync();
+            return;
+        }
+        BoundlessKit.debugLog("SyncCoordinator", "Reinforcements disabled");
     }
 
     /**
      * Finds the right cartridge for an action and returns a reinforcement decision.
      *
      * @param context  Context
-     * @param actionID The action to retrieve a reinforcement decision for
+     * @param actionId The action to retrieve a reinforcement decision for
      * @return A reinforcement decision
      */
-    public String removeReinforcementDecisionFor(Context context, String actionID) {
-        Cartridge cartridge = cartridges.get(actionID);
-        if (cartridge == null) {
-            cartridge = new Cartridge(this, actionID);
-            cartridges.put(actionID, cartridge);
-            preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
-            BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionID + " for the first time!");
+    public String removeReinforcementDecisionFor(Context context, String actionId) {
+        if (boot.reinforcementEnabled) {
+            Cartridge cartridge = cartridges.get(actionId);
+            if (cartridge == null) {
+                cartridge = new Cartridge(this, actionId);
+                cartridges.put(actionId, cartridge);
+                preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
+                BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionId + " for the first time!");
+            }
+            return cartridge.remove();
         }
-        return cartridge.remove();
+        BoundlessKit.debugLog("SyncCoordinator", "Reinforcements disabled");
+        return BoundlessAction.NEUTRAL_DECISION;
     }
 
     /**
@@ -132,40 +153,65 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 break;
                             }
                         }
+                        boolean bootShouldSync = !boot.didSync;
                         boolean reportShouldSync = (someCartridgeToSync != null) || report.isTriggered();
                         boolean trackShouldSync = reportShouldSync || track.isTriggered();
 
-                        if (trackShouldSync) {
-                            String syncCause;
+                        if (bootShouldSync || trackShouldSync) {
+                            String syncCause = bootShouldSync ? "Will send boot call.\n" : "";
                             if (someCartridgeToSync != null) {
-                                syncCause = "Cartridge " + someCartridgeToSync.actionID + " needs to sync.";
+                                syncCause += "Cartridge " + someCartridgeToSync.actionId + " needs to sync.";
                             } else if (reportShouldSync) {
-                                syncCause = "Report needs to sync.";
-                            } else {
-                                syncCause = "Track needs to sync.";
+                                syncCause += "Report needs to sync.";
+                            } else if (trackShouldSync) {
+                                syncCause += "Track needs to sync.";
                             }
+                            BoundlessKit.debugLog("SyncCoordinator", "Sync cause:" + syncCause);
 
                             Future<Integer> apiCall;
                             Integer apiResponse;
                             telemetry.startRecordingSync(syncCause, track, report, cartridges);
 
-                            // Track syncing
-                            //
-                            apiCall = syncerExecutor.submit(track);
-                            if (BoundlessKit.debugMode) {
-                                while (!apiCall.isDone()) {
-                                    BoundlessKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
-                                    Thread.sleep(200);
+                            // Boot syncing
+                            if (bootShouldSync) {
+                                apiCall = syncerExecutor.submit(boot);
+                                if (BoundlessKit.debugMode) {
+                                    while (!apiCall.isDone()) {
+                                        BoundlessKit.debugLog("SyncCoordinator", "Waiting for boot syncer to be done...");
+                                        Thread.sleep(200);
+                                    }
+                                }
+                                apiResponse = apiCall.get();
+                                if (apiResponse == 200) {
+                                    BoundlessKit.debugLog("Boot", "Boot Syncer is done!");
+                                    Thread.sleep(1000);
+                                } else if (apiResponse < 0) {
+                                    BoundlessKit.debugLog("SyncCoordinator", "Boot failed during sync cycle. Halting sync cycle early.");
+                                    telemetry.stopRecordingSync(false);
+                                    return null;
                                 }
                             }
-                            apiResponse = apiCall.get();
-                            if (apiResponse == 200) {
-                                BoundlessKit.debugLog("SyncCoordinator", "Track Syncer is done!");
-                                Thread.sleep(1000);
-                            } else if (apiResponse < 0) {
-                                BoundlessKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
-                                telemetry.stopRecordingSync(false);
-                                return null;
+
+
+                            // Track syncing
+                            //
+                            if (trackShouldSync) {
+                                apiCall = syncerExecutor.submit(track);
+                                if (BoundlessKit.debugMode) {
+                                    while (!apiCall.isDone()) {
+                                        BoundlessKit.debugLog("SyncCoordinator", "Waiting for track syncer to be done...");
+                                        Thread.sleep(200);
+                                    }
+                                }
+                                apiResponse = apiCall.get();
+                                if (apiResponse == 200) {
+                                    BoundlessKit.debugLog("SyncCoordinator", "Track Syncer is done!");
+                                    Thread.sleep(1000);
+                                } else if (apiResponse < 0) {
+                                    BoundlessKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
+                                    telemetry.stopRecordingSync(false);
+                                    return null;
+                                }
                             }
 
                             // Report syncing

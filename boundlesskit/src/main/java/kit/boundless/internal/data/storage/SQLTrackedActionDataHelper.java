@@ -25,7 +25,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
 
     public static long insert(SQLiteDatabase db, TrackedActionContract item) {
         ContentValues values = new ContentValues();
-        values.put(TrackedActionContract.COLUMNS_NAME_ACTIONID, item.actionID);
+        values.put(TrackedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionId);
         values.put(TrackedActionContract.COLUMNS_NAME_METADATA, item.metaData);
         values.put(TrackedActionContract.COLUMNS_NAME_UTC, item.utc);
         values.put(TrackedActionContract.COLUMNS_NAME_TIMEZONEOFFSET, item.timezoneOffset);
@@ -46,7 +46,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(TrackedActionContract.TABLE_NAME,
-                    new String[] {TrackedActionContract._ID, TrackedActionContract.COLUMNS_NAME_ACTIONID, TrackedActionContract.COLUMNS_NAME_METADATA, TrackedActionContract.COLUMNS_NAME_UTC, TrackedActionContract.COLUMNS_NAME_TIMEZONEOFFSET},
+                    new String[] {TrackedActionContract._ID, TrackedActionContract.COLUMNS_NAME_ACTIONNAME, TrackedActionContract.COLUMNS_NAME_METADATA, TrackedActionContract.COLUMNS_NAME_UTC, TrackedActionContract.COLUMNS_NAME_TIMEZONEOFFSET},
                     TrackedActionContract._ID + "=?",
                     new String[] {String.valueOf(item.id) }, null, null, null, null
             );
@@ -66,7 +66,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
                 do {
                     TrackedActionContract action = TrackedActionContract.fromCursor(cursor);
                     actions.add(action);
-//                    BoundlessKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
+//                    BoundlessKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionId:" + action.actionId + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
         } finally {

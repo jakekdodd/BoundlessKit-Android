@@ -51,7 +51,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
     private Track(Context base) {
         super(base);
         sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
-        preferences = getSharedPreferences(preferencesName, 0);
+        preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
         sizeToSync = preferences.getInt(sizeToSyncKey, 15);
         timerStartsAt = preferences.getLong(timerStartsAtKey, System.currentTimeMillis());
         timerExpiresIn = preferences.getLong(timerExpiresInKey, 172800000);
@@ -139,7 +139,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
     void store(BoundlessAction action) {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLTrackedActionDataHelper.insert(sqlDB, new TrackedActionContract(
-                0, action.actionID, metaData, action.utc, action.timezoneOffset
+                0, action.actionId, metaData, action.utc, action.timezoneOffset
         ));
 //        BoundlessKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
 
@@ -169,14 +169,18 @@ class Track extends ContextWrapper implements Callable<Integer> {
                             BoundlessKit.debugLog("TrackSyncer", sqlActions.size() + " tracked actions to be synced.");
                             JSONObject apiResponse = BoundlessAPI.track(this, sqlActions);
                             if (apiResponse != null) {
-                                int statusCode = apiResponse.optInt("status", -2);
-                                if (statusCode == 200) {
-                                    for (int i = 0; i < sqlActions.size(); i++) {
-                                        SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
-                                    }
-                                    updateTriggers(null, System.currentTimeMillis(), null);
+                                String error = apiResponse.optString("error");
+                                if (!error.isEmpty()) {
+                                    BoundlessKit.debugLog("Track", "Got error:" + error);
+                                    return -1;
                                 }
-                                return statusCode;
+
+                                for (int i = 0; i < sqlActions.size(); i++) {
+                                    SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
+                                }
+
+                                updateTriggers(null, System.currentTimeMillis(), null);
+                                return 200;
                             } else {
                                 BoundlessKit.debugLog("TrackSyncer", "Something went wrong making the call...");
                                 return -1;

@@ -95,12 +95,12 @@ class SyncOverview {
     /**
      * Sets the `syncResponse` for the cartridge in the current sync overview.
      *
-     * @param actionID  The name of the cartridge's action
+     * @param actionId  The name of the cartridge's action
      * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
-    void setCartridgeSyncResponse(String actionID, int status, @Nullable String error, long startedAt) {
+    void setCartridgeSyncResponse(String actionId, int status, @Nullable String error, long startedAt) {
         JSONObject syncResponse = new JSONObject();
         try {
             syncResponse.put(utcKey, startedAt);
@@ -108,7 +108,7 @@ class SyncOverview {
             syncResponse.put(statusKey, status);
             syncResponse.put(errorKey, error);
 
-            JSONObject cartridge = cartridges.get(actionID);
+            JSONObject cartridge = cartridges.get(actionId);
             if (cartridge != null) {
                 cartridge.put(syncResponseKey, syncResponse);
             }

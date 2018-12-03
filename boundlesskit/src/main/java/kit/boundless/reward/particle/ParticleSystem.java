@@ -824,6 +824,9 @@ public class ParticleSystem {
 	}
 
 	private void onUpdate(long milliseconds) {
+		if (mDrawingView == null) {
+			return;
+		}
 		while (((mEmittingTime > 0 && milliseconds < mEmittingTime)|| mEmittingTime == -1) && // This point should emit
 				!mParticles.isEmpty() && // We have particles in the pool
 				mActivatedParticles < mParticlesPerMillisecond *milliseconds) { // and we are under the number of particles that should be launched
