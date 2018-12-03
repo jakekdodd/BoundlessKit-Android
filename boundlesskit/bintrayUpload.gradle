@@ -1,3 +1,4 @@
+//equivalent to apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = publishedGroupId                               // Maven Group ID for the artifact
@@ -43,6 +44,7 @@ install {
 
 
 
+//equivalent to apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
 apply plugin: 'com.jfrog.bintray'
 
 version = libraryVersion
@@ -53,10 +55,10 @@ if (project.hasProperty("android")) { // Android libraries
         from android.sourceSets.main.java.srcDirs
     }
 
-    task javadoc(type: Javadoc) {
-        source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    }
+//    task javadoc(type: Javadoc) {
+//        source = android.sourceSets.main.java.srcDirs
+//        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    }
 } else { // Java libraries
     task sourcesJar(type: Jar, dependsOn: classes) {
         classifier = 'sources'
@@ -64,13 +66,13 @@ if (project.hasProperty("android")) { // Android libraries
     }
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
 
 artifacts {
-    archives javadocJar
+//    archives javadocJar
     archives sourcesJar
 }
 
