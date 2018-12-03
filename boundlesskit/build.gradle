@@ -52,17 +52,18 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:support-dynamic-animation:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:support-annotations:28.0.0'
+
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
 
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 }
 
 // taken from https://inthecheesefactory.com/blog/how-to-upload-library-to-jcenter-maven-central-as-dependency/en
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+apply from: 'bintrayUpload.gradle'

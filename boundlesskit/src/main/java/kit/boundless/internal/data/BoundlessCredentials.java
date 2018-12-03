@@ -76,6 +76,7 @@ public class BoundlessCredentials {
      *
      * @param context       Context
      * @param jsonString    A JSON formatted string
+     * @return An object initiated with the values from file.
      */
     @Nullable
     public static BoundlessCredentials valueOf(Context context, String jsonString) {

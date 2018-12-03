@@ -10,6 +10,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -109,8 +110,15 @@ public class SheenView extends android.support.v7.widget.AppCompatImageView {
             return false;
         }
 
-        view.buildDrawingCache();
-        mMask = Bitmap.createBitmap(view.getDrawingCache());
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Drawable bgDrawable = view.getBackground();
+        if (bgDrawable != null) {
+            bgDrawable.draw(canvas);
+        }
+        view.draw(canvas);
+
+        mMask = Bitmap.createBitmap(bitmap);
 
         if (mMask == null) {
             return false;

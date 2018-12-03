@@ -460,11 +460,7 @@ public class ParticleSystem {
      * components in x and y direction are controlled by the acceleration angle. The acceleration
      * is measured in density pixels per square millisecond. The angle is measured in degrees
      * with 0° pointing to the right and going clockwise.
-     * @param minAcceleration
-     * @param maxAcceleration
-     * @param minAngle
-     * @param maxAngle
-     * @return
+	 *
      */
 	public ParticleSystem setAccelerationModuleAndAndAngleRange(float minAcceleration, float maxAcceleration, int minAngle, int maxAngle) {
         mInitializers.add(new AccelerationInitializer(dpToPx(minAcceleration), dpToPx(maxAcceleration),
