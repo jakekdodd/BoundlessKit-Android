@@ -140,7 +140,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
         String metaData = (action.metaData == null) ? null : action.metaData.toString();
         long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
                 0,
-                action.actionID,
+                action.actionId,
                 action.cartridgeId,
                 action.reinforcementDecision,
                 metaData,

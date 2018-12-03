@@ -25,13 +25,13 @@ public final class ReinforcementDecisionContract implements BaseColumns {
     public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public long id;
-    public String actionID;
+    public String actionId;
     public String cartridgeID;
     public String reinforcementDecision;
 
-    public ReinforcementDecisionContract(long id, String actionID, String cartridgeID, String reinforcementDecision) {
+    public ReinforcementDecisionContract(long id, String actionId, String cartridgeID, String reinforcementDecision) {
         this.id = id;
-        this.actionID = actionID;
+        this.actionId = actionId;
         this.cartridgeID = cartridgeID;
         this.reinforcementDecision = reinforcementDecision;
     }

@@ -26,7 +26,7 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
 
     public static long insert(SQLiteDatabase db, ReportedActionContract item) {
         ContentValues values = new ContentValues();
-        values.put(ReportedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionID);
+        values.put(ReportedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionId);
         values.put(ReportedActionContract.COLUMNS_NAME_CARTRIDGEID, item.cartridgeId);
         values.put(ReportedActionContract.COLUMNS_NAME_REINFORCEMENTDECISION, item.reinforcementDecision);
         values.put(ReportedActionContract.COLUMNS_NAME_METADATA, item.metaData);
@@ -68,7 +68,7 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
                 do {
                     ReportedActionContract action = ReportedActionContract.fromCursor(cursor);
                     actions.add(action);
-                    BoundlessKit.debugLog("SQLReportedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " reinforcementDecision:" + action.reinforcementDecision + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
+                    BoundlessKit.debugLog("SQLReportedActionDataHelper", "Found row:" + action.id + " actionId:" + action.actionId + " reinforcementDecision:" + action.reinforcementDecision + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
         } finally {

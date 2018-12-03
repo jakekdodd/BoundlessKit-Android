@@ -14,7 +14,8 @@ import kit.boundless.internal.data.SyncCoordinator;
 public class BoundlessKit extends ContextWrapper {
     /**
      * The callback interface used by {@link BoundlessKit} to inform its client
-     * about a successful reinforcement decision.
+     * about a reinforcement decision. Use {@link #reinforce(Context, String, JSONObject, ReinforcementCallback)}
+     * to initiate a reinforcement decision.
      */
     public interface ReinforcementCallback {
 
@@ -45,45 +46,52 @@ public class BoundlessKit extends ContextWrapper {
     }
 
     /**
-     * This method sends a tracking request for the specified actionID to the BoundlessAPI.
+     * Reinforce actions to increase engagement. The actionIds must be configured on the Developer Dashboard.
      *
-     * @param context			Context to retrieve api key from file res/raw/boundlessproperties.json
-     * @param actionID			The name of an action
-     * @param metaData			Optional metadata for better analytics
+     * @param context			Context to retrieve api key from file res/raw/boundlessproperties.json. ActionIds are specific to the included versionId.
+     * @param actionId			The name of the action.
+     * @param metaData			Optional metadata for fine grained reinforcement.
+     * @param callback          The callback to trigger when the reinforcement decision has been made. The reinforcement decision ids are configured on the Developer Dashboard.
      */
-    public static void track(Context context, String actionID, @Nullable JSONObject metaData) {
-        BoundlessAction action = new BoundlessAction(actionID, null, metaData);
-        getInstance(context).syncCoordinator.storeTrackedAction(action);
-    }
-
-    /**
-     * This method sends a reinforcement request for the specified actionID to the BoundlessAPI.
-     *
-     * @param context			Context to retrieve api key from file res/raw/boundlessproperties.json
-     * @param actionID			The name of the registered action
-     * @param metaData			Optional metadata for better analytics
-     * @param callback          The callback to trigger when the reinforcement decision has been made
-     */
-    public static void reinforce(final Context context, final String actionID, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
+    public static void reinforce(final Context context, final String actionId, @Nullable final JSONObject metaData, final ReinforcementCallback callback) {
         AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... voids) {
-                return BoundlessKit.getInstance(context).syncCoordinator.removeReinforcementDecisionFor(context, actionID);
+                return BoundlessKit.getInstance(context).syncCoordinator.removeReinforcementDecisionFor(context, actionId);
             }
 
             @Override
             protected void onPostExecute(String reinforcementDecision) {
                 callback.onReinforcement(reinforcementDecision);
-                BoundlessAction action = new BoundlessAction(actionID, reinforcementDecision, metaData);
+                BoundlessAction action = new BoundlessAction(actionId, reinforcementDecision, metaData);
                 BoundlessKit.getInstance(context).syncCoordinator.storeReportedAction(action);
             }
         }.execute();
     }
 
-    public static boolean debugMode = false;
+    /**
+     * Track events to measure how reinforcements change user behavior.
+     *
+     * @param context			Context to retrieve api key from file res/raw/boundlessproperties.json.
+     * @param actionId			The name of an action event.
+     * @param metaData			Optional metadata for detailed analytics.
+     */
+    public static void track(Context context, String actionId, @Nullable JSONObject metaData) {
+        BoundlessAction action = new BoundlessAction(actionId, null, metaData);
+        getInstance(context).syncCoordinator.storeTrackedAction(action);
+    }
+
+    /**
+     * Map an identity to match users across other systems, like a Leanplum userId.
+     *
+     * @param context           Context to retrieve api key from file res/raw/boundlessproperties.json.
+     * @param externalUserId    A userId to map to the user.
+     */
     public static void mapExternalUserId(final Context context, final String externalUserId) {
         getInstance(context).syncCoordinator.mapExternalId(externalUserId);
     }
+
+    public static boolean debugMode = false;
 
     /**
      * By default debug mode is set to `false`.

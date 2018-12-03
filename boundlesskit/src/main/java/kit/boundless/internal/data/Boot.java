@@ -156,7 +156,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                             update();
                             return 200;
                         } else {
-                            BoundlessKit.debugLog("Boot", "Something with boot call.");
+                            BoundlessKit.debugLog("Boot", "Something went wrong with boot call. No internet?");
                             return -1;
                         }
                     } finally {

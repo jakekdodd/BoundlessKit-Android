@@ -42,16 +42,16 @@ public final class ReportedActionContract implements BaseColumns {
     public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public long id;
-    public String actionID;
+    public String actionId;
     public String cartridgeId;
     public String reinforcementDecision;
     public @Nullable String metaData;
     public long utc;
     public long timezoneOffset;
 
-    public ReportedActionContract(long id, String actionID, String cartridgeId, String reinforcementDecision, @Nullable String metaData, long utc, long timezoneOffset) {
+    public ReportedActionContract(long id, String actionId, String cartridgeId, String reinforcementDecision, @Nullable String metaData, long utc, long timezoneOffset) {
         this.id = id;
-        this.actionID = actionID;
+        this.actionId = actionId;
         this.cartridgeId = cartridgeId;
         this.reinforcementDecision = reinforcementDecision;
         this.metaData = metaData;
@@ -75,9 +75,9 @@ public final class ReportedActionContract implements BaseColumns {
         HashMap<String, HashMap<String, List<ReportedActionContract>>> actionCartridges = new HashMap<>();
 
         for (ReportedActionContract action: actions) {
-            if (actionCartridges.get(action.actionID) == null) { actionCartridges.put(action.actionID, new HashMap<String, List<ReportedActionContract>>()); }
-            if (actionCartridges.get(action.actionID).get(action.cartridgeId) == null) { actionCartridges.get(action.actionID).put(action.cartridgeId, new ArrayList<ReportedActionContract>()); }
-            actionCartridges.get(action.actionID).get(action.cartridgeId).add(action);
+            if (actionCartridges.get(action.actionId) == null) { actionCartridges.put(action.actionId, new HashMap<String, List<ReportedActionContract>>()); }
+            if (actionCartridges.get(action.actionId).get(action.cartridgeId) == null) { actionCartridges.get(action.actionId).put(action.cartridgeId, new ArrayList<ReportedActionContract>()); }
+            actionCartridges.get(action.actionId).get(action.cartridgeId).add(action);
         }
 
         JSONArray reportsJSON = new JSONArray();

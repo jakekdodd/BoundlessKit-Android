@@ -26,7 +26,7 @@ A simple "To Do List" Android App is included in this repo to demonstrate how Bo
     }
     
   dependencies {
-        compile 'boundless:boundlesskit:4.0.7'
+        compile 'boundless:boundlesskit:4.0.8'
   	}
   ```
 

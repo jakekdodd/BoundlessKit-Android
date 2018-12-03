@@ -29,7 +29,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     private Report report;
     private HashMap<String, Cartridge> cartridges;
 
-    // static reference to known actionIDs
+    // static reference to known actionIds
     private SharedPreferences preferences;
     private final String preferencesName = "boundless.boundlesskit.synchronization.synccoordinator";
     private final String preferencesActionIDSet = "actionidset";
@@ -57,11 +57,11 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         cartridges = new HashMap<>();
 
         preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
-        Set<String> actionIDs = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
+        Set<String> actionIds = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
         BoundlessKit.debugLog("SyncCoordinator", "Loading known actionsIDS...");
-        for (String actionID : actionIDs) {
-            cartridges.put(actionID, new Cartridge(base, actionID));
-            BoundlessKit.debugLog("SyncCoordinator", "Loaded cartridge for actionID:" + actionID);
+        for (String actionId : actionIds) {
+            cartridges.put(actionId, new Cartridge(base, actionId));
+            BoundlessKit.debugLog("SyncCoordinator", "Loaded cartridge for actionId:" + actionId);
         }
         BoundlessKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
     }
@@ -105,17 +105,17 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
      * Finds the right cartridge for an action and returns a reinforcement decision.
      *
      * @param context  Context
-     * @param actionID The action to retrieve a reinforcement decision for
+     * @param actionId The action to retrieve a reinforcement decision for
      * @return A reinforcement decision
      */
-    public String removeReinforcementDecisionFor(Context context, String actionID) {
+    public String removeReinforcementDecisionFor(Context context, String actionId) {
         if (boot.reinforcementEnabled) {
-            Cartridge cartridge = cartridges.get(actionID);
+            Cartridge cartridge = cartridges.get(actionId);
             if (cartridge == null) {
-                cartridge = new Cartridge(this, actionID);
-                cartridges.put(actionID, cartridge);
+                cartridge = new Cartridge(this, actionId);
+                cartridges.put(actionId, cartridge);
                 preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
-                BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionID + " for the first time!");
+                BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionId + " for the first time!");
             }
             return cartridge.remove();
         }
@@ -160,7 +160,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                         if (bootShouldSync || trackShouldSync) {
                             String syncCause = bootShouldSync ? "Will send boot call.\n" : "";
                             if (someCartridgeToSync != null) {
-                                syncCause += "Cartridge " + someCartridgeToSync.actionID + " needs to sync.";
+                                syncCause += "Cartridge " + someCartridgeToSync.actionId + " needs to sync.";
                             } else if (reportShouldSync) {
                                 syncCause += "Report needs to sync.";
                             } else if (trackShouldSync) {

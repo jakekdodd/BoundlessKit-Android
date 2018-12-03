@@ -76,9 +76,15 @@ public class BoundlessAPI extends ContextWrapper {
     }
 
     /**
-     * This method sends a Boot {@link CallType}.
+     * Sends an api call to retrieve configuration details like reinforced actionIds and reinforcementEnabled.
      *
-     * @param
+     * @param context The context
+     * @param initialBoot Whether this is the first time the device has made a boot call. If true, the asks the api to include the newest config details even if the sdk already has the newest configId. Will reset any manual modifications to the config.
+     * @param currentVersion The current experiment versionId. If a new version is available, the response will include the new version details.
+     * @param currentConfig The current configuration configId. If a new config is available, the response will include the new config details.
+     * @param internalId An experiment id for the user.
+     * @param externalId A localized id for the user. Can be set by the client.
+     * @return The api response as JSON.
      */
     public static
     @Nullable
@@ -147,15 +153,16 @@ public class BoundlessAPI extends ContextWrapper {
     /**
      * This method sends a Refresh {@link CallType}.
      *
-     * @param actionID The actionID for the cartridge to reload
+     * @param actionId The actionId for the cartridge to reload
      */
     public static
     @Nullable
-    JSONObject refresh(Context context, String actionID) {
+    JSONObject refresh(Context context, String actionId) {
         try {
             JSONObject payload = new JSONObject();
 
-            payload.put("actionName", actionID);
+            payload.put(
+                    "actionName", actionId);
 
             return getInstance(context).send(CallType.REFRESH, payload);
         } catch (JSONException e) {
@@ -251,8 +258,8 @@ public class BoundlessAPI extends ContextWrapper {
                     break;
 
                 case REFRESH:
-                    String actionID = payload.optString("actionName");
-                    telemetry.setResponseForCartridgeSync(actionID, -1, e.getMessage(), startTime);
+                    String actionId = payload.optString("actionName");
+                    telemetry.setResponseForCartridgeSync(actionId, -1, e.getMessage(), startTime);
                     break;
 
                 case SYNC:
@@ -284,8 +291,8 @@ public class BoundlessAPI extends ContextWrapper {
                 break;
 
             case REFRESH:
-                String actionID = payload.optString("actionName");
-                telemetry.setResponseForCartridgeSync(actionID, status, errorsString, startTime);
+                String actionId = payload.optString("actionName");
+                telemetry.setResponseForCartridgeSync(actionId, status, errorsString, startTime);
                 break;
 
             case SYNC:

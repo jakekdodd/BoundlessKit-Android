@@ -116,15 +116,15 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
     /**
      * Sets the `syncResponse` for the cartridge in the current sync overview.
      *
-     * @param actionID  The name of the cartridge's action
+     * @param actionId  The name of the cartridge's action
      * @param status    The HTTP status code received from the BoundlessAPI
      * @param error     An error if one was received
      * @param startedAt The time the API call started at
      */
-    public void setResponseForCartridgeSync(String actionID, int status, @Nullable String error, long startedAt) {
+    public void setResponseForCartridgeSync(String actionId, int status, @Nullable String error, long startedAt) {
         synchronized (syncOverviewLock) {
             if (currentSyncOverview != null) {
-                currentSyncOverview.setCartridgeSyncResponse(actionID, status, error, startedAt);
+                currentSyncOverview.setCartridgeSyncResponse(actionId, status, error, startedAt);
             }
         }
     }

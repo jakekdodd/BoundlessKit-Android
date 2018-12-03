@@ -25,7 +25,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
 
     public static long insert(SQLiteDatabase db, TrackedActionContract item) {
         ContentValues values = new ContentValues();
-        values.put(TrackedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionID);
+        values.put(TrackedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionId);
         values.put(TrackedActionContract.COLUMNS_NAME_METADATA, item.metaData);
         values.put(TrackedActionContract.COLUMNS_NAME_UTC, item.utc);
         values.put(TrackedActionContract.COLUMNS_NAME_TIMEZONEOFFSET, item.timezoneOffset);
@@ -66,7 +66,7 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
                 do {
                     TrackedActionContract action = TrackedActionContract.fromCursor(cursor);
                     actions.add(action);
-//                    BoundlessKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionID:" + action.actionID + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
+//                    BoundlessKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action.id + " actionId:" + action.actionId + " metaData:" + action.metaData + " utc:" + action.utc + " timezoneOffset:" + action.timezoneOffset);
                 } while (cursor.moveToNext());
             }
         } finally {

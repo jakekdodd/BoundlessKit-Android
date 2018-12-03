@@ -33,14 +33,14 @@ public final class TrackedActionContract implements BaseColumns {
     public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public long id;
-    public String actionID;
+    public String actionId;
     public @Nullable String metaData;
     public long utc;
     public long timezoneOffset;
 
-    public TrackedActionContract(long id, String actionID, @Nullable String metaData, long utc, long timezoneOffset) {
+    public TrackedActionContract(long id, String actionId, @Nullable String metaData, long utc, long timezoneOffset) {
         this.id = id;
-        this.actionID = actionID;
+        this.actionId = actionId;
         this.metaData = metaData;
         this.utc = utc;
         this.timezoneOffset = timezoneOffset;
@@ -56,7 +56,7 @@ public final class TrackedActionContract implements BaseColumns {
         JSONObject json = new JSONObject();
 
         try {
-            json.put(COLUMNS_NAME_ACTIONNAME, actionID);
+            json.put(COLUMNS_NAME_ACTIONNAME, actionId);
             if (metaData != null) {
                 json.put(COLUMNS_NAME_METADATA, new JSONObject(metaData));
             }
