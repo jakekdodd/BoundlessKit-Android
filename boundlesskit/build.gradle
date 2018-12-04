@@ -8,7 +8,7 @@ ext {
     libraryName = 'BoundlessKit'
     artifact = 'boundlesskit'
 
-    libraryDescription = 'A wrapper for Boundless AI on Android. Includes out-of-the-box rewards to delight your users.'
+    libraryDescription = 'A wrapper for the Reinforcement AI by Boundless Mind on Android. Includes out-of-the-box rewards to delight and engage your users.'
 
     siteUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android'
     gitUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android.git'
@@ -16,8 +16,8 @@ ext {
     libraryVersion = '4.0.8'
 
     developerId = 'cuddergambino'
-    developerName = 'Akash Desai'
-    developerEmail = 'kash@boundless.ai'
+    developerName = 'Boundless Mind'
+    developerEmail = 'team@boundless.ai'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
@@ -65,5 +65,4 @@ dependencies {
 
 }
 
-// taken from https://inthecheesefactory.com/blog/how-to-upload-library-to-jcenter-maven-central-as-dependency/en
 apply from: 'bintrayUpload.gradle'
