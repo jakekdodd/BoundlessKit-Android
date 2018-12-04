@@ -1,27 +1,27 @@
 apply plugin: 'com.android.library'
 
 ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'boundlesskit'
+  bintrayRepo = 'maven'
+  bintrayName = 'boundlesskit'
 
-    publishedGroupId = 'boundless'
-    libraryName = 'BoundlessKit'
-    artifact = 'boundlesskit'
+  publishedGroupId = 'boundless'
+  libraryName = 'BoundlessKit'
+  artifact = 'boundlesskit'
 
-    libraryDescription = 'A wrapper for Boundless AI on Android. Includes out-of-the-box rewards to delight your users.'
+  libraryDescription = 'A wrapper for Boundless AI on Android. Includes out-of-the-box rewards to delight your users.'
 
-    siteUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android'
-    gitUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android.git'
+  siteUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android'
+  gitUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android.git'
 
-    libraryVersion = '4.0.8'
+  libraryVersion = '4.0.8'
 
-    developerId = 'cuddergambino'
-    developerName = 'Akash Desai'
-    developerEmail = 'kash@boundless.ai'
+  developerId = 'cuddergambino'
+  developerName = 'Akash Desai'
+  developerEmail = 'kash@boundless.ai'
 
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
+  licenseName = 'The Apache Software License, Version 2.0'
+  licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+  allLicenses = ["Apache-2.0"]
 }
 
 android {
@@ -63,6 +63,3 @@ dependencies {
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
 
 }
-
-// taken from https://inthecheesefactory.com/blog/how-to-upload-library-to-jcenter-maven-central-as-dependency/en
-//apply from: 'bintrayUpload.gradle'
