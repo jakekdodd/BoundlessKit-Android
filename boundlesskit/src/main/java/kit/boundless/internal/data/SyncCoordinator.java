@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import kit.boundless.BoundlessKit;
+import kit.boundless.internal.api.BoundlessAPI;
 
 /**
  * Created by cuddergambino on 8/4/16.
@@ -24,6 +25,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     private static SyncCoordinator sharedInstance;
 
     private Telemetry telemetry;
+    private BoundlessAPI api;
+    private BoundlessUser user;
     private Boot boot;
     private Track track;
     private Report report;
@@ -50,6 +53,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     private SyncCoordinator(Context base) {
         super(base);
 
+        api = BoundlessAPI.getInstance(base);
+        user = BoundlessUser.getSharedInstance(base);
         telemetry = Telemetry.getSharedInstance(base);
         boot = Boot.getSharedInstance(base);
         track = Track.getSharedInstance(base);
@@ -68,9 +73,14 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
     public void mapExternalId(String externalId) {
         BoundlessKit.debugLog("SyncCoordinator","Mapping externalID:" + externalId + "...");
-        boot.externalId = externalId;
+        user.externalId = externalId;
+        user.update();
         boot.didSync = false;
         performSync();
+    }
+
+    public BoundlessUser getUser() {
+        return user;
     }
 
     /**

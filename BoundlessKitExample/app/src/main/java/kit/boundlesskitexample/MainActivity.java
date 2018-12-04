@@ -290,7 +290,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addDemoTasks(){
-        BoundlessKit.mapExternalUserId(getApplicationContext(), "externalDev");
+        BoundlessKit.debugLog("App", "Current user id:" + BoundlessKit.getUserId(getApplicationContext()) + " experimentGroup:" + BoundlessKit.getExperimentGroup(getApplicationContext()));
+        BoundlessKit.mapUserId(getApplicationContext(), "externalDev");
         BoundlessKit.track(getApplicationContext(), "addedDemoTasks", null);
 
         String demoTasks[] = {"Feed the kitties", "Feed the mice", "Feed the snakes the mice", "Feed the mongoose the snakes", "a", "b", "c"};

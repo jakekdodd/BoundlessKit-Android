@@ -37,7 +37,7 @@ public class BoundlessAPI extends ContextWrapper {
 
     private Telemetry telemetry;
 
-    private BoundlessCredentials credentials;
+    public BoundlessCredentials credentials;
 
     private enum CallType {
         BOOT("app/boot"),
@@ -58,7 +58,7 @@ public class BoundlessAPI extends ContextWrapper {
         }
     }
 
-    private static BoundlessAPI getInstance(Context context) {
+    public static BoundlessAPI getInstance(Context context) {
         if (myInstance == null) {
             myInstance = new BoundlessAPI(context);
         }
@@ -88,21 +88,8 @@ public class BoundlessAPI extends ContextWrapper {
      */
     public static
     @Nullable
-    JSONObject boot(Context context, boolean initialBoot, String currentVersion, String currentConfig, @Nullable String internalId, @Nullable String externalId) {
-        try {
-            JSONObject payload = new JSONObject();
-            payload.put("initialBoot", initialBoot);
-            payload.put("currentVersion", currentVersion);
-            payload.put("currentConfig", currentConfig);
-            payload.put("internalId", internalId);
-            payload.put("externalId", externalId);
-
-            return getInstance(context).send(CallType.BOOT, payload);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Telemetry.storeException(e);
-            return null;
-        }
+    JSONObject boot(Context context, JSONObject payload) {
+        return getInstance(context).send(CallType.BOOT, payload);
     }
 
     /**

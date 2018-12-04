@@ -22,8 +22,21 @@ public class SQLUserIdentityDataHelper extends SQLDataHelper {
         ContentValues values = new ContentValues();
         values.put(UserIdentityContract._ID, 0);
         values.put(UserIdentityContract.COLUMNS_NAME_INTERNALID, item.internalId);
+        values.put(UserIdentityContract.COLUMNS_NAME_EXTERNALID, item.externalId);
+        values.put(UserIdentityContract.COLUMNS_NAME_EXPERIMENTGROUP, item.experimentGroup);
 
         item.id = db.insert(UserIdentityContract.TABLE_NAME, null, values);
+        return item.id;
+    }
+
+    public static long update(SQLiteDatabase db, UserIdentityContract item) {
+        ContentValues values = new ContentValues();
+        values.put(UserIdentityContract._ID, 0);
+        values.put(UserIdentityContract.COLUMNS_NAME_INTERNALID, item.internalId);
+        values.put(UserIdentityContract.COLUMNS_NAME_EXTERNALID, item.externalId);
+        values.put(UserIdentityContract.COLUMNS_NAME_EXPERIMENTGROUP, item.experimentGroup);
+
+        item.id = db.update(UserIdentityContract.TABLE_NAME, values, null, null);
         return item.id;
     }
 
@@ -39,7 +52,7 @@ public class SQLUserIdentityDataHelper extends SQLDataHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(UserIdentityContract.TABLE_NAME,
-                    new String[] {UserIdentityContract._ID, UserIdentityContract.COLUMNS_NAME_INTERNALID},
+                    new String[] {UserIdentityContract._ID, UserIdentityContract.COLUMNS_NAME_INTERNALID, UserIdentityContract.COLUMNS_NAME_EXTERNALID, UserIdentityContract.COLUMNS_NAME_EXPERIMENTGROUP},
                     null, null,
                     null, null,
                     null
@@ -51,15 +64,6 @@ public class SQLUserIdentityDataHelper extends SQLDataHelper {
             if (cursor != null) { cursor.close(); }
         }
         return result;
-    }
-
-    public static @Nullable
-    String getInternalId(SQLiteDatabase db) {
-        UserIdentityContract userIdentityContract = find(db);
-        if (userIdentityContract != null) {
-            return userIdentityContract.internalId;
-        }
-        return null;
     }
 
 }

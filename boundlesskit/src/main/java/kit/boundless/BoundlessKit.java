@@ -9,6 +9,7 @@ import android.util.Log;
 import org.json.JSONObject;
 
 import kit.boundless.internal.data.BoundlessAction;
+import kit.boundless.internal.data.BoundlessUser;
 import kit.boundless.internal.data.SyncCoordinator;
 
 public class BoundlessKit extends ContextWrapper {
@@ -87,8 +88,32 @@ public class BoundlessKit extends ContextWrapper {
      * @param context           Context to retrieve api key from file res/raw/boundlessproperties.json.
      * @param externalUserId    A userId to map to the user.
      */
-    public static void mapExternalUserId(final Context context, final String externalUserId) {
+    public static void mapUserId(final Context context, final String externalUserId) {
         getInstance(context).syncCoordinator.mapExternalId(externalUserId);
+    }
+
+    /**
+     * Get the identity for the user
+     *
+     * @param context           Context to retrieve api key from file res/raw/boundlessproperties.json.
+     * @return The user's identity used for requests.
+     */
+    public static String getUserId(final Context context) {
+        return getInstance(context).syncCoordinator.getUser().externalId;
+    }
+
+    /**
+     * Get the experiment group assigned to the user.
+     *
+     * @param context           Context to retrieve api key from file res/raw/boundlessproperties.json.
+     * @return The user's experiment group. Could be a string like DEVELOPMENT, CONTROL, or BOUNDLESS
+     */
+    public static @Nullable String getExperimentGroup(final Context context) {
+        BoundlessUser user = getInstance(context).syncCoordinator.getUser();
+        if (user != null) {
+            return user.experimentGroup;
+        }
+        return null;
     }
 
     public static boolean debugMode = false;
