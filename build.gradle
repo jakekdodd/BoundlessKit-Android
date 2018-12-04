@@ -1,0 +1,24 @@
+ext {
+  buildToolsVersion = '28.0.3'
+  compileSdkVersion = 28
+}
+
+buildscript {
+  repositories {
+    jcenter()
+    google()
+  }
+
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.2.1'
+  }
+}
+
+allprojects {
+  group = 'ai.boundless'
+
+  repositories {
+    google()
+    jcenter()
+  }
+}
