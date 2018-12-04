@@ -69,6 +69,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
             BoundlessKit.debugLog("SyncCoordinator", "Loaded cartridge for actionId:" + actionId);
         }
         BoundlessKit.debugLog("SyncCoordinator", "Done loading known actionsIDS.");
+
+        beforeBoot();
     }
 
     public void mapExternalId(String externalId) {
@@ -141,6 +143,30 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
         myExecutor.submit(this);
     }
 
+    private void beforeBoot() {
+        boot.internalId = user.internalId;
+        boot.externalId = user.externalId;
+        boot.experimentGroup = user.experimentGroup;
+
+        if (boot.versionId == null) {
+            boot.versionId  = api.credentials.versionId;
+        }
+        api.credentials.primaryIdentity = boot.externalId;
+    }
+
+    private void afterBoot() {
+        // update App Experiment info after boot
+        user.internalId = boot.internalId;
+        user.externalId = boot.externalId;
+        user.experimentGroup = boot.experimentGroup;
+        user.update();
+
+        if (boot.versionId != null) {
+            api.credentials.versionId = boot.versionId;
+        }
+        api.credentials.primaryIdentity = boot.externalId;
+    }
+
     @Override
     public Void call() throws Exception {
 
@@ -184,6 +210,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
                             // Boot syncing
                             if (bootShouldSync) {
+                                beforeBoot();
+
                                 apiCall = syncerExecutor.submit(boot);
                                 if (BoundlessKit.debugMode) {
                                     while (!apiCall.isDone()) {
@@ -194,7 +222,8 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 apiResponse = apiCall.get();
                                 if (apiResponse == 200) {
                                     BoundlessKit.debugLog("Boot", "Boot Syncer is done!");
-                                    Thread.sleep(1000);
+
+                                    afterBoot();
                                 } else if (apiResponse < 0) {
                                     BoundlessKit.debugLog("SyncCoordinator", "Boot failed during sync cycle. Halting sync cycle early.");
                                     telemetry.stopRecordingSync(false);
@@ -216,7 +245,6 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 apiResponse = apiCall.get();
                                 if (apiResponse == 200) {
                                     BoundlessKit.debugLog("SyncCoordinator", "Track Syncer is done!");
-                                    Thread.sleep(1000);
                                 } else if (apiResponse < 0) {
                                     BoundlessKit.debugLog("SyncCoordinator", "Track failed during sync cycle. Halting sync cycle early.");
                                     telemetry.stopRecordingSync(false);
@@ -237,7 +265,6 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                                 apiResponse = apiCall.get();
                                 if (apiResponse == 200) {
                                     BoundlessKit.debugLog("SyncCoordinator", "Report Syncer is done!");
-                                    Thread.sleep(5000);
                                 } else if (apiResponse < 0) {
                                     BoundlessKit.debugLog("SyncCoordinator", "Report failed during sync cycle. Halting sync cycle early.");
                                     telemetry.stopRecordingSync(false);

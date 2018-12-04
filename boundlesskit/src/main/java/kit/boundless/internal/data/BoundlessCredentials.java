@@ -2,7 +2,6 @@ package kit.boundless.internal.data;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
@@ -23,14 +22,14 @@ public class BoundlessCredentials {
     final String clientSDKVersion = "4.1.0";
 
     final String appId;
-    final String versionId;
+    String versionId;
     boolean inProduction;
     final String developmentSecret;
     final String productionSecret;
     String getSecret() {
         return inProduction ? productionSecret : developmentSecret;
     }
-    String primaryIdentity;
+    @Nullable String primaryIdentity;
 
     public BoundlessCredentials(Context context, String appId, String versionId, boolean inProduction, String developmentSecret, String productionSecret) {
         this.appId = appId;
@@ -38,7 +37,6 @@ public class BoundlessCredentials {
         this.inProduction = inProduction;
         this.developmentSecret = developmentSecret;
         this.productionSecret = productionSecret;
-        this.primaryIdentity = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         String clientBuild = "UNKNOWNBUILD";
         try {
             clientBuild = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
