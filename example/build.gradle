@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-evaluationDependsOn(':boundlesskit')
+evaluationDependsOn(':boundless')
 
 android {
     compileSdkVersion 28
@@ -41,6 +41,6 @@ dependencies {
     // Set this dependency to use JUnit 4 rules
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support:support-annotations:28.0.0'
-    implementation project(':boundlesskit')
+    implementation project(':boundless')
     //    compile 'boundless:boundlesskit:4.0.2'
 }
