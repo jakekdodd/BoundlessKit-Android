@@ -90,6 +90,11 @@ public class ExampleInstrumentedTest {
         }
     }
 
+    @Test
+    public void testBoundlessKitMapUserId() throws Exception {
+        BoundlessKit.mapExternalUserId(appContext, "testMappedId");
+    }
+
     @After
     public void waitForSyncersToComplete() throws Exception {
         Thread.sleep(10000);

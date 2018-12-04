@@ -341,6 +341,7 @@ public class ParticleSystem {
 	 * Delays the Particle system
 	 *
 	 * @param delay the time in milliseconds to delay
+	 * @return The particle system
 	 */
 	public ParticleSystem setStartDelay(int delay) {
 		mStartDelay = delay;
@@ -361,6 +362,7 @@ public class ParticleSystem {
 	 * Adds a modifier to the Particle system, it will be executed on each update.
 	 *
 	 * @param modifier modifier to be added to the ParticleSystem
+	 * @return The particle system
 	 */
 	public ParticleSystem addModifier(ParticleModifier modifier) {
 		mModifiers.add(modifier);
@@ -455,7 +457,7 @@ public class ParticleSystem {
 		return this;
 	}
 
-    /**
+    /*
      * Initializes the acceleration range and angle range of emitted particles. The acceleration
      * components in x and y direction are controlled by the acceleration angle. The acceleration
      * is measured in density pixels per square millisecond. The angle is measured in degrees
@@ -520,6 +522,7 @@ public class ParticleSystem {
      *
      * @param duration fade in duration in milliseconds
      * @param interpolator the interpolator for the fade in (default is linear)
+	 * @return The particle system
      */
     public ParticleSystem setFadeIn(long duration, Interpolator interpolator) {
         mModifiers.add(new AlphaModifier(0, 255, 0, duration, interpolator));
@@ -530,6 +533,7 @@ public class ParticleSystem {
      * Configures a fade in for the particles when they appear
      *
      * @param duration fade in duration in milliseconds
+	 * @return The particle system
      */
     public ParticleSystem setFadeIn(long duration) {
         return setFadeIn(duration, new LinearInterpolator());
@@ -540,6 +544,7 @@ public class ParticleSystem {
 	 *
 	 * @param duration fade out duration in milliseconds
 	 * @param interpolator the interpolator for the fade out (default is linear)
+	 * @return    The particle system
 	 */
 	public ParticleSystem setFadeOut(long duration, Interpolator interpolator) {
 		mModifiers.add(new AlphaModifier(255, 0, -1, duration, interpolator));
@@ -550,6 +555,7 @@ public class ParticleSystem {
 	 * Configures a fade out for the particles when they disappear
 	 *
 	 * @param duration fade out duration in milliseconds
+	 * @return The particle system
 	 */
 	public ParticleSystem setFadeOut(long duration) {
 		return setFadeOut(duration, new LinearInterpolator());
