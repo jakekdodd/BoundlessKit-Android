@@ -66,4 +66,4 @@ dependencies {
 }
 
 // taken from https://inthecheesefactory.com/blog/how-to-upload-library-to-jcenter-maven-central-as-dependency/en
-apply from: 'bintrayUpload.gradle'
+//apply from: 'bintrayUpload.gradle'
