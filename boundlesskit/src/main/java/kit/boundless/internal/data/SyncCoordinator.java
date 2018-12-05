@@ -129,7 +129,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                 preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
                 BoundlessKit.debugLog("SyncCoordinator", "Created a cartridge for " + actionId + " for the first time!");
             }
-            return cartridge.remove();
+            return cartridge.dispenseReinforcement();
         }
         BoundlessKit.debugLog("SyncCoordinator", "Reinforcements disabled");
         return BoundlessAction.NEUTRAL_DECISION;

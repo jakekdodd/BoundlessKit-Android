@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +24,8 @@ import kit.boundless.internal.api.BoundlessAPI;
  */
 
 class Track extends ContextWrapper implements Callable<Integer> {
+
+    private final String TAG = "TrackSyncer";
 
     private static Track sharedInstance;
 
@@ -127,7 +130,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
     private boolean isSizeToSync() {
         int count = SQLTrackedActionDataHelper.count(sqlDB);
         boolean isSize = count >= sizeToSync;
-        BoundlessKit.debugLog("Track", "Track has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
+        BoundlessKit.debugLog(TAG, "Track has batched " + count + "/" + sizeToSync + " actions" + (isSize ? " so needs to sync..." : "."));
         return isSize;
     }
 
@@ -148,41 +151,41 @@ class Track extends ContextWrapper implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            BoundlessKit.debugLog("TrackSyncer", "Track sync already happening");
+            BoundlessKit.debugLog(TAG, "Track sync already happening");
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    BoundlessKit.debugLog("TrackSyncer", "Track sync already happening");
+                    BoundlessKit.debugLog(TAG, "Track sync already happening");
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        BoundlessKit.debugLog("TrackSyncer", "Beginning tracker sync!");
+                        BoundlessKit.debugLog(TAG, "Beginning tracker sync!");
 
                         final ArrayList<TrackedActionContract> sqlActions = SQLTrackedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
-                            BoundlessKit.debugLog("TrackSyncer", "No tracked actions to be synced.");
+                            BoundlessKit.debugLog(TAG, "No tracked actions to be synced.");
                             updateTriggers(null, System.currentTimeMillis(), null);
                             return 0;
                         } else {
-                            BoundlessKit.debugLog("TrackSyncer", sqlActions.size() + " tracked actions to be synced.");
+                            BoundlessKit.debugLog(TAG, sqlActions.size() + " tracked actions to be synced.");
                             JSONObject apiResponse = BoundlessAPI.track(this, sqlActions);
                             if (apiResponse != null) {
-                                String error = apiResponse.optString("error");
-                                if (!error.isEmpty()) {
-                                    BoundlessKit.debugLog("Track", "Got error:" + error);
-                                    return -1;
-                                }
-
                                 for (int i = 0; i < sqlActions.size(); i++) {
                                     SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
+                                }
+
+                                JSONArray errors = apiResponse.optJSONArray("errors");
+                                if (errors != null) {
+                                    BoundlessKit.debugLog(TAG, "Got errors:" + errors);
+                                    return -1;
                                 }
 
                                 updateTriggers(null, System.currentTimeMillis(), null);
                                 return 200;
                             } else {
-                                BoundlessKit.debugLog("TrackSyncer", "Something went wrong making the call...");
+                                BoundlessKit.debugLog(TAG, "Could not send request.");
                                 return -1;
                             }
                         }

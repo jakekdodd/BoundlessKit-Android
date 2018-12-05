@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +24,8 @@ import kit.boundless.internal.api.BoundlessAPI;
  */
 
 class Report extends ContextWrapper implements Callable<Integer> {
+
+    private final String TAG = "ReportSyncer";
 
     private static Report sharedInstance;
 
@@ -157,41 +160,41 @@ class Report extends ContextWrapper implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            BoundlessKit.debugLog("ReportSyncer", "Report sync already happening");
+            BoundlessKit.debugLog(TAG, "Report sync already happening");
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    BoundlessKit.debugLog("ReportSyncer", "Report sync already happening");
+                    BoundlessKit.debugLog(TAG, "Report sync already happening");
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        BoundlessKit.debugLog("ReportSyncer", "Beginning reporter sync!");
+                        BoundlessKit.debugLog(TAG, "Beginning reporter sync!");
 
                         final ArrayList<ReportedActionContract> sqlActions = SQLReportedActionDataHelper.findAll(sqlDB);
                         if (sqlActions.size() == 0) {
-                            BoundlessKit.debugLog("ReportSyncer", "No reported actions to be synced.");
+                            BoundlessKit.debugLog(TAG, "No reported actions to be synced.");
                             updateTriggers(null, System.currentTimeMillis(), null);
                             return 0;
                         } else {
-                            BoundlessKit.debugLog("ReportSyncer", sqlActions.size() + " reported actions to be synced.");
+                            BoundlessKit.debugLog(TAG, sqlActions.size() + " reported actions to be synced.");
                             JSONObject apiResponse = BoundlessAPI.report(this, sqlActions);
                             if (apiResponse != null) {
-                                String error = apiResponse.optString("error");
-                                if (!error.isEmpty()) {
-                                    BoundlessKit.debugLog("ReportSyncer", "Got error:" + error);
-                                    return -1;
-                                }
-
                                 for (int i = 0; i < sqlActions.size(); i++) {
                                     remove(sqlActions.get(i));
+                                }
+
+                                JSONArray errors = apiResponse.optJSONArray("errors");
+                                if (errors != null) {
+                                    BoundlessKit.debugLog(TAG, "Got errors:" + errors);
+                                    return -1;
                                 }
 
                                 updateTriggers(null, System.currentTimeMillis(), null);
                                 return 200;
                             } else {
-                                BoundlessKit.debugLog("ReportSyncer", "Something went wrong making the call...");
+                                BoundlessKit.debugLog(TAG, "Could not send request.");
                                 return -1;
                             }
                         }

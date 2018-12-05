@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,6 +17,8 @@ import kit.boundless.internal.api.BoundlessAPI;
 import kit.boundless.internal.data.storage.SQLiteDataStore;
 
 class Boot extends ContextWrapper implements Callable<Integer> {
+
+    private final String TAG = "BootSyncer";
 
     private static Boot sharedInstance;
 
@@ -101,28 +104,29 @@ class Boot extends ContextWrapper implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            BoundlessKit.debugLog("Boot", "Boot sync already happening");
+            BoundlessKit.debugLog(TAG, "Boot sync already happening");
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    BoundlessKit.debugLog("Boot", "Boot sync already happening");
+                    BoundlessKit.debugLog(TAG, "Boot sync already happening");
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        BoundlessKit.debugLog("Boot", "Beginning sync for boot");
+                        BoundlessKit.debugLog(TAG, "Beginning sync for boot");
 
                         JSONObject apiResponse = BoundlessAPI.boot(this, requestJSON());
                         if (apiResponse != null) {
-                            String error = apiResponse.optString("error");
-                            if (!error.isEmpty()) {
-                                BoundlessKit.debugLog("Boot", "Got error:" + error);
-                                return -1;
-                            }
-                            BoundlessKit.debugLog("Boot", "Successful boot");
                             didSync = true;
                             initialBoot = false;
+
+                            JSONArray errors = apiResponse.optJSONArray("errors");
+                            if (errors != null) {
+                                BoundlessKit.debugLog(TAG, "Got errors:" + errors);
+                                return -1;
+                            }
+                            BoundlessKit.debugLog(TAG, "Successful boot");
 
                             try {
                                 JSONObject configJSON = apiResponse.optJSONObject("config");
@@ -153,7 +157,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
                             update();
                             return 200;
                         } else {
-                            BoundlessKit.debugLog("Boot", "Something went wrong with boot call. No internet?");
+                            BoundlessKit.debugLog(TAG, "Could not send request.");
                             return -1;
                         }
                     } finally {

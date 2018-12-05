@@ -23,6 +23,8 @@ import kit.boundless.internal.api.BoundlessAPI;
 
 class Cartridge extends ContextWrapper implements Callable<Integer> {
 
+    private final String TAG = "CartridgeSyncer";
+
     private SQLiteDatabase sqlDB;
     private SharedPreferences preferences;
 
@@ -132,7 +134,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
     private boolean isCapacityToSync() {
         int count = SQLCartridgeDataHelper.countFor(sqlDB, actionId);
         boolean isCapacity = count < minimumCount || (double) count / initialSize <= capacityToSync;
-        BoundlessKit.debugLog("Cartridge", "Cartridge for actionId:(" + actionId + ") has " + count + "/" + initialSize + " decisions remaining in its queue" + (isCapacity ? " so needs to sync..." : "."));
+        BoundlessKit.debugLog(TAG, "Cartridge for actionId:(" + actionId + ") has " + count + "/" + initialSize + " decisions remaining in its queue" + (isCapacity ? " so needs to sync..." : "."));
         return isCapacity;
     }
 
@@ -145,15 +147,15 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
         long rowId = SQLCartridgeDataHelper.insert(sqlDB, new ReinforcementDecisionContract(
                 0, actionId, cartridgeId, reinforcementDecision
         ));
-//        BoundlessKit.debugLog("Cartridge", "Inserted "+reinforcementDecision+" into row "+rowId+" for action "+actionId);
+//        BoundlessKit.debugLog(TAG, "Inserted "+reinforcementDecision+" into row "+rowId+" for action "+actionId);
     }
 
     /**
-     * Unloads a reinforcement decision
+     * Dispenses a reinforcement decision from the cartridge.
      *
-     * @return A reinforcement decision for a user's action
+     * @return A reinforcement decision string. If there are no reinforcements, a neutral decision is returned.
      */
-    public String remove() {
+    public String dispenseReinforcement() {
         String reinforcementDecision = BoundlessAction.NEUTRAL_DECISION;
 
         if (isFresh()) {
@@ -170,27 +172,28 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         if (syncInProgress) {
-            BoundlessKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionId);
+            BoundlessKit.debugLog(TAG, "Cartridge sync already happening for " + actionId);
             return 0;
         } else {
             synchronized (apiSyncLock) {
                 if (syncInProgress) {
-                    BoundlessKit.debugLog("Cartridge", "Cartridge sync already happening for " + actionId);
+                    BoundlessKit.debugLog(TAG, "Cartridge sync already happening for " + actionId);
                     return 0;
                 } else {
                     try {
                         syncInProgress = true;
-                        BoundlessKit.debugLog("Cartridge", "Beginning cartridge sync for " + actionId + "!");
+                        BoundlessKit.debugLog(TAG, "Beginning cartridge sync for " + actionId + "!");
 
                         JSONObject apiResponse = BoundlessAPI.refresh(this, actionId);
                         if (apiResponse != null) {
-                            String error = apiResponse.optString("error");
-                            if (!error.isEmpty()) {
-                                BoundlessKit.debugLog("Cartridge", "Got error:" + error);
+
+                            JSONArray errors = apiResponse.optJSONArray("errors");
+                            if (errors != null) {
+                                BoundlessKit.debugLog(TAG, "Got errors:" + errors);
                                 return -1;
                             }
 
-                            BoundlessKit.debugLog("Cartridge", "Replacing cartridge for " + actionId + "...");
+                            BoundlessKit.debugLog(TAG, "Replacing cartridge for " + actionId + "...");
                             JSONArray reinforcementCartridge = apiResponse.getJSONArray("reinforcements");
                             long expiresIn = apiResponse.getLong("ttl");
                             String  cartridgeId = apiResponse.getString("cartridgeId");
@@ -202,7 +205,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
                             updateTriggers(reinforcementCartridge.length(), System.currentTimeMillis(), expiresIn);
                             return 200;
                         } else {
-                            BoundlessKit.debugLog("Cartridge", "Something went wrong making the call...");
+                            BoundlessKit.debugLog(TAG, "Could not send request.");
                             return -1;
                         }
                     } finally {
