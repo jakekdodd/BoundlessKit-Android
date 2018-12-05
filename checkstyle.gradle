@@ -18,7 +18,7 @@ task checkstyle(type: Checkstyle) {
 
   source = sources
   classpath = files()
-  ignoreFailures false
+  ignoreFailures true
 }
 
 checkstyle {
