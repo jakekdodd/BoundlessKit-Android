@@ -125,63 +125,6 @@ install {
   }
 }
 
-//install {
-//  repositories.mavenInstaller {
-//    pom {
-//      project {
-//        packaging 'aar'
-//        name 'boundless'
-//        url siteUrl
-//        licenses {
-//          license {
-//            name 'MIT License'
-//            url 'https://opensource.org/licenses/MIT'
-//          }
-//        }
-//        developers {
-//          developer {
-//            id 'boundlessai'
-//            name 'Boundless Mind, Inc'
-//            email 'android-support@boundless.ai'
-//          }
-//        }
-//        scm {
-//          connection siteUrl
-//          developerConnection gitUrl
-//          url siteUrl
-//        }
-//      }
-//    }
-//  }
-//}
-
 nebulaRelease {
   addReleaseBranchPattern 'project-cleanup'
 }
-
-//bintray {
-//
-//  user = System.getenv("BINTRAY_USER")
-//  key = System.getenv("BINTRAY_KEY")
-//
-//  publications = ['nebula']
-//  dryRun = false
-//  publish = true
-//
-//  pkg {
-//    repo = 'boundless-java'
-//    userOrg = 'boundless-ai'
-//    name = 'boundless'
-//    desc = libraryDescription
-//    websiteUrl = siteUrl
-//    issueTrackerUrl = siteUrl
-//    vcsUrl = gitUrl
-//    licenses = ['MIT']
-//    labels = ['boundless', 'sdk', 'android']
-//    publicDownloadNumbers = true
-//    version {
-//      name = project.version
-//      vcsTag = project.version
-//    }
-//  }
-//}
