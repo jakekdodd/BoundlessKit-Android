@@ -1,60 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'nebula.maven-publish'
-apply plugin: 'com.github.dcendents.android-maven'
-
-apply plugin: 'nebula.javadoc-jar'
-apply plugin: 'nebula.nebula-bintray-publishing'
-apply plugin: 'nebula.source-jar'
 
 apply from: '../checkstyle.gradle'
-
-ext {
-  bintrayRepo = 'maven'
-  bintrayName = 'boundlesskit'
-
-  publishedGroupId = 'boundless'
-  libraryName = 'BoundlessKit'
-  artifact = 'boundlesskit'
-
-  libraryDescription = 'A wrapper for Boundless AI on Android. Includes out-of-the-box rewards to delight your users.'
-
-  siteUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android'
-  gitUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android.git'
-
-  libraryVersion = '4.0.8'
-
-  developerId = 'cuddergambino'
-  developerName = 'Akash Desai'
-  developerEmail = 'kash@boundless.ai'
-
-  licenseName = 'The Apache Software License, Version 2.0'
-  licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-  allLicenses = ["Apache-2.0"]
-}
-
-bintray {
-  user = System.getenv("BINTRAY_USER")
-  key = System.getenv("BINTRAY_KEY")
-
-  configurations = ['archives']
-  pkg {
-    repo = 'boundless-java'
-    userOrg = 'boundless-ai'
-    name = 'boundless'
-    desc = libraryDescription
-    websiteUrl = siteUrl
-    issueTrackerUrl = siteUrl
-    vcsUrl = gitUrl
-    licenses = ['MIT']
-    labels = ['boundless', 'sdk', 'android']
-
-    version {
-      name = project.version
-      vcsTag = project.version
-      desc = libraryDescription
-    }
-  }
-}
+apply from: 'publishing.gradle'
 
 android {
   compileSdkVersion rootProject.compileSdkVersion
@@ -82,7 +29,6 @@ android {
 }
 
 dependencies {
-  implementation fileTree(include: ['*.jar'], dir: 'libs')
   implementation 'com.android.support:design:28.0.0'
   implementation 'com.android.support:appcompat-v7:28.0.0'
   implementation 'com.android.support:support-dynamic-animation:28.0.0'
@@ -93,38 +39,4 @@ dependencies {
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
   androidTestImplementation 'com.android.support.test:runner:1.0.2'
-}
-
-install {
-  repositories.mavenInstaller {
-    pom {
-      project {
-        packaging 'aar'
-        name 'boundless'
-        url siteUrl
-        licenses {
-          license {
-            name 'MIT License'
-            url 'https://opensource.org/licenses/MIT'
-          }
-        }
-        developers {
-          developer {
-            id 'boundlessai'
-            name 'Boundless Mind, Inc'
-            email 'android-support@boundless.ai'
-          }
-        }
-        scm {
-          connection siteUrl
-          developerConnection gitUrl
-          url siteUrl
-        }
-      }
-    }
-  }
-}
-
-nebulaRelease {
-  addReleaseBranchPattern 'project-cleanup'
 }
