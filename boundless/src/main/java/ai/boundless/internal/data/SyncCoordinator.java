@@ -9,11 +9,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import ai.boundless.BoundlessKit;
+import ai.boundless.internal.api.BoundlessApi;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
-import ai.boundless.BoundlessKit;
-import ai.boundless.internal.api.BoundlessApi;
 
 /**
  * Created by cuddergambino on 8/4/16.

@@ -1,8 +1,8 @@
 package ai.boundless.reward.particle.modifiers;
 
+import ai.boundless.reward.particle.Particle;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import ai.boundless.reward.particle.Particle;
 
 /**
  * The type Scale modifier.

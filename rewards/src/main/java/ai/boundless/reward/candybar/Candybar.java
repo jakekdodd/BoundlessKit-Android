@@ -3,6 +3,7 @@ package ai.boundless.reward.candybar;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import ai.boundless.R;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
@@ -30,7 +31,6 @@ import android.view.ViewParent;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import ai.boundless.R;
 
 /**
  * Candybars provide lightweight reinforcement to users for an action. They show a brief message at

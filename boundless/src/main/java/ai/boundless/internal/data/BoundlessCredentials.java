@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.TimeZone;
 
+import ai.boundless.BoundlessKit;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.Nullable;
-import ai.boundless.BoundlessKit;
 import org.json.JSONException;
 import org.json.JSONObject;
 

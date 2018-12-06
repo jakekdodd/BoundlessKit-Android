@@ -1,7 +1,7 @@
 package ai.boundless.reward.particle.modifiers;
 
-import android.view.animation.Interpolator;
 import ai.boundless.reward.particle.Particle;
+import android.view.animation.Interpolator;
 
 /**
  * The type Alpha modifier.

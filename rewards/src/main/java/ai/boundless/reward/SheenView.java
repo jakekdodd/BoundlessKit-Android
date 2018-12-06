@@ -1,5 +1,6 @@
 package ai.boundless.reward;
 
+import ai.boundless.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -18,7 +19,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.RelativeLayout;
-import ai.boundless.R;
 
 /**
  * Displays a shiny effect over a view.

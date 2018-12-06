@@ -1,15 +1,15 @@
 package ai.boundless.internal.data;
 
+import ai.boundless.BoundlessKit;
+import ai.boundless.internal.data.storage.SqlUserIdentityDataHelper;
+import ai.boundless.internal.data.storage.SqliteDataStore;
+import ai.boundless.internal.data.storage.contracts.UserIdentityContract;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import ai.boundless.BoundlessKit;
-import ai.boundless.internal.data.storage.SqlUserIdentityDataHelper;
-import ai.boundless.internal.data.storage.SqliteDataStore;
-import ai.boundless.internal.data.storage.contracts.UserIdentityContract;
 
 
 public class BoundlessUser extends ContextWrapper {

@@ -7,6 +7,16 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ai.boundless.reward.particle.initializers.AccelerationInitializer;
+import ai.boundless.reward.particle.initializers.LifetimeInitializer;
+import ai.boundless.reward.particle.initializers.ParticleInitializer;
+import ai.boundless.reward.particle.initializers.RotationInitializer;
+import ai.boundless.reward.particle.initializers.RotationSpeedInitializer;
+import ai.boundless.reward.particle.initializers.ScaleInitializer;
+import ai.boundless.reward.particle.initializers.SpeedByComponentsInitializer;
+import ai.boundless.reward.particle.initializers.SpeedModuleAndRangeInitializer;
+import ai.boundless.reward.particle.modifiers.AlphaModifier;
+import ai.boundless.reward.particle.modifiers.ParticleModifier;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ValueAnimator;
@@ -28,16 +38,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import ai.boundless.reward.particle.initializers.AccelerationInitializer;
-import ai.boundless.reward.particle.initializers.LifetimeInitializer;
-import ai.boundless.reward.particle.initializers.ParticleInitializer;
-import ai.boundless.reward.particle.initializers.RotationInitializer;
-import ai.boundless.reward.particle.initializers.RotationSpeedInitializer;
-import ai.boundless.reward.particle.initializers.ScaleInitializer;
-import ai.boundless.reward.particle.initializers.SpeedByComponentsInitializer;
-import ai.boundless.reward.particle.initializers.SpeedModuleAndRangeInitializer;
-import ai.boundless.reward.particle.modifiers.AlphaModifier;
-import ai.boundless.reward.particle.modifiers.ParticleModifier;
 
 /**
  * The type Particle system.

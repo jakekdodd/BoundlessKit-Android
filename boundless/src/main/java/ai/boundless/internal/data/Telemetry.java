@@ -6,10 +6,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
 import ai.boundless.BoundlessKit;
 import ai.boundless.internal.api.BoundlessApi;
 import ai.boundless.internal.data.storage.SqlBoundlessExceptionDataHelper;
@@ -17,6 +13,10 @@ import ai.boundless.internal.data.storage.SqlSyncOverviewDataHelper;
 import ai.boundless.internal.data.storage.SqliteDataStore;
 import ai.boundless.internal.data.storage.contracts.BoundlessExceptionContract;
 import ai.boundless.internal.data.storage.contracts.SyncOverviewContract;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import org.json.JSONObject;
 
 /**
