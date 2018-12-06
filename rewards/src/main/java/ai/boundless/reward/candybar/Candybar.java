@@ -3,7 +3,7 @@ package ai.boundless.reward.candybar;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import ai.boundless.R;
+import ai.boundless.reward.R;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
