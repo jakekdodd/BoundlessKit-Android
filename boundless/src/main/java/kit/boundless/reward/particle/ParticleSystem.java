@@ -74,7 +74,7 @@ public class ParticleSystem {
   private int mEmitterYMax;
 
   /**
-   * Creates a particle system with the given parameters
+   * Creates a particle system with the given parameters.
    *
    * @param parentView The parent view group
    * @param particleTemplates The drawable to use as particles
@@ -166,7 +166,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the parent view group. This needs to be done before any other configuration or
+   * Initializes the parent view group. This needs to be done before any other configuration or.
    * emitting is done. Drawing will be done to a child that is added to this view. So this view
    * needs to allow displaying an arbitrary sized view on top of its other content.
    *
@@ -182,7 +182,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Creates a particle system with the given parameters
+   * Creates a particle system with the given parameters.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -195,7 +195,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Utility constructor that receives a Drawable
+   * Utility constructor that receives a Drawable.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -209,7 +209,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Creates a particle system with the given parameters
+   * Creates a particle system with the given parameters.
    *
    * @param parentView The parent view group
    * @param maxParticles The maximum number of particles
@@ -245,7 +245,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Creates a particle system with the given parameters
+   * Creates a particle system with the given parameters.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -260,7 +260,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Utility constructor that receives a Drawable
+   * Utility constructor that receives a Drawable.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -272,7 +272,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Utility constructor that receives a Bitmap
+   * Utility constructor that receives a Bitmap.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -284,7 +284,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Utility constructor that receives a Bitmap
+   * Utility constructor that receives a Bitmap.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -301,7 +301,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Utility constructor that receives an AnimationDrawable
+   * Utility constructor that receives an AnimationDrawable.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -314,7 +314,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Utility constructor that receives an AnimationDrawable
+   * Utility constructor that receives an AnimationDrawable.
    *
    * @param a The parent activity
    * @param maxParticles The maximum number of particles
@@ -336,11 +336,11 @@ public class ParticleSystem {
   }
 
   /**
-   * Sets the frames per second of <em>ALL</em> ParticleSystems
+   * Sets the frames per second of <em>ALL</em> ParticleSystems.
    *
    * @param fps the desired frames per second
    */
-  public static void setFPS(double fps) {
+  public static void setFps(double fps) {
     TIMER_TASK_INTERVAL = Math.round(1000 / fps);
   }
 
@@ -363,7 +363,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Delays the Particle system
+   * Delays the Particle system.
    *
    * @param delay the time in milliseconds to delay
    * @return The particle system
@@ -433,7 +433,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the speed range and angle range of emitted particles. Angles are in degrees
+   * Initializes the speed range and angle range of emitted particles. Angles are in degrees.
    * and non negative:
    * 0 meaning to the right, 90 to the bottom,... in clockwise orientation. Speed is non
    * negative and is described in pixels per millisecond.
@@ -460,7 +460,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the speed components ranges that particles will be emitted. Speeds are
+   * Initializes the speed components ranges that particles will be emitted. Speeds are.
    * measured in density pixels per millisecond.
    *
    * @param speedMinX The minimum speed in x direction.
@@ -480,7 +480,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the initial rotation range of emitted particles. The rotation angle is
+   * Initializes the initial rotation range of emitted particles. The rotation angle is.
    * measured in degrees with 0° being no rotation at all and 90° tilting the image to the right.
    *
    * @param minAngle The minimum tilt angle.
@@ -493,7 +493,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the scale range of emitted particles. Will scale the images around their
+   * Initializes the scale range of emitted particles. Will scale the images around their.
    * center multiplied with the given scaling factor.
    *
    * @param minScale The minimum scaling factor
@@ -506,7 +506,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the rotation speed of emitted particles. Rotation speed is measured in degrees
+   * Initializes the rotation speed of emitted particles. Rotation speed is measured in degrees.
    * per second.
    *
    * @param rotationSpeed The rotation speed.
@@ -518,7 +518,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the rotation speed range for emitted particles. The rotation speed is measured
+   * Initializes the rotation speed range for emitted particles. The rotation speed is measured.
    * in degrees per second and can be positive or negative.
    *
    * @param minRotationSpeed The minimum rotation speed.
@@ -533,18 +533,16 @@ public class ParticleSystem {
   /**
    * Sets acceleration module and and angle range.
    *
-   * @param minAcceleration the min acceleration
-   * @param maxAcceleration the max acceleration
-   * @param minAngle the min angle
-   * @param maxAngle the max angle
-   * @return the acceleration module and and angle range
-   */
-  /*
    * Initializes the acceleration range and angle range of emitted particles. The acceleration
    * components in x and y direction are controlled by the acceleration angle. The acceleration
    * is measured in density pixels per square millisecond. The angle is measured in degrees
    * with 0° pointing to the right and going clockwise.
    *
+   * @param minAcceleration the min acceleration
+   * @param maxAcceleration the max acceleration
+   * @param minAngle the min angle
+   * @param maxAngle the max angle
+   * @return the acceleration module and and angle range
    */
   public ParticleSystem setAccelerationModuleAndAndAngleRange(
       float minAcceleration, float maxAcceleration, int minAngle, int maxAngle) {
@@ -557,7 +555,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Adds a custom initializer for emitted particles. The most common use case is the ability to
+   * Adds a custom initializer for emitted particles. The most common use case is the ability to.
    * update the initializer in real-time instead of adding new ones ontop of the existing one.
    *
    * @param initializer The non-null initializer to add.
@@ -571,7 +569,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Initializes the acceleration for emitted particles with the given angle. Acceleration is
+   * Initializes the acceleration for emitted particles with the given angle. Acceleration is.
    * measured in pixels per square millisecond. The angle is measured in degrees with 0°
    * meaning to the right and orientation being clockwise. The angle controls the acceleration
    * direction.
@@ -597,7 +595,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Configures a fade in for the particles when they appear
+   * Configures a fade in for the particles when they appear.
    *
    * @param duration fade in duration in milliseconds
    * @return The particle system
@@ -607,7 +605,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Configures a fade in for the particles when they appear
+   * Configures a fade in for the particles when they appear.
    *
    * @param duration fade in duration in milliseconds
    * @param interpolator the interpolator for the fade in (default is linear)
@@ -619,7 +617,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Configures a fade out for the particles when they disappear
+   * Configures a fade out for the particles when they disappear.
    *
    * @param duration fade out duration in milliseconds
    * @return The particle system
@@ -629,7 +627,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Configures a fade out for the particles when they disappear
+   * Configures a fade out for the particles when they disappear.
    *
    * @param duration fade out duration in milliseconds
    * @param interpolator the interpolator for the fade out (default is linear)
@@ -641,7 +639,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Starts emitting particles from a specific view. If at some point the number goes over the
+   * Starts emitting particles from a specific view. If at some point the number goes over the.
    * amount of particles availabe on create
    * no new particles will be created
    *
@@ -658,7 +656,23 @@ public class ParticleSystem {
   }
 
   /**
-   * Starts emitting particles from a specific view. If at some point the number goes over the
+   * Starts emitting particles from a specific view. If at some point the number goes over the.
+   * amount of particles availabe on create
+   * no new particles will be created
+   *
+   * @param emitter View from which center the particles will be emited
+   * @param gravity Which position among the view the emission takes place
+   * @param particlesPerSecond Number of particles per second that will be emited (evenly
+   *     distributed)
+   */
+  public void emitWithGravity(View emitter, int gravity, int particlesPerSecond) {
+    // Setup emitter
+    configureEmitter(emitter, gravity);
+    startEmitting(particlesPerSecond);
+  }
+
+  /**
+   * Starts emitting particles from a specific view. If at some point the number goes over the.
    * amount of particles availabe on create
    * no new particles will be created
    *
@@ -672,7 +686,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Starts emitting particles from a specific view. If at some point the number goes over the
+   * Starts emitting particles from a specific view. If at some point the number goes over the.
    * amount of particles availabe on create
    * no new particles will be created
    *
@@ -686,18 +700,51 @@ public class ParticleSystem {
   }
 
   /**
-   * Starts emitting particles from a specific view. If at some point the number goes over the
-   * amount of particles availabe on create
-   * no new particles will be created
+   * Emit.
    *
-   * @param emitter View from which center the particles will be emited
-   * @param gravity Which position among the view the emission takes place
-   * @param particlesPerSecond Number of particles per second that will be emited (evenly
-   *     distributed)
+   * @param emitterX the emitter x
+   * @param emitterY the emitter y
+   * @param particlesPerSecond the particles per second
+   * @param emittingTime the emitting time
    */
-  public void emitWithGravity(View emitter, int gravity, int particlesPerSecond) {
-    // Setup emitter
-    configureEmitter(emitter, gravity);
+  public void emit(int emitterX, int emitterY, int particlesPerSecond, int emittingTime) {
+    configureEmitter(emitterX, emitterY);
+    startEmitting(particlesPerSecond, emittingTime);
+  }
+
+  /**
+   * Emit.
+   *
+   * @param emitterXMin the emitter x min
+   * @param emitterXMax the emitter x max
+   * @param emitterYMin the emitter y min
+   * @param emitterYMax the emitter y max
+   * @param particlesPerSecond the particles per second
+   * @param emittingTime the emitting time
+   */
+  public void emit(
+      int emitterXMin,
+      int emitterXMax,
+      int emitterYMin,
+      int emitterYMax,
+      int particlesPerSecond,
+      int emittingTime) {
+    mEmitterXMin = emitterXMin;
+    mEmitterXMax = emitterXMax;
+    mEmitterYMin = emitterYMin;
+    mEmitterYMax = emitterYMax;
+    startEmitting(particlesPerSecond, emittingTime);
+  }
+
+  /**
+   * Emit.
+   *
+   * @param emitterX the emitter x
+   * @param emitterY the emitter y
+   * @param particlesPerSecond the particles per second
+   */
+  public void emit(int emitterX, int emitterY, int particlesPerSecond) {
+    configureEmitter(emitterX, emitterY);
     startEmitting(particlesPerSecond);
   }
 
@@ -739,6 +786,15 @@ public class ParticleSystem {
     }
   }
 
+  private void configureEmitter(int emitterX, int emitterY) {
+    // We configure the emitter based on the window location to fix the offset of action bar if
+    // present
+    mEmitterXMin = emitterX - mParentLocation[0];
+    mEmitterXMax = mEmitterXMin;
+    mEmitterYMin = emitterY - mParentLocation[1];
+    mEmitterYMax = mEmitterYMin;
+  }
+
   private void startEmitting(int particlesPerSecond) {
     mActivatedParticles = 0;
     mParticlesPerMillisecond = particlesPerSecond / 1000f;
@@ -750,6 +806,19 @@ public class ParticleSystem {
     updateParticlesBeforeStartTime(particlesPerSecond);
     mTimer = new Timer();
     mTimer.schedule(mTimerTask, 0, TIMER_TASK_INTERVAL);
+  }
+
+  private void startEmitting(int particlesPerSecond, int emittingTime) {
+    mActivatedParticles = 0;
+    mParticlesPerMillisecond = particlesPerSecond / 1000f;
+    // Add a full size view to the parent view
+    mDrawingView = new ParticleField(mParentView.getContext());
+    mParentView.addView(mDrawingView);
+
+    mDrawingView.setParticles(mActiveParticles);
+    updateParticlesBeforeStartTime(particlesPerSecond);
+    mEmittingTime = emittingTime;
+    startAnimator(new LinearInterpolator(), emittingTime + mTimeToLive);
   }
 
   private boolean hasGravity(int gravity, int gravityToCheck) {
@@ -775,11 +844,13 @@ public class ParticleSystem {
     if (mDrawingView == null) {
       return;
     }
-    while (((mEmittingTime > 0 && milliseconds < mEmittingTime) || mEmittingTime == -1) &&
+    while (
         // This point should emit
-        !mParticles.isEmpty() && // We have particles in the pool
-        mActivatedParticles < mParticlesPerMillisecond
-            * milliseconds) { // and we are under the number of particles that should be launched
+        ((mEmittingTime > 0 && milliseconds < mEmittingTime) || mEmittingTime == -1)
+            // We have particles in the pool
+            && !mParticles.isEmpty()
+            // and we are under the number of particles that should be launched
+            && mActivatedParticles < mParticlesPerMillisecond * milliseconds) {
       // Activate a new particle
       activateParticle(milliseconds);
     }
@@ -835,77 +906,6 @@ public class ParticleSystem {
   }
 
   /**
-   * Emit.
-   *
-   * @param emitterX the emitter x
-   * @param emitterY the emitter y
-   * @param particlesPerSecond the particles per second
-   * @param emittingTime the emitting time
-   */
-  public void emit(int emitterX, int emitterY, int particlesPerSecond, int emittingTime) {
-    configureEmitter(emitterX, emitterY);
-    startEmitting(particlesPerSecond, emittingTime);
-  }
-
-  /**
-   * Emit.
-   *
-   * @param emitterXMin the emitter x min
-   * @param emitterXMax the emitter x max
-   * @param emitterYMin the emitter y min
-   * @param emitterYMax the emitter y max
-   * @param particlesPerSecond the particles per second
-   * @param emittingTime the emitting time
-   */
-  public void emit(
-      int emitterXMin,
-      int emitterXMax,
-      int emitterYMin,
-      int emitterYMax,
-      int particlesPerSecond,
-      int emittingTime) {
-    mEmitterXMin = emitterXMin;
-    mEmitterXMax = emitterXMax;
-    mEmitterYMin = emitterYMin;
-    mEmitterYMax = emitterYMax;
-    startEmitting(particlesPerSecond, emittingTime);
-  }
-
-  private void startEmitting(int particlesPerSecond, int emittingTime) {
-    mActivatedParticles = 0;
-    mParticlesPerMillisecond = particlesPerSecond / 1000f;
-    // Add a full size view to the parent view
-    mDrawingView = new ParticleField(mParentView.getContext());
-    mParentView.addView(mDrawingView);
-
-    mDrawingView.setParticles(mActiveParticles);
-    updateParticlesBeforeStartTime(particlesPerSecond);
-    mEmittingTime = emittingTime;
-    startAnimator(new LinearInterpolator(), emittingTime + mTimeToLive);
-  }
-
-  /**
-   * Emit.
-   *
-   * @param emitterX the emitter x
-   * @param emitterY the emitter y
-   * @param particlesPerSecond the particles per second
-   */
-  public void emit(int emitterX, int emitterY, int particlesPerSecond) {
-    configureEmitter(emitterX, emitterY);
-    startEmitting(particlesPerSecond);
-  }
-
-  private void configureEmitter(int emitterX, int emitterY) {
-    // We configure the emitter based on the window location to fix the offset of action bar if
-    // present
-    mEmitterXMin = emitterX - mParentLocation[0];
-    mEmitterXMax = mEmitterXMin;
-    mEmitterYMin = emitterY - mParentLocation[1];
-    mEmitterYMax = mEmitterYMin;
-  }
-
-  /**
    * Update emit point.
    *
    * @param emitterX the emitter x
@@ -926,7 +926,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Launches particles in one Shot
+   * Launches particles in one Shot.
    *
    * @param emitter View from which center the particles will be emited
    * @param numParticles number of particles launched on the one shot
@@ -936,7 +936,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Launches particles in one Shot using a special Interpolator
+   * Launches particles in one Shot using a special Interpolator.
    *
    * @param emitter View from which center the particles will be emited
    * @param numParticles number of particles launched on the one shot
@@ -1003,7 +1003,7 @@ public class ParticleSystem {
   }
 
   /**
-   * Stops emitting new particles, but will draw the existing ones until their timeToLive expire
+   * Stops emitting new particles, but will draw the existing ones until their timeToLive expire.
    * For an cancellation and stop drawing of the particles, use cancel instead.
    */
   public void stopEmitting() {

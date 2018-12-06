@@ -7,9 +7,9 @@ import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.api.BoundlessAPI;
-import kit.boundless.internal.data.storage.SQLCartridgeDataHelper;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.api.BoundlessApi;
+import kit.boundless.internal.data.storage.SqlCartridgeDataHelper;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import kit.boundless.internal.data.storage.contracts.ReinforcementDecisionContract;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,36 +18,44 @@ import org.json.JSONObject;
 /**
  * Created by cuddergambino on 9/6/16.
  */
-
 class Cartridge extends ContextWrapper implements Callable<Integer> {
 
-  private static final String actionIdKey = "actionName";
-  private static final String sizeKey = "size";
-  private static final String capacityToSyncKey = "capacityToSync";
-  private static final String initialSizeKey = "initialSize";
-  private static final String timerStartsAtKey = "timerStartsAt";
-  private static final String timerExpiresInKey = "timerExpiresIn";
-  private static final double capacityToSync = 0.25;
-  private static final int minimumCount = 2;
+  private static final String ACTION_ID_KEY = "actionName";
+  private static final String SIZE_KEY = "size";
+  private static final String CAPACITY_TO_SYNC_KEY = "capacityToSync";
+  private static final String INITIAL_SIZE_KEY = "initialSize";
+  private static final String TIMER_STARTS_AT_KEY = "timerStartsAt";
+  private static final String TIMER_EXPIRES_IN_KEY = "timerExpiresIn";
+  private static final double CAPACITY_TO_SYNC = 0.25;
+  private static final int MINIMUM_COUNT = 2;
+  /**
+   * The Action id.
+   */
   public final String actionId;
-  private final String TAG = "CartridgeSyncer";
+  private final String tag = "CartridgeSyncer";
   private final Object apiSyncLock = new Object();
-  private SQLiteDatabase sqlDB;
+  private SQLiteDatabase sqlDb;
   private SharedPreferences preferences;
   private int initialSize;
   private long timerStartsAt;
   private long timerExpiresIn;
   private Boolean syncInProgress = false;
 
+  /**
+   * Instantiates a new Cartridge.
+   *
+   * @param base the base
+   * @param actionId the action id
+   */
   protected Cartridge(Context base, String actionId) {
     super(base);
     this.actionId = actionId;
 
-    sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
+    sqlDb = SqliteDataStore.getInstance(base).getWritableDatabase();
     preferences = getSharedPreferences(preferencesName(), Context.MODE_PRIVATE);
-    initialSize = preferences.getInt(initialSizeKey, 0);
-    timerStartsAt = preferences.getLong(timerStartsAtKey, 0);
-    timerExpiresIn = preferences.getLong(timerExpiresInKey, 0);
+    initialSize = preferences.getInt(INITIAL_SIZE_KEY, 0);
+    timerStartsAt = preferences.getLong(TIMER_STARTS_AT_KEY, 0);
+    timerExpiresIn = preferences.getLong(TIMER_EXPIRES_IN_KEY, 0);
   }
 
   private String preferencesName() {
@@ -55,6 +63,8 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
   }
 
   /**
+   * Is triggered boolean.
+   *
    * @return Whether a sync should be started
    */
   public boolean isTriggered() {
@@ -68,9 +78,10 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
   }
 
   private boolean isCapacityToSync() {
-    int count = SQLCartridgeDataHelper.countFor(sqlDB, actionId);
-    boolean isCapacity = count < minimumCount || (double) count / initialSize <= capacityToSync;
-    BoundlessKit.debugLog(TAG,
+    int count = SqlCartridgeDataHelper.countFor(sqlDb, actionId);
+    boolean isCapacity = count < MINIMUM_COUNT || (double) count / initialSize <= CAPACITY_TO_SYNC;
+    BoundlessKit.debugLog(
+        tag,
         "Cartridge for actionId:(" + actionId + ") has " + count + "/" + initialSize
             + " decisions remaining in its queue" + (isCapacity ? " so needs to sync..." : ".")
     );
@@ -95,12 +106,12 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
   public JSONObject jsonForTriggers() {
     JSONObject json = new JSONObject();
     try {
-      json.put(actionIdKey, actionId);
-      json.put(sizeKey, SQLCartridgeDataHelper.countFor(sqlDB, actionId));
-      json.put(initialSizeKey, initialSize);
-      json.put(capacityToSyncKey, capacityToSync);
-      json.put(timerStartsAtKey, timerStartsAt);
-      json.put(timerExpiresInKey, timerExpiresIn);
+      json.put(ACTION_ID_KEY, actionId);
+      json.put(SIZE_KEY, SqlCartridgeDataHelper.countFor(sqlDb, actionId));
+      json.put(INITIAL_SIZE_KEY, initialSize);
+      json.put(CAPACITY_TO_SYNC_KEY, CAPACITY_TO_SYNC);
+      json.put(TIMER_STARTS_AT_KEY, timerStartsAt);
+      json.put(TIMER_EXPIRES_IN_KEY, timerExpiresIn);
     } catch (JSONException e) {
       e.printStackTrace();
       Telemetry.storeException(e);
@@ -111,17 +122,17 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
   /**
    * Dispenses a reinforcement decision from the cartridge.
    *
-   * @return A reinforcement decision string. If there are no reinforcements, a neutral decision is
-   *     returned.
+   * @return A reinforcement decision string. If there are no reinforcements, a neutral decision
+   *     is     returned.
    */
   public String dispenseReinforcement() {
     String reinforcementDecision = BoundlessAction.NEUTRAL_DECISION;
 
     if (isFresh()) {
-      ReinforcementDecisionContract rdc = SQLCartridgeDataHelper.findFirstFor(sqlDB, actionId);
+      ReinforcementDecisionContract rdc = SqlCartridgeDataHelper.findFirstFor(sqlDb, actionId);
       if (rdc != null) {
         reinforcementDecision = rdc.reinforcementDecision;
-        SQLCartridgeDataHelper.delete(sqlDB, rdc);
+        SqlCartridgeDataHelper.delete(sqlDb, rdc);
       }
     }
 
@@ -129,42 +140,44 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
   }
 
   /**
+   * Is fresh boolean.
+   *
    * @return Whether there is a live ammo in the cartridge
    */
   public boolean isFresh() {
-    return !timerDidExpire() && SQLCartridgeDataHelper.countFor(sqlDB, actionId) >= 1;
+    return !timerDidExpire() && SqlCartridgeDataHelper.countFor(sqlDb, actionId) >= 1;
   }
 
   @Override
   public Integer call() throws Exception {
     if (syncInProgress) {
-      BoundlessKit.debugLog(TAG, "Cartridge sync already happening for " + actionId);
+      BoundlessKit.debugLog(tag, "Cartridge sync already happening for " + actionId);
       return 0;
     } else {
       synchronized (apiSyncLock) {
         if (syncInProgress) {
-          BoundlessKit.debugLog(TAG, "Cartridge sync already happening for " + actionId);
+          BoundlessKit.debugLog(tag, "Cartridge sync already happening for " + actionId);
           return 0;
         } else {
           try {
             syncInProgress = true;
-            BoundlessKit.debugLog(TAG, "Beginning cartridge sync for " + actionId + "!");
+            BoundlessKit.debugLog(tag, "Beginning cartridge sync for " + actionId + "!");
 
-            JSONObject apiResponse = BoundlessAPI.refresh(this, actionId);
+            JSONObject apiResponse = BoundlessApi.refresh(this, actionId);
             if (apiResponse != null) {
 
               JSONArray errors = apiResponse.optJSONArray("errors");
               if (errors != null) {
-                BoundlessKit.debugLog(TAG, "Got errors:" + errors);
+                BoundlessKit.debugLog(tag, "Got errors:" + errors);
                 return -1;
               }
 
-              BoundlessKit.debugLog(TAG, "Replacing cartridge for " + actionId + "...");
+              BoundlessKit.debugLog(tag, "Replacing cartridge for " + actionId + "...");
               JSONArray reinforcementCartridge = apiResponse.getJSONArray("reinforcements");
               long expiresIn = apiResponse.getLong("ttl");
               String cartridgeId = apiResponse.getString("cartridgeId");
 
-              SQLCartridgeDataHelper.deleteAllFor(sqlDB, actionId);
+              SqlCartridgeDataHelper.deleteAllFor(sqlDb, actionId);
               for (int i = 0; i < reinforcementCartridge.length(); i++) {
                 store(cartridgeId,
                     reinforcementCartridge.getJSONObject(i).getString("reinforcementName")
@@ -176,7 +189,7 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
               );
               return 200;
             } else {
-              BoundlessKit.debugLog(TAG, "Could not send request.");
+              BoundlessKit.debugLog(tag, "Could not send request.");
               return -1;
             }
           } finally {
@@ -188,16 +201,18 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
   }
 
   /**
-   * Stores a reinforcement decision in the cartridge
+   * Stores a reinforcement decision in the cartridge.
    *
+   * @param cartridgeId the cartridge id
    * @param reinforcementDecision The decision to be stored
    */
   public void store(String cartridgeId, String reinforcementDecision) {
-    long rowId = SQLCartridgeDataHelper.insert(sqlDB,
+    long rowId = SqlCartridgeDataHelper.insert(
+        sqlDb,
         new ReinforcementDecisionContract(0, actionId, cartridgeId, reinforcementDecision)
     );
-//        BoundlessKit.debugLog(TAG, "Inserted "+reinforcementDecision+" into row "+rowId+" for
-// action "+actionId);
+    //        BoundlessKit.debugLog(TAG, "Inserted "+reinforcementDecision+" into row "+rowId+" for
+    // action "+actionId);
   }
 
   /**
@@ -213,9 +228,9 @@ class Cartridge extends ContextWrapper implements Callable<Integer> {
     timerExpiresIn = expiresIn;
 
     preferences.edit()
-        .putInt(initialSizeKey, initialSize)
-        .putLong(timerStartsAtKey, timerStartsAt)
-        .putLong(timerExpiresInKey, timerExpiresIn)
+        .putInt(INITIAL_SIZE_KEY, initialSize)
+        .putLong(TIMER_STARTS_AT_KEY, timerStartsAt)
+        .putLong(TIMER_EXPIRES_IN_KEY, timerExpiresIn)
         .apply();
   }
 }

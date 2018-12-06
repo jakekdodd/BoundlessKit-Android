@@ -12,17 +12,33 @@ import kit.boundless.internal.data.storage.contracts.ReportedActionContract;
 /**
  * Created by cuddergambino on 8/9/16.
  */
+public class SqlReportedActionDataHelper extends SqlDataHelper {
 
-public class SQLReportedActionDataHelper extends SQLDataHelper {
-
+  /**
+   * Create table.
+   *
+   * @param db the db
+   */
   static void createTable(SQLiteDatabase db) {
     db.execSQL(ReportedActionContract.SQL_CREATE_TABLE);
   }
 
+  /**
+   * Drop table.
+   *
+   * @param db the db
+   */
   static void dropTable(SQLiteDatabase db) {
     db.execSQL(ReportedActionContract.SQL_DROP_TABLE);
   }
 
+  /**
+   * Insert long.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the long
+   */
   public static long insert(SQLiteDatabase db, ReportedActionContract item) {
     ContentValues values = new ContentValues();
     values.put(ReportedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionId);
@@ -38,14 +54,27 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
     return item.id;
   }
 
+  /**
+   * Delete.
+   *
+   * @param db the db
+   * @param item the item
+   */
   public static void delete(SQLiteDatabase db, ReportedActionContract item) {
     String selection = ReportedActionContract._ID + " LIKE ? ";
     String[] args = {String.valueOf(item.id)};
     db.delete(ReportedActionContract.TABLE_NAME, selection, args);
   }
 
-  public static @Nullable
-  ReportedActionContract find(SQLiteDatabase db, ReportedActionContract item) {
+  /**
+   * Find reported action contract.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the reported action contract
+   */
+  @Nullable
+  public static ReportedActionContract find(SQLiteDatabase db, ReportedActionContract item) {
     ReportedActionContract result = null;
     Cursor cursor = null;
     try {
@@ -71,6 +100,12 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
     return result;
   }
 
+  /**
+   * Find all array list.
+   *
+   * @param db the db
+   * @return the array list
+   */
   public static ArrayList<ReportedActionContract> findAll(SQLiteDatabase db) {
     ArrayList<ReportedActionContract> actions = new ArrayList<>();
     Cursor cursor = null;
@@ -95,6 +130,12 @@ public class SQLReportedActionDataHelper extends SQLDataHelper {
     return actions;
   }
 
+  /**
+   * Count int.
+   *
+   * @param db the db
+   * @return the int
+   */
   public static int count(SQLiteDatabase db) {
     int result = 0;
     Cursor cursor = null;

@@ -9,7 +9,7 @@ import android.view.animation.LinearInterpolator;
 import kit.boundless.reward.particle.ParticleSystem;
 import kit.boundless.reward.particle.TextDrawable;
 import kit.boundless.reward.particle.initializers.LifetimeInitializer;
-import kit.boundless.reward.particle.initializers.XYAccelerationInitializer;
+import kit.boundless.reward.particle.initializers.XyAccelerationInitializer;
 import kit.boundless.reward.particle.modifiers.ScaleModifier;
 
 /**
@@ -163,7 +163,9 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
-   * Explode the screen with emoji particles!
+   * Sets whether to include an explosion effect.
+   *
+   * Explode the screen with emoji particles!.
    * When set true, the number of emojis is determined by {@link #setRatePerSecond(int)} * {@link
    * #setDuration(long)}/1000
    *
@@ -177,7 +179,9 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
-   * A random value between 0 and lifetimeRange will be subtracted from each particle's lifetime
+   * Sets the lifetime range.
+   *
+   * A random value between 0 and lifetimeRange will be subtracted from each particle's lifetime.
    *
    * @param lifetimeRange Time in milliseconds
    * @return The object used for Constructor Chaining
@@ -188,6 +192,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the fade in duration.
+   *
    * @param fadeIn Time in milliseconds to fade in an emoji particle
    * @return The object used for Constructor Chaining
    */
@@ -197,6 +203,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the fade out duration.
+   *
    * @param fadeOut Time in milliseconds to fade out an emoji particle
    * @return The object used for Constructor Chaining
    */
@@ -206,7 +214,9 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
-   * If only one emoji is preferred:
+   * Sets the rate of emojis per second.
+   *
+   * If only one emoji is preferred:.
    * {@link #setRatePerSecond(int)} to 1,
    * {@link #setDuration(long)} to 1000,
    * and finally {@link #setLifetime(long)} to desired time
@@ -220,6 +230,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the scale.
+   *
    * @param scale The initial scale for an emoji particle
    * @return The object used for Constructor Chaining
    */
@@ -229,7 +241,9 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
-   * A positive value will give an exploding effect, while a negative value will give an imploding
+   * Sets the scale range.
+   *
+   * A positive value will give an exploding effect, while a negative value will give an imploding.
    * effect.
    *
    * @param scaleChange The magnitude by which an emoji particle scale will change by the end of
@@ -242,6 +256,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the velocity.
+   *
    * To set direction, use {@link #setShootingAngle(float)}.
    * To set acceleration, use {@link #setXAcceleration(float)}.
    *
@@ -254,6 +270,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the velocity range.
+   *
    * @param velocityRange The magnitude by which the initial velocity of an emoji particle can
    *     vary measured in density pixels per second
    * @return The object used for Constructor Chaining
@@ -264,6 +282,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the x-axis acceleration.
+   *
    * @param xAcceleration The x acceleration of an emoji particle measured in density pixels per
    *     second by second
    * @return The object used for Constructor Chaining
@@ -274,6 +294,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the y-axis acceleration.
+   *
    * @param yAcceleration The y acceleration of an emoji particle measured in density pixels per
    *     second by second
    * @return The object used for Constructor Chaining
@@ -284,7 +306,9 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
-   * Angles are in degrees and non negative meaning:
+   * Sets the shooting angle.
+   *
+   * Angles are in degrees and non negative meaning:.
    * 0 is to the right, 90 is to the bottom, 180 is left, 270 is right.
    *
    * To shoot in all directions, {@link #setShootingAngle(float)} to '180' and {@link
@@ -299,7 +323,9 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
-   * Angles are in degrees and non negative meaning:
+   * Sets the shooting angle range.
+   *
+   * Angles are in degrees and non negative meaning:.
    * 0 is to the right, 90 is to the bottom, 180 is left, 270 is right.
    *
    * To shoot in all directions, {@link #setShootingAngle(float)} to '180' and {@link
@@ -315,6 +341,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the rotation speed.
+   *
    * @param rotationSpeed The rotation speed of an emoji particle, can be negative or positive
    *     and measured in degrees per second
    * @return The object used for Constructor Chaining
@@ -325,6 +353,8 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
   }
 
   /**
+   * Sets the rotation speed range.
+   *
    * @param rotationSpeedRange The magnitude by which the initial rotation of an emoji particle
    *     can vary measured in degrees per second
    * @return The object used for Constructor Chaining
@@ -356,7 +386,7 @@ public class EmojisplosionAnimator extends BaseViewAnimator<EmojisplosionAnimato
           content,
           lifetime
       ).addInitializer(new LifetimeInitializer(lifetimeRange))
-          .addInitializer(new XYAccelerationInitializer(xAcceleration / 1000f / 1000f,
+          .addInitializer(new XyAccelerationInitializer(xAcceleration / 1000f / 1000f,
               yAcceleration / 1000f / 1000f
           ))
           .addModifier(new ScaleModifier(scale,

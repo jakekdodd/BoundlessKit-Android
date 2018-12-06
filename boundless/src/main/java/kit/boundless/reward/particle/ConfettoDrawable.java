@@ -73,6 +73,8 @@ public class ConfettoDrawable extends Drawable {
       case CIRCLE:
         path.addOval(0, 0, width, height, Path.Direction.CW);
         break;
+      default:
+
     }
 
   }

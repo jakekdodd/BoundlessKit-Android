@@ -10,7 +10,13 @@ import kit.boundless.internal.data.BoundlessUser;
 import kit.boundless.internal.data.SyncCoordinator;
 import org.json.JSONObject;
 
+/**
+ * The type Boundless kit.
+ */
 public class BoundlessKit extends ContextWrapper {
+  /**
+   * The constant debugMode.
+   */
   public static boolean debugMode = false;
   private static BoundlessKit sharedInstance = null;
 
@@ -23,7 +29,7 @@ public class BoundlessKit extends ContextWrapper {
   }
 
   /**
-   * Reinforce actions to increase engagement. The actionIds must be configured on the Developer
+   * Reinforce actions to increase engagement. The actionIds must be configured on the Developer.
    * Dashboard.
    *
    * @param context Context to retrieve api key from file res/raw/boundlessproperties.json.
@@ -41,10 +47,9 @@ public class BoundlessKit extends ContextWrapper {
     AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
       @Override
       protected String doInBackground(Void... voids) {
-        return BoundlessKit.getInstance(context).syncCoordinator.removeReinforcementDecisionFor
-            (context,
-            actionId
-        );
+        return BoundlessKit.getInstance(context)
+            .syncCoordinator
+            .removeReinforcementDecisionFor(context, actionId);
       }
 
       @Override
@@ -56,6 +61,12 @@ public class BoundlessKit extends ContextWrapper {
     }.execute();
   }
 
+  /**
+   * Gets instance.
+   *
+   * @param context the context
+   * @return the instance
+   */
   protected static BoundlessKit getInstance(Context context) {
     if (sharedInstance == null) {
       sharedInstance = new BoundlessKit(context);
@@ -86,7 +97,7 @@ public class BoundlessKit extends ContextWrapper {
   }
 
   /**
-   * Get the identity for the user
+   * Get the identity for the user.
    *
    * @param context Context to retrieve api key from file res/raw/boundlessproperties.json.
    * @return The user's identity used for requests.
@@ -101,8 +112,8 @@ public class BoundlessKit extends ContextWrapper {
    * @param context Context to retrieve api key from file res/raw/boundlessproperties.json.
    * @return The user's experiment group. Could be a string like DEVELOPMENT, CONTROL, or BOUNDLESS
    */
-  public static @Nullable
-  String getExperimentGroup(final Context context) {
+  @Nullable
+  public static String getExperimentGroup(final Context context) {
     BoundlessUser user = getInstance(context).syncCoordinator.getUser();
     if (user != null) {
       return user.experimentGroup;
@@ -121,6 +132,12 @@ public class BoundlessKit extends ContextWrapper {
     debugMode = enable;
   }
 
+  /**
+   * Debug log.
+   *
+   * @param tag the tag
+   * @param msg the msg
+   */
   public static void debugLog(String tag, String msg) {
     if (debugMode) {
       Log.v("BoundlessKit", tag + ":" + msg);
@@ -128,10 +145,11 @@ public class BoundlessKit extends ContextWrapper {
   }
 
   /**
-   * The callback interface used by {@link BoundlessKit} to inform its client
-   * about a reinforcement decision. Use {@link #reinforce(Context, String, JSONObject, *
-   * ReinforcementCallback)}
-   * to initiate a reinforcement decision.
+   * The callback interface used by {@link BoundlessKit} to inform its client about a reinforcement
+   * decision.
+   *
+   * Use {@link #reinforce(Context, String, JSONObject, ReinforcementCallback)} to initiate a
+   * reinforcement decision.
    */
   public interface ReinforcementCallback {
 

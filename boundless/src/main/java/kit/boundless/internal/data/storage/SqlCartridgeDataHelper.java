@@ -12,17 +12,33 @@ import kit.boundless.internal.data.storage.contracts.ReinforcementDecisionContra
 /**
  * Created by cuddergambino on 8/21/16.
  */
+public class SqlCartridgeDataHelper extends SqlDataHelper {
 
-public class SQLCartridgeDataHelper extends SQLDataHelper {
-
+  /**
+   * Create table.
+   *
+   * @param db the db
+   */
   static void createTable(SQLiteDatabase db) {
     db.execSQL(ReinforcementDecisionContract.SQL_CREATE_TABLE);
   }
 
+  /**
+   * Drop table.
+   *
+   * @param db the db
+   */
   static void dropTable(SQLiteDatabase db) {
     db.execSQL(ReinforcementDecisionContract.SQL_DROP_TABLE);
   }
 
+  /**
+   * Insert long.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the long
+   */
   public static long insert(SQLiteDatabase db, ReinforcementDecisionContract item) {
     ContentValues values = new ContentValues();
     values.put(ReinforcementDecisionContract.COLUMNS_NAME_ACTIONID, item.actionId);
@@ -35,12 +51,25 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
     return item.id;
   }
 
+  /**
+   * Delete.
+   *
+   * @param db the db
+   * @param item the item
+   */
   public static void delete(SQLiteDatabase db, ReinforcementDecisionContract item) {
     String selection = ReinforcementDecisionContract._ID + " LIKE ? ";
     String[] args = {String.valueOf(item.id)};
     db.delete(ReinforcementDecisionContract.TABLE_NAME, selection, args);
   }
 
+  /**
+   * Delete all for int.
+   *
+   * @param db the db
+   * @param actionId the action id
+   * @return the int
+   */
   public static int deleteAllFor(SQLiteDatabase db, String actionId) {
     String selection = ReinforcementDecisionContract.COLUMNS_NAME_ACTIONID + " LIKE ? ";
     String[] args = {actionId};
@@ -53,6 +82,12 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
     return numDeleted;
   }
 
+  /**
+   * Find all array list.
+   *
+   * @param db the db
+   * @return the array list
+   */
   public static ArrayList<ReinforcementDecisionContract> findAll(SQLiteDatabase db) {
     ArrayList<ReinforcementDecisionContract> results =
         new ArrayList<ReinforcementDecisionContract>();
@@ -80,8 +115,15 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
     return results;
   }
 
-  public static @Nullable
-  ReinforcementDecisionContract findFirstFor(SQLiteDatabase db, String actionId) {
+  /**
+   * Find first for reinforcement decision contract.
+   *
+   * @param db the db
+   * @param actionId the action id
+   * @return the reinforcement decision contract
+   */
+  @Nullable
+  public static ReinforcementDecisionContract findFirstFor(SQLiteDatabase db, String actionId) {
     ReinforcementDecisionContract result = null;
     Cursor cursor = null;
     try {
@@ -109,6 +151,12 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
     return result;
   }
 
+  /**
+   * Count int.
+   *
+   * @param db the db
+   * @return the int
+   */
   public static int count(SQLiteDatabase db) {
     Cursor cursor = null;
     try {
@@ -122,6 +170,13 @@ public class SQLCartridgeDataHelper extends SQLDataHelper {
     }
   }
 
+  /**
+   * Count for int.
+   *
+   * @param db the db
+   * @param actionId the action id
+   * @return the int
+   */
   public static int countFor(SQLiteDatabase db, String actionId) {
     Cursor cursor = null;
     try {

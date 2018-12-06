@@ -46,7 +46,7 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
   public abstract T setTarget(View target);
 
   /**
-   * Begins animation. If animation does not seem to start,
+   * Begins animation. If animation does not seem to start,.
    * make sure the target view is assigned using method {@link #setTarget(View)}.
    */
   public void start() {
@@ -57,7 +57,7 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
   }
 
   /**
-   * Returns the animator object if further customization is desired
+   * Returns the animator object if further customization is desired.
    *
    * @return The animator set object
    */
@@ -66,7 +66,7 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
   }
 
   /**
-   * The animation duration
+   * The animation duration.
    *
    * @return How long, in milliseconds, the animation will take.
    */
@@ -119,7 +119,7 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
   }
 
   /**
-   * Cancels the animation causing the animation to stop in its tracks, sending an
+   * Cancels the animation causing the animation to stop in its tracks, sending an.
    * onAnimationCancel(Animator) to its listeners, followed by an onAnimationEnd(Animator) message.
    * This method must be called on the thread that is running the animation.
    */
@@ -128,7 +128,7 @@ public abstract class BaseViewAnimator<T extends BaseViewAnimator<T>> {
   }
 
   /**
-   * Adds a listener to the set of listeners that are sent events through the life of an animation,
+   * Adds a listener to the set of listeners that are sent events through the life of an animation,.
    * such as start, repeat, and end.
    *
    * @param listener The listener to be added to the current set of listeners for this

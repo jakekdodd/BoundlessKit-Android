@@ -28,42 +28,36 @@ import org.json.JSONObject;
 /**
  * Created by cuddergambino on 7/17/16.
  */
+public class BoundlessApi extends ContextWrapper {
 
-public class BoundlessAPI extends ContextWrapper {
-
-  private static BoundlessAPI myInstance = null;
+  private static BoundlessApi myInstance = null;
+  /**
+   * The Credentials.
+   */
   public BoundlessCredentials credentials;
   private Telemetry telemetry;
 
-  private BoundlessAPI(Context context) {
+  private BoundlessApi(Context context) {
     super(context);
 
     telemetry = Telemetry.getSharedInstance(context);
 
     // Read credentials from ("res/raw/boundlessproperties.json")
-    int credentialResourceID = context.getResources()
+    int credentialResourceId = context.getResources()
         .getIdentifier("boundlessproperties", "raw", context.getPackageName());
-    credentials = BoundlessCredentials.valueOf(context, credentialResourceID);
+    credentials = BoundlessCredentials.valueOf(context, credentialResourceId);
   }
 
   /**
-   * Sends an api call to retrieve configuration details like reinforced actionIds and
+   * Sends an api call to retrieve configuration details like reinforced actionIds and.
    * reinforcementEnabled.
    *
    * @param context The context
-   * @param initialBoot Whether this is the first time the device has made a boot call. If true,
-   *     the asks the api to include the newest config details even if the sdk already has the
-   *     newest configId. Will reset any manual modifications to the config.
-   * @param currentVersion The current experiment versionId. If a new version is available, the
-   *     response will include the new version details.
-   * @param currentConfig The current configuration configId. If a new config is available, the
-   *     response will include the new config details.
-   * @param internalId An experiment id for the user.
-   * @param externalId A localized id for the user. Can be set by the client.
+   * @param payload the payload
    * @return The api response as JSON.
    */
-  public static @Nullable
-  JSONObject boot(Context context, JSONObject payload) {
+  @Nullable
+  public static JSONObject boot(Context context, JSONObject payload) {
     return getInstance(context).send(CallType.BOOT, payload);
   }
 
@@ -74,17 +68,17 @@ public class BoundlessAPI extends ContextWrapper {
    * @param payload JSON data to send
    * @return The api response as JSON.
    */
-  private @Nullable
-  JSONObject send(final CallType type, JSONObject payload) {
+  @Nullable
+  private JSONObject send(final CallType type, JSONObject payload) {
 
     String url = type.getPath();
     String payloadString;
     try {
-      JSONObject credentialsJSON = credentials.asJSONObject();
-      Iterator<String> credentialsKeys = credentialsJSON.keys();
+      JSONObject credentialsJson = credentials.asJsonObject();
+      Iterator<String> credentialsKeys = credentialsJson.keys();
       while (credentialsKeys.hasNext()) {
         String key = credentialsKeys.next();
-        payload.put(key, credentialsJSON.get(key));
+        payload.put(key, credentialsJson.get(key));
       }
 
       payloadString = payload.toString(2);
@@ -129,13 +123,14 @@ public class BoundlessAPI extends ContextWrapper {
 
         case SYNC:
           break;
+        default:
       }
       return null;
     }
 
-    JSONObject responseJSON;
+    JSONObject responseJson;
     try {
-      responseJSON = new JSONObject(responseString);
+      responseJson = new JSONObject(responseString);
     } catch (JSONException e) {
       e.printStackTrace();
       Log.v("BoundlessAPI", "Parse Error - " + e.getMessage());
@@ -143,8 +138,8 @@ public class BoundlessAPI extends ContextWrapper {
       return null;
     }
 
-    int status = responseJSON.optInt("status", -1);
-    JSONArray errors = responseJSON.optJSONArray("errors");
+    int status = responseJson.optInt("status", -1);
+    JSONArray errors = responseJson.optJSONArray("errors");
     String errorsString = (errors == null) ? null : errors.toString();
     switch (type) {
       case TRACK:
@@ -162,15 +157,22 @@ public class BoundlessAPI extends ContextWrapper {
 
       case SYNC:
         break;
+      default:
     }
 
     BoundlessKit.debugLog("BoundlessAPI", "Request resulted in - " + responseString);
-    return responseJSON;
+    return responseJson;
   }
 
-  public static BoundlessAPI getInstance(Context context) {
+  /**
+   * Gets instance.
+   *
+   * @param context the context
+   * @return the instance
+   */
+  public static BoundlessApi getInstance(Context context) {
     if (myInstance == null) {
-      myInstance = new BoundlessAPI(context);
+      myInstance = new BoundlessApi(context);
     }
     return myInstance;
   }
@@ -182,14 +184,14 @@ public class BoundlessAPI extends ContextWrapper {
    * @param actions The actions to send
    * @return The api response as JSON.
    */
-  public static @Nullable
-  JSONObject track(Context context, ArrayList<TrackedActionContract> actions) {
+  @Nullable
+  public static JSONObject track(Context context, ArrayList<TrackedActionContract> actions) {
     try {
       JSONObject payload = new JSONObject();
 
       JSONArray trackedActions = new JSONArray();
       for (int i = 0; i < actions.size(); i++) {
-        trackedActions.put(actions.get(i).toJSON());
+        trackedActions.put(actions.get(i).toJson());
       }
       payload.put("tracks", trackedActions);
 
@@ -208,11 +210,11 @@ public class BoundlessAPI extends ContextWrapper {
    * @param actions The actions to send
    * @return The api response as JSON.
    */
-  public static @Nullable
-  JSONObject report(Context context, ArrayList<ReportedActionContract> actions) {
+  @Nullable
+  public static JSONObject report(Context context, ArrayList<ReportedActionContract> actions) {
     try {
       JSONObject payload = new JSONObject();
-      payload.put("reports", ReportedActionContract.valuesToJSON(actions));
+      payload.put("reports", ReportedActionContract.valuesToJson(actions));
 
       return getInstance(context).send(CallType.REPORT, payload);
     } catch (JSONException e) {
@@ -229,8 +231,8 @@ public class BoundlessAPI extends ContextWrapper {
    * @param actionId The actionId for the cartridge to reload
    * @return The api response as JSON.
    */
-  public static @Nullable
-  JSONObject refresh(Context context, String actionId) {
+  @Nullable
+  public static JSONObject refresh(Context context, String actionId) {
     try {
       JSONObject payload = new JSONObject();
 
@@ -252,24 +254,24 @@ public class BoundlessAPI extends ContextWrapper {
    * @param exceptions Any exceptions caught during execution.
    * @return The api response as JSON.
    */
-  public static @Nullable
-  JSONObject sync(
+  @Nullable
+  public static JSONObject sync(
       Context context,
       ArrayList<SyncOverviewContract> syncOverviews,
       ArrayList<BoundlessExceptionContract> exceptions) {
     try {
       JSONObject payload = new JSONObject();
 
-      JSONArray syncOverviewsInJSON = new JSONArray();
-      JSONArray exceptionsJSON = new JSONArray();
+      JSONArray syncOverviewsInJson = new JSONArray();
+      JSONArray exceptionsJson = new JSONArray();
       for (int i = 0; i < syncOverviews.size(); i++) {
-        syncOverviewsInJSON.put(syncOverviews.get(i).toJSON());
+        syncOverviewsInJson.put(syncOverviews.get(i).toJson());
       }
       for (int i = 0; i < exceptions.size(); i++) {
-        exceptionsJSON.put(exceptions.get(i).toJSON());
+        exceptionsJson.put(exceptions.get(i).toJson());
       }
-      payload.put("syncOverviews", syncOverviewsInJSON);
-      payload.put("exceptions", exceptionsJSON);
+      payload.put("syncOverviews", syncOverviewsInJson);
+      payload.put("exceptions", exceptionsJson);
 
       return getInstance(context).send(CallType.SYNC, payload);
     } catch (JSONException e) {
@@ -280,21 +282,43 @@ public class BoundlessAPI extends ContextWrapper {
   }
 
   private enum CallType {
-    BOOT("app/boot"),
-    TRACK("app/track"),
-    REPORT("app/report"),
-    REFRESH("app/refresh"),
+    /**
+     * Boot call type.
+     */
+    BOOT("app/boot"), /**
+     * Track call type.
+     */
+    TRACK("app/track"), /**
+     * Report call type.
+     */
+    REPORT("app/report"), /**
+     * Refresh call type.
+     */
+    REFRESH("app/refresh"), /**
+     * Sync call type.
+     */
     SYNC("telemetry/sync");
 
-    static final String pathBase = "https://reinforce.boundless.ai/v6/";
+    /**
+     * The Path base.
+     */
+    static final String PATH_BASE = "https://reinforce.boundless.ai/v6/";
+    /**
+     * The Path extension.
+     */
     final String pathExtension;
 
     private CallType(final String value) {
       this.pathExtension = value;
     }
 
+    /**
+     * Gets path.
+     *
+     * @return the path
+     */
     String getPath() {
-      return pathBase + pathExtension;
+      return PATH_BASE + pathExtension;
     }
   }
 

@@ -45,6 +45,7 @@ class CandybarManager {
           case MSG_TIMEOUT:
             handleTimeout((CandybarRecord) message.obj);
             return true;
+          default:
         }
         return false;
       }
@@ -169,7 +170,7 @@ class CandybarManager {
   }
 
   /**
-   * Should be called when a Candybar is no longer displayed. This is after any exit
+   * Should be called when a Candybar is no longer displayed. This is after any exit.
    * animation has finished.
    *
    * @param callback the callback
@@ -187,7 +188,7 @@ class CandybarManager {
   }
 
   /**
-   * Should be called when a Candybar is being shown. This is after any entrance animation has
+   * Should be called when a Candybar is being shown. This is after any entrance animation has.
    * finished.
    *
    * @param callback the callback

@@ -11,17 +11,33 @@ import kit.boundless.internal.data.storage.contracts.BoundlessExceptionContract;
 /**
  * Created by cuddergambino on 10/3/16.
  */
+public class SqlBoundlessExceptionDataHelper extends SqlDataHelper {
 
-public class SQLBoundlessExceptionDataHelper extends SQLDataHelper {
-
+  /**
+   * Create table.
+   *
+   * @param db the db
+   */
   static void createTable(SQLiteDatabase db) {
     db.execSQL(BoundlessExceptionContract.SQL_CREATE_TABLE);
   }
 
+  /**
+   * Drop table.
+   *
+   * @param db the db
+   */
   static void dropTable(SQLiteDatabase db) {
     db.execSQL(BoundlessExceptionContract.SQL_DROP_TABLE);
   }
 
+  /**
+   * Insert long.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the long
+   */
   public static long insert(SQLiteDatabase db, BoundlessExceptionContract item) {
     ContentValues values = new ContentValues();
     values.put(BoundlessExceptionContract.COLUMNS_NAME_UTC, item.utc);
@@ -34,12 +50,25 @@ public class SQLBoundlessExceptionDataHelper extends SQLDataHelper {
     return item.id;
   }
 
+  /**
+   * Delete.
+   *
+   * @param db the db
+   * @param item the item
+   */
   public static void delete(SQLiteDatabase db, BoundlessExceptionContract item) {
     String selection = BoundlessExceptionContract._ID + " LIKE ? ";
     String[] args = {String.valueOf(item.id)};
     db.delete(BoundlessExceptionContract.TABLE_NAME, selection, args);
   }
 
+  /**
+   * Find boundless exception contract.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the boundless exception contract
+   */
   @Nullable
   public static BoundlessExceptionContract find(
       SQLiteDatabase db, BoundlessExceptionContract item) {
@@ -69,6 +98,12 @@ public class SQLBoundlessExceptionDataHelper extends SQLDataHelper {
     return result;
   }
 
+  /**
+   * Find all array list.
+   *
+   * @param db the db
+   * @return the array list
+   */
   public static ArrayList<BoundlessExceptionContract> findAll(SQLiteDatabase db) {
     ArrayList<BoundlessExceptionContract> exceptions = new ArrayList<>();
     Cursor cursor = null;
@@ -87,6 +122,12 @@ public class SQLBoundlessExceptionDataHelper extends SQLDataHelper {
     return exceptions;
   }
 
+  /**
+   * Count int.
+   *
+   * @param db the db
+   * @return the int
+   */
   public static int count(SQLiteDatabase db) {
     int result = 0;
     Cursor cursor = null;

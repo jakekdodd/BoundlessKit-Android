@@ -11,10 +11,10 @@ import android.content.ContextWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.api.BoundlessAPI;
-import kit.boundless.internal.data.storage.SQLBoundlessExceptionDataHelper;
-import kit.boundless.internal.data.storage.SQLSyncOverviewDataHelper;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.api.BoundlessApi;
+import kit.boundless.internal.data.storage.SqlBoundlessExceptionDataHelper;
+import kit.boundless.internal.data.storage.SqlSyncOverviewDataHelper;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import kit.boundless.internal.data.storage.contracts.BoundlessExceptionContract;
 import kit.boundless.internal.data.storage.contracts.SyncOverviewContract;
 import org.json.JSONObject;
@@ -22,21 +22,26 @@ import org.json.JSONObject;
 /**
  * Created by cuddergambino on 9/30/16.
  */
-
 public class Telemetry extends ContextWrapper implements Callable<Integer> {
   private static Telemetry sharedInstance;
   private final Object syncOverviewLock = new Object();
   private final Object apiSyncLock = new Object();
-  private SQLiteDatabase sqlDB;
+  private SQLiteDatabase sqlDb;
   private SyncOverview currentSyncOverview = null;
   private ExecutorService syncerExecutor = Executors.newSingleThreadExecutor();
   private Boolean syncInProgress = false;
 
   private Telemetry(Context base) {
     super(base);
-    sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
+    sqlDb = SqliteDataStore.getInstance(base).getWritableDatabase();
   }
 
+  /**
+   * Gets shared instance.
+   *
+   * @param base the base
+   * @return the shared instance
+   */
   public static Telemetry getSharedInstance(Context base) {
     if (sharedInstance == null) {
       sharedInstance = new Telemetry(base);
@@ -60,7 +65,7 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
   }
 
   /**
-   * Creates a SyncOverview object to record to sync performance and take a snapshot of the
+   * Creates a SyncOverview object to record to sync performance and take a snapshot of the.
    * syncers.
    * Use the functions setResponseForTrackSync(), setResponseForReportSync(), and
    * setResponseForCartridgeSync()
@@ -75,14 +80,14 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
   public void startRecordingSync(
       String cause, Track track, Report report, HashMap<String, Cartridge> cartridges) {
     synchronized (syncOverviewLock) {
-      HashMap<String, JSONObject> cartridgeJSONs = new HashMap<>();
+      HashMap<String, JSONObject> cartridgeJsons = new HashMap<>();
       for (HashMap.Entry<String, Cartridge> entry : cartridges.entrySet()) {
-        cartridgeJSONs.put(entry.getKey(), entry.getValue().jsonForTriggers());
+        cartridgeJsons.put(entry.getKey(), entry.getValue().jsonForTriggers());
       }
       currentSyncOverview = new SyncOverview(cause,
           track.jsonForTriggers(),
           report.jsonForTriggers(),
-          cartridgeJSONs
+          cartridgeJsons
       );
     }
   }
@@ -141,22 +146,22 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
    */
   public void stopRecordingSync(boolean successfulSync) {
     // endpoint no longer exists?
-//        synchronized (syncOverviewLock) {
-//            if (currentSyncOverview != null) {
-//                currentSyncOverview.finish();
-//                currentSyncOverview.store(this);
-//                currentSyncOverview = null;
-//                BoundlessKit.debugLog("Telemetry", "Saved a sync overview, totalling " +
-// SQLSyncOverviewDataHelper.count(sqlDB) + " overviews");
-//            } else {
-//                BoundlessKit.debugLog("Telemetry", "No recording has started. Did you remember
-// to execute startRecordingSync() at the beginning of the sync performance?");
-//            }
-//        }
-//
-//        if (successfulSync) {
-//            syncerExecutor.submit(this);
-//        }
+    //        synchronized (syncOverviewLock) {
+    //            if (currentSyncOverview != null) {
+    //                currentSyncOverview.finish();
+    //                currentSyncOverview.store(this);
+    //                currentSyncOverview = null;
+    //                BoundlessKit.debugLog("Telemetry", "Saved a sync overview, totalling " +
+    // SQLSyncOverviewDataHelper.count(sqlDB) + " overviews");
+    //            } else {
+    //                BoundlessKit.debugLog("Telemetry", "No recording has started. Did you remember
+    // to execute startRecordingSync() at the beginning of the sync performance?");
+    //            }
+    //        }
+    //
+    //        if (successfulSync) {
+    //            syncerExecutor.submit(this);
+    //        }
   }
 
   @Override
@@ -175,9 +180,9 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
             BoundlessKit.debugLog("Telemetry", "Beginning telemetry sync!");
 
             final ArrayList<SyncOverviewContract> syncOverviews =
-                SQLSyncOverviewDataHelper.findAll(sqlDB);
+                SqlSyncOverviewDataHelper.findAll(sqlDb);
             final ArrayList<BoundlessExceptionContract> exceptions =
-                SQLBoundlessExceptionDataHelper.findAll(sqlDB);
+                SqlBoundlessExceptionDataHelper.findAll(sqlDb);
             if (syncOverviews.size() == 0 && exceptions.size() == 0) {
               BoundlessKit.debugLog("Telemetry", "No sync overviews or exceptions to be synced.");
               return 0;
@@ -186,15 +191,15 @@ public class Telemetry extends ContextWrapper implements Callable<Integer> {
                   syncOverviews.size() + " sync overviews and " + exceptions.size()
                       + " exceptions to be synced."
               );
-              JSONObject apiResponse = BoundlessAPI.sync(this, syncOverviews, exceptions);
+              JSONObject apiResponse = BoundlessApi.sync(this, syncOverviews, exceptions);
               if (apiResponse != null) {
                 int statusCode = apiResponse.optInt("status", 404);
                 if (statusCode == 200) {
                   for (int i = 0; i < syncOverviews.size(); i++) {
-                    SQLSyncOverviewDataHelper.delete(sqlDB, syncOverviews.get(i));
+                    SqlSyncOverviewDataHelper.delete(sqlDb, syncOverviews.get(i));
                   }
                   for (int i = 0; i < exceptions.size(); i++) {
-                    SQLBoundlessExceptionDataHelper.delete(sqlDB, exceptions.get(i));
+                    SqlBoundlessExceptionDataHelper.delete(sqlDb, exceptions.get(i));
                   }
                 }
                 return statusCode;

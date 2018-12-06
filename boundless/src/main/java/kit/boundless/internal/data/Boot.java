@@ -8,38 +8,74 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.api.BoundlessAPI;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.api.BoundlessApi;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * The type Boot.
+ */
 class Boot extends ContextWrapper implements Callable<Integer> {
 
-  private static final String initialBootKey = "initialBoot";
-  private static final String versionIdKey = "versionId";
-  private static final String configIdKey = "configId";
-  private static final String reinforcementEnabledKey = "reinforcementEnabled";
-  private static final String trackingEnabledKey = "trackingEnabled";
+  private static final String INITIAL_BOOT_KEY = "initialBoot";
+  private static final String VERSION_ID_KEY = "versionId";
+  private static final String CONFIG_ID_KEY = "configId";
+  private static final String REINFORCEMENT_ENABLED_KEY = "reinforcementEnabled";
+  private static final String TRACKING_ENABLED_KEY = "trackingEnabled";
   private static Boot sharedInstance;
-  private final String TAG = "BootSyncer";
+  private final String tag = "BootSyncer";
   private final Object apiSyncLock = new Object();
+  /**
+   * The Initial boot.
+   */
   // stored
   public boolean initialBoot;
-  public @Nullable
-  String versionId;
+
+  /**
+   * The Version id.
+   */
+  @Nullable
+  public String versionId;
+
+  /**
+   * The Config id.
+   */
   public String configId;
+  /**
+   * The Reinforcement enabled.
+   */
   public boolean reinforcementEnabled;
+  /**
+   * The Tracking enabled.
+   */
   public boolean trackingEnabled;
+  /**
+   * The Did sync.
+   */
   // transient
   public boolean didSync;
-  public @Nullable
-  String internalId;
-  public @Nullable
-  String externalId;
-  public @Nullable
-  String experimentGroup;
-  private SQLiteDatabase sqlDB;
+
+  /**
+   * The Internal id.
+   */
+  @Nullable
+  public String internalId;
+
+  /**
+   * The External id.
+   */
+  @Nullable
+  public String externalId;
+
+  /**
+   * The Experiment group.
+   */
+  @Nullable
+  public String experimentGroup;
+
+  private SQLiteDatabase sqlDb;
   private SharedPreferences preferences;
   private Boolean syncInProgress = false;
 
@@ -47,19 +83,25 @@ class Boot extends ContextWrapper implements Callable<Integer> {
     super(base);
     didSync = false;
 
-    sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
+    sqlDb = SqliteDataStore.getInstance(base).getWritableDatabase();
     preferences = getSharedPreferences(preferencesName(), Context.MODE_PRIVATE);
-    initialBoot = preferences.getBoolean(initialBootKey, true);
-    versionId = preferences.getString(versionIdKey, null);
-    configId = preferences.getString(configIdKey, "0");
-    reinforcementEnabled = preferences.getBoolean(reinforcementEnabledKey, true);
-    trackingEnabled = preferences.getBoolean(trackingEnabledKey, true);
+    initialBoot = preferences.getBoolean(INITIAL_BOOT_KEY, true);
+    versionId = preferences.getString(VERSION_ID_KEY, null);
+    configId = preferences.getString(CONFIG_ID_KEY, "0");
+    reinforcementEnabled = preferences.getBoolean(REINFORCEMENT_ENABLED_KEY, true);
+    trackingEnabled = preferences.getBoolean(TRACKING_ENABLED_KEY, true);
   }
 
   private String preferencesName() {
     return "boundless.boundlesskit.synchronization.boot";
   }
 
+  /**
+   * Gets shared instance.
+   *
+   * @param base the base
+   * @return the shared instance
+   */
   static Boot getSharedInstance(Context base) {
     if (sharedInstance == null) {
       sharedInstance = new Boot(base);
@@ -70,41 +112,41 @@ class Boot extends ContextWrapper implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     if (syncInProgress) {
-      BoundlessKit.debugLog(TAG, "Boot sync already happening");
+      BoundlessKit.debugLog(tag, "Boot sync already happening");
       return 0;
     } else {
       synchronized (apiSyncLock) {
         if (syncInProgress) {
-          BoundlessKit.debugLog(TAG, "Boot sync already happening");
+          BoundlessKit.debugLog(tag, "Boot sync already happening");
           return 0;
         } else {
           try {
             syncInProgress = true;
-            BoundlessKit.debugLog(TAG, "Beginning sync for boot");
+            BoundlessKit.debugLog(tag, "Beginning sync for boot");
 
-            JSONObject apiResponse = BoundlessAPI.boot(this, requestJSON());
+            JSONObject apiResponse = BoundlessApi.boot(this, requestJson());
             if (apiResponse != null) {
               didSync = true;
               initialBoot = false;
 
               JSONArray errors = apiResponse.optJSONArray("errors");
               if (errors != null) {
-                BoundlessKit.debugLog(TAG, "Got errors:" + errors);
+                BoundlessKit.debugLog(tag, "Got errors:" + errors);
                 return -1;
               }
-              BoundlessKit.debugLog(TAG, "Successful boot");
+              BoundlessKit.debugLog(tag, "Successful boot");
 
               try {
-                JSONObject configJSON = apiResponse.optJSONObject("config");
-                if (configJSON != null) {
-                  configId = configJSON.getString("configID");
-                  reinforcementEnabled = configJSON.getBoolean("reinforcementEnabled");
-                  trackingEnabled = configJSON.getBoolean("trackingEnabled");
+                JSONObject configJson = apiResponse.optJSONObject("config");
+                if (configJson != null) {
+                  configId = configJson.getString("configID");
+                  reinforcementEnabled = configJson.getBoolean("reinforcementEnabled");
+                  trackingEnabled = configJson.getBoolean("trackingEnabled");
                 }
 
-                JSONObject versionJSON = apiResponse.optJSONObject("version");
-                if (versionJSON != null) {
-                  versionId = versionJSON.getString("versionID");
+                JSONObject versionJson = apiResponse.optJSONObject("version");
+                if (versionJson != null) {
+                  versionId = versionJson.getString("versionID");
                 }
 
                 String internalId = apiResponse.optString("internalId");
@@ -123,7 +165,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
               update();
               return 200;
             } else {
-              BoundlessKit.debugLog(TAG, "Could not send request.");
+              BoundlessKit.debugLog(tag, "Could not send request.");
               return -1;
             }
           } finally {
@@ -139,7 +181,7 @@ class Boot extends ContextWrapper implements Callable<Integer> {
    *
    * @return A JSONObject containing the size and sync triggers
    */
-  public JSONObject requestJSON() {
+  public JSONObject requestJson() {
     JSONObject payload = new JSONObject();
     try {
       payload.put("initialBoot", initialBoot);
@@ -154,13 +196,16 @@ class Boot extends ContextWrapper implements Callable<Integer> {
     return payload;
   }
 
+  /**
+   * Update.
+   */
   void update() {
     preferences.edit()
-        .putBoolean(initialBootKey, initialBoot)
-        .putString(versionIdKey, versionId)
-        .putString(configIdKey, configId)
-        .putBoolean(reinforcementEnabledKey, reinforcementEnabled)
-        .putBoolean(trackingEnabledKey, trackingEnabled)
+        .putBoolean(INITIAL_BOOT_KEY, initialBoot)
+        .putString(VERSION_ID_KEY, versionId)
+        .putString(CONFIG_ID_KEY, configId)
+        .putBoolean(REINFORCEMENT_ENABLED_KEY, reinforcementEnabled)
+        .putBoolean(TRACKING_ENABLED_KEY, trackingEnabled)
         .apply();
   }
 }

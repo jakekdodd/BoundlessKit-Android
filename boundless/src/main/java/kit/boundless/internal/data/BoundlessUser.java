@@ -7,34 +7,35 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.data.storage.SQLUserIdentityDataHelper;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.data.storage.SqlUserIdentityDataHelper;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import kit.boundless.internal.data.storage.contracts.UserIdentityContract;
 
 
 public class BoundlessUser extends ContextWrapper {
 
   private static BoundlessUser sharedInstance;
-  public @Nullable
-  String internalId;
+  @Nullable
+  public String internalId;
   public String externalId;
-  public @Nullable
-  String experimentGroup;
-  private SQLiteDatabase sqlDB;
+
+  @Nullable
+  public String experimentGroup;
+  private SQLiteDatabase sqlDb;
 
   private BoundlessUser(Context base) {
     super(base);
 
-    sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
+    sqlDb = SqliteDataStore.getInstance(base).getWritableDatabase();
 
-    UserIdentityContract saved = SQLUserIdentityDataHelper.find(sqlDB);
+    UserIdentityContract saved = SqlUserIdentityDataHelper.find(sqlDb);
     if (saved == null) {
       saved = new UserIdentityContract(0,
           null,
           Settings.Secure.getString(base.getContentResolver(), Settings.Secure.ANDROID_ID),
           null
       );
-      SQLUserIdentityDataHelper.insert(sqlDB, saved);
+      SqlUserIdentityDataHelper.insert(sqlDb, saved);
     }
     internalId = saved.internalId;
     externalId = saved.externalId;
@@ -48,8 +49,11 @@ public class BoundlessUser extends ContextWrapper {
     return sharedInstance;
   }
 
+  /**
+   * Updates this model.
+   */
   public void update() {
-    UserIdentityContract saved = SQLUserIdentityDataHelper.find(sqlDB);
+    UserIdentityContract saved = SqlUserIdentityDataHelper.find(sqlDb);
     if (saved == null) {
       BoundlessKit.debugLog("BoundlessUser", "No user found to update.");
       return;
@@ -66,7 +70,7 @@ public class BoundlessUser extends ContextWrapper {
         "Updating user to internalId:" + internalId + " externalId:" + externalId
             + " experimentGroup:" + experimentGroup
     );
-    SQLUserIdentityDataHelper.update(sqlDB, saved);
+    SqlUserIdentityDataHelper.update(sqlDb, saved);
   }
 
 }

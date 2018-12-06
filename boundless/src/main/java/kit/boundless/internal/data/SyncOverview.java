@@ -7,8 +7,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.data.storage.SQLSyncOverviewDataHelper;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.data.storage.SqlSyncOverviewDataHelper;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import kit.boundless.internal.data.storage.contracts.SyncOverviewContract;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,12 +20,12 @@ import org.json.JSONObject;
 
 class SyncOverview {
 
-  private static final String syncResponseKey = "syncResponse";
-  private static final String utcKey = "utc";
-  private static final String roundTripTimeKey = "roundTripTime";
-  private static final String statusKey = "status";
-  private static final String errorKey = "error";
-  private static SQLiteDatabase sqlDB;
+  private static final String SYNC_RESPONSE_KEY = "syncResponse";
+  private static final String UTC_KEY = "utc";
+  private static final String ROUND_TRIP_TIME_KEY = "roundTripTime";
+  private static final String STATUS_KEY = "status";
+  private static final String ERROR_KEY = "error";
+  private static SQLiteDatabase sqlDb;
   private long utc;
   private long timezoneOffset;
   private long totalSyncTime;
@@ -58,12 +58,12 @@ class SyncOverview {
   void setTrackSyncResponse(int status, @Nullable String error, long startedAt) {
     JSONObject syncResponse = new JSONObject();
     try {
-      syncResponse.put(utcKey, startedAt);
-      syncResponse.put(roundTripTimeKey, System.currentTimeMillis() - startedAt);
-      syncResponse.put(statusKey, status);
-      syncResponse.put(errorKey, error);
+      syncResponse.put(UTC_KEY, startedAt);
+      syncResponse.put(ROUND_TRIP_TIME_KEY, System.currentTimeMillis() - startedAt);
+      syncResponse.put(STATUS_KEY, status);
+      syncResponse.put(ERROR_KEY, error);
 
-      track.put(syncResponseKey, syncResponse);
+      track.put(SYNC_RESPONSE_KEY, syncResponse);
     } catch (JSONException e) {
       e.printStackTrace();
       Telemetry.storeException(e);
@@ -80,12 +80,12 @@ class SyncOverview {
   void setReportSyncResponse(int status, @Nullable String error, long startedAt) {
     JSONObject syncResponse = new JSONObject();
     try {
-      syncResponse.put(utcKey, startedAt);
-      syncResponse.put(roundTripTimeKey, System.currentTimeMillis() - startedAt);
-      syncResponse.put(statusKey, status);
-      syncResponse.put(errorKey, error);
+      syncResponse.put(UTC_KEY, startedAt);
+      syncResponse.put(ROUND_TRIP_TIME_KEY, System.currentTimeMillis() - startedAt);
+      syncResponse.put(STATUS_KEY, status);
+      syncResponse.put(ERROR_KEY, error);
 
-      report.put(syncResponseKey, syncResponse);
+      report.put(SYNC_RESPONSE_KEY, syncResponse);
     } catch (JSONException e) {
       e.printStackTrace();
       Telemetry.storeException(e);
@@ -104,14 +104,14 @@ class SyncOverview {
       String actionId, int status, @Nullable String error, long startedAt) {
     JSONObject syncResponse = new JSONObject();
     try {
-      syncResponse.put(utcKey, startedAt);
-      syncResponse.put(roundTripTimeKey, System.currentTimeMillis() - startedAt);
-      syncResponse.put(statusKey, status);
-      syncResponse.put(errorKey, error);
+      syncResponse.put(UTC_KEY, startedAt);
+      syncResponse.put(ROUND_TRIP_TIME_KEY, System.currentTimeMillis() - startedAt);
+      syncResponse.put(STATUS_KEY, status);
+      syncResponse.put(ERROR_KEY, error);
 
       JSONObject cartridge = cartridges.get(actionId);
       if (cartridge != null) {
-        cartridge.put(syncResponseKey, syncResponse);
+        cartridge.put(SYNC_RESPONSE_KEY, syncResponse);
       }
     } catch (JSONException e) {
       e.printStackTrace();
@@ -127,13 +127,13 @@ class SyncOverview {
   }
 
   /**
-   * Stores the sync overview in the sql database
+   * Stores the sync overview in the sql database.
    *
    * @param context Context
    */
   void store(Context context) {
-    if (sqlDB == null) {
-      sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
+    if (sqlDb == null) {
+      sqlDb = SqliteDataStore.getInstance(context).getWritableDatabase();
     }
 
     SyncOverviewContract overviewContract = new SyncOverviewContract(
@@ -146,11 +146,11 @@ class SyncOverview {
         report.toString(),
         new JSONArray(cartridges.values()).toString()
     );
-    long rowId = SQLSyncOverviewDataHelper.insert(sqlDB, overviewContract);
+    long rowId = SqlSyncOverviewDataHelper.insert(sqlDb, overviewContract);
 
     BoundlessKit.debugLog("SQL Sync Overviews", "Inserted into row " + rowId);
     try {
-      BoundlessKit.debugLog("SQL Sync Overviews", overviewContract.toJSON().toString(2));
+      BoundlessKit.debugLog("SQL Sync Overviews", overviewContract.toJson().toString(2));
     } catch (JSONException e) {
       e.printStackTrace();
       Telemetry.storeException(e);

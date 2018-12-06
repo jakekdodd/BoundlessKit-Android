@@ -7,7 +7,7 @@ import kit.boundless.reward.particle.Particle;
 /**
  * The type Xy acceleration initializer.
  */
-public class XYAccelerationInitializer implements ParticleInitializer {
+public class XyAccelerationInitializer implements ParticleInitializer {
 
   private float mXValue;
   private float mYValue;
@@ -15,12 +15,12 @@ public class XYAccelerationInitializer implements ParticleInitializer {
   /**
    * Instantiates a new Xy acceleration initializer.
    *
-   * @param XValue the x value
-   * @param YValue the y value
+   * @param xValue the x value
+   * @param yValue the y value
    */
-  public XYAccelerationInitializer(float XValue, float YValue) {
-    mXValue = XValue;
-    mYValue = YValue;
+  public XyAccelerationInitializer(float xValue, float yValue) {
+    mXValue = xValue;
+    mYValue = yValue;
   }
 
   @Override

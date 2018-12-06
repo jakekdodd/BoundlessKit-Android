@@ -16,34 +16,92 @@ import org.json.JSONObject;
 /**
  * Created by cuddergambino on 8/4/16.
  */
-
 public final class ReportedActionContract implements BaseColumns {
 
+  /**
+   * The constant TABLE_NAME.
+   */
   public static final String TABLE_NAME = "Reported_Actions";
+  /**
+   * The constant COLUMNS_NAME_ACTIONNAME.
+   */
   public static final String COLUMNS_NAME_ACTIONNAME = "actionName";
+  /**
+   * The constant COLUMNS_NAME_CARTRIDGEID.
+   */
   public static final String COLUMNS_NAME_CARTRIDGEID = "cartridgeId";
+  /**
+   * The constant COLUMNS_NAME_REINFORCEMENTDECISION.
+   */
   public static final String COLUMNS_NAME_REINFORCEMENTDECISION = "reinforcementDecision";
+  /**
+   * The constant COLUMNS_NAME_METADATA.
+   */
   public static final String COLUMNS_NAME_METADATA = "metaData";
+  /**
+   * The constant COLUMNS_NAME_UTC.
+   */
   public static final String COLUMNS_NAME_UTC = "utc";
+  /**
+   * The constant COLUMNS_NAME_TIMEZONEOFFSET.
+   */
   public static final String COLUMNS_NAME_TIMEZONEOFFSET = "deviceTimezoneOffset";
 
+  /**
+   * The constant SQL_CREATE_TABLE.
+   */
   public static final String SQL_CREATE_TABLE =
       "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + _ID + " INTEGER PRIMARY KEY,"
           + COLUMNS_NAME_ACTIONNAME + " TEXT," + COLUMNS_NAME_CARTRIDGEID + " TEXT,"
           + COLUMNS_NAME_REINFORCEMENTDECISION + " TEXT," + COLUMNS_NAME_METADATA + " TEXT,"
           + COLUMNS_NAME_UTC + " INTEGER," + COLUMNS_NAME_TIMEZONEOFFSET + " INTEGER" + " )";
 
+  /**
+   * The constant SQL_DROP_TABLE.
+   */
   public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
+  /**
+   * The Id.
+   */
   public long id;
+  /**
+   * The Action id.
+   */
   public String actionId;
+  /**
+   * The Cartridge id.
+   */
   public String cartridgeId;
+  /**
+   * The Reinforcement decision.
+   */
   public String reinforcementDecision;
-  public @Nullable
-  String metaData;
+  /**
+   * The Meta data.
+   */
+  @Nullable
+  public String metaData;
+  /**
+   * The Utc.
+   */
   public long utc;
+  /**
+   * The Timezone offset.
+   */
   public long timezoneOffset;
 
+  /**
+   * Instantiates a new Reported action contract.
+   *
+   * @param id the id
+   * @param actionId the action id
+   * @param cartridgeId the cartridge id
+   * @param reinforcementDecision the reinforcement decision
+   * @param metaData the meta data
+   * @param utc the utc
+   * @param timezoneOffset the timezone offset
+   */
   public ReportedActionContract(
       long id,
       String actionId,
@@ -61,6 +119,12 @@ public final class ReportedActionContract implements BaseColumns {
     this.timezoneOffset = timezoneOffset;
   }
 
+  /**
+   * From cursor reported action contract.
+   *
+   * @param cursor the cursor
+   * @return the reported action contract
+   */
   public static ReportedActionContract fromCursor(Cursor cursor) {
     return new ReportedActionContract(
         cursor.getLong(0),
@@ -73,7 +137,13 @@ public final class ReportedActionContract implements BaseColumns {
     );
   }
 
-  public static JSONArray valuesToJSON(ArrayList<ReportedActionContract> actions) {
+  /**
+   * Values to json json array.
+   *
+   * @param actions the actions
+   * @return the json array
+   */
+  public static JSONArray valuesToJson(ArrayList<ReportedActionContract> actions) {
     HashMap<String, HashMap<String, List<ReportedActionContract>>> actionCartridges =
         new HashMap<>();
 
@@ -88,34 +158,39 @@ public final class ReportedActionContract implements BaseColumns {
       actionCartridges.get(action.actionId).get(action.cartridgeId).add(action);
     }
 
-    JSONArray reportsJSON = new JSONArray();
+    JSONArray reportsJson = new JSONArray();
     try {
       for (Map.Entry<String, HashMap<String, List<ReportedActionContract>>> actionCartridge :
           actionCartridges
           .entrySet()) {
         for (Map.Entry<String, List<ReportedActionContract>> cartridge : actionCartridge.getValue()
             .entrySet()) {
-          JSONObject reportJSON = new JSONObject();
-          JSONArray eventsJSON = new JSONArray();
+          JSONObject reportJson = new JSONObject();
+          JSONArray eventsJson = new JSONArray();
           for (ReportedActionContract action : cartridge.getValue()) {
-            eventsJSON.put(action.toJSON());
+            eventsJson.put(action.toJson());
           }
 
-          reportJSON.put(COLUMNS_NAME_ACTIONNAME, actionCartridge.getKey());
-          reportJSON.put(COLUMNS_NAME_CARTRIDGEID, cartridge.getKey());
-          reportJSON.put("events", eventsJSON);
+          reportJson.put(COLUMNS_NAME_ACTIONNAME, actionCartridge.getKey());
+          reportJson.put(COLUMNS_NAME_CARTRIDGEID, cartridge.getKey());
+          reportJson.put("events", eventsJson);
 
-          reportsJSON.put(reportJSON);
+          reportsJson.put(reportJson);
         }
       }
     } catch (JSONException e) {
       e.printStackTrace();
       Telemetry.storeException(e);
     }
-    return reportsJSON;
+    return reportsJson;
   }
 
-  public JSONObject toJSON() {
+  /**
+   * To json json object.
+   *
+   * @return the json object
+   */
+  public JSONObject toJson() {
     JSONObject json = new JSONObject();
 
     try {

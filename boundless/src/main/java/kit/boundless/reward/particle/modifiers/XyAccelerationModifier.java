@@ -6,7 +6,7 @@ import kit.boundless.reward.particle.Particle;
 /**
  * The type Xy acceleration modifier.
  */
-public class XYAccelerationModifier implements ParticleModifier {
+public class XyAccelerationModifier implements ParticleModifier {
 
   /**
    * The Enabled.
@@ -34,26 +34,26 @@ public class XYAccelerationModifier implements ParticleModifier {
   /**
    * Instantiates a new Xy acceleration modifier.
    *
-   * @param XInitialValue the x initial value
-   * @param YInitialValue the y initial value
-   * @param XFinalValue the x final value
-   * @param YFinalValue the y final value
+   * @param xInitialValue the x initial value
+   * @param yInitialValue the y initial value
+   * @param xFinalValue the x final value
+   * @param yFinalValue the y final value
    * @param startMillis the start millis
    * @param duration the duration
    * @param interpolator the interpolator
    */
-  public XYAccelerationModifier(
-      float XInitialValue,
-      float YInitialValue,
-      float XFinalValue,
-      float YFinalValue,
+  public XyAccelerationModifier(
+      float xInitialValue,
+      float yInitialValue,
+      float xFinalValue,
+      float yFinalValue,
       long startMillis,
       long duration,
       Interpolator interpolator) {
-    mXInitialValue = XInitialValue;
-    mYInitialValue = YInitialValue;
-    mXFinalValue = XFinalValue;
-    mYFinalValue = YFinalValue;
+    mXInitialValue = xInitialValue;
+    mYInitialValue = yInitialValue;
+    mXFinalValue = xFinalValue;
+    mYFinalValue = yFinalValue;
     mStartTime = startMillis;
     mDuration = duration;
     mXValueIncrement = mXFinalValue - mXInitialValue;

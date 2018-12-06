@@ -9,9 +9,9 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.api.BoundlessAPI;
-import kit.boundless.internal.data.storage.SQLTrackedActionDataHelper;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.api.BoundlessApi;
+import kit.boundless.internal.data.storage.SqlTrackedActionDataHelper;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import kit.boundless.internal.data.storage.contracts.TrackedActionContract;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,18 +20,17 @@ import org.json.JSONObject;
 /**
  * Created by cuddergambino on 9/4/16.
  */
-
 class Track extends ContextWrapper implements Callable<Integer> {
 
   private static Track sharedInstance;
-  private final String TAG = "TrackSyncer";
+  private final String tag = "TrackSyncer";
   private final String preferencesName = "boundless.boundlesskit.synchronization.track";
   private final String sizeKey = "size";
   private final String sizeToSyncKey = "sizeToSync";
   private final String timerStartsAtKey = "timerStartsAt";
   private final String timerExpiresInKey = "timerExpiresIn";
   private final Object apiSyncLock = new Object();
-  private SQLiteDatabase sqlDB;
+  private SQLiteDatabase sqlDb;
   private SharedPreferences preferences;
   private int sizeToSync;
   private long timerStartsAt;
@@ -40,13 +39,19 @@ class Track extends ContextWrapper implements Callable<Integer> {
 
   private Track(Context base) {
     super(base);
-    sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
+    sqlDb = SqliteDataStore.getInstance(base).getWritableDatabase();
     preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
     sizeToSync = preferences.getInt(sizeToSyncKey, 15);
     timerStartsAt = preferences.getLong(timerStartsAtKey, System.currentTimeMillis());
     timerExpiresIn = preferences.getLong(timerExpiresInKey, 172800000);
   }
 
+  /**
+   * Gets shared instance.
+   *
+   * @param base the base
+   * @return the shared instance
+   */
   static Track getSharedInstance(Context base) {
     if (sharedInstance == null) {
       sharedInstance = new Track(base);
@@ -55,6 +60,8 @@ class Track extends ContextWrapper implements Callable<Integer> {
   }
 
   /**
+   * Is triggered boolean.
+   *
    * @return Whether a sync should be started
    */
   boolean isTriggered() {
@@ -68,10 +75,10 @@ class Track extends ContextWrapper implements Callable<Integer> {
   }
 
   private boolean isSizeToSync() {
-    int count = SQLTrackedActionDataHelper.count(sqlDB);
+    int count = SqlTrackedActionDataHelper.count(sqlDb);
     boolean isSize = count >= sizeToSync;
     BoundlessKit.debugLog(
-        TAG,
+        tag,
         "Track has batched " + count + "/" + sizeToSync + " actions" + (isSize
             ? " so needs to sync..."
             : ".")
@@ -97,7 +104,7 @@ class Track extends ContextWrapper implements Callable<Integer> {
   JSONObject jsonForTriggers() {
     JSONObject json = new JSONObject();
     try {
-      json.put(sizeKey, SQLTrackedActionDataHelper.count(sqlDB));
+      json.put(sizeKey, SqlTrackedActionDataHelper.count(sqlDb));
       json.put(sizeToSyncKey, sizeToSync);
       json.put(timerStartsAtKey, timerStartsAt);
       json.put(timerExpiresInKey, timerExpiresIn);
@@ -114,53 +121,53 @@ class Track extends ContextWrapper implements Callable<Integer> {
    */
   void store(BoundlessAction action) {
     String metaData = (action.metaData == null) ? null : action.metaData.toString();
-    long rowId = SQLTrackedActionDataHelper.insert(
-        sqlDB,
+    long rowId = SqlTrackedActionDataHelper.insert(
+        sqlDb,
         new TrackedActionContract(0, action.actionId, metaData, action.utc, action.timezoneOffset)
     );
-//        BoundlessKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
+    // BoundlessKit.debugLog("SQL Tracked Actions", "Inserted into row " + rowId);
 
   }
 
   @Override
   public Integer call() throws Exception {
     if (syncInProgress) {
-      BoundlessKit.debugLog(TAG, "Track sync already happening");
+      BoundlessKit.debugLog(tag, "Track sync already happening");
       return 0;
     } else {
       synchronized (apiSyncLock) {
         if (syncInProgress) {
-          BoundlessKit.debugLog(TAG, "Track sync already happening");
+          BoundlessKit.debugLog(tag, "Track sync already happening");
           return 0;
         } else {
           try {
             syncInProgress = true;
-            BoundlessKit.debugLog(TAG, "Beginning tracker sync!");
+            BoundlessKit.debugLog(tag, "Beginning tracker sync!");
 
             final ArrayList<TrackedActionContract> sqlActions =
-                SQLTrackedActionDataHelper.findAll(sqlDB);
+                SqlTrackedActionDataHelper.findAll(sqlDb);
             if (sqlActions.size() == 0) {
-              BoundlessKit.debugLog(TAG, "No tracked actions to be synced.");
+              BoundlessKit.debugLog(tag, "No tracked actions to be synced.");
               updateTriggers(null, System.currentTimeMillis(), null);
               return 0;
             } else {
-              BoundlessKit.debugLog(TAG, sqlActions.size() + " tracked actions to be synced.");
-              JSONObject apiResponse = BoundlessAPI.track(this, sqlActions);
+              BoundlessKit.debugLog(tag, sqlActions.size() + " tracked actions to be synced.");
+              JSONObject apiResponse = BoundlessApi.track(this, sqlActions);
               if (apiResponse != null) {
                 for (int i = 0; i < sqlActions.size(); i++) {
-                  SQLTrackedActionDataHelper.delete(sqlDB, sqlActions.get(i));
+                  SqlTrackedActionDataHelper.delete(sqlDb, sqlActions.get(i));
                 }
 
                 JSONArray errors = apiResponse.optJSONArray("errors");
                 if (errors != null) {
-                  BoundlessKit.debugLog(TAG, "Got errors:" + errors);
+                  BoundlessKit.debugLog(tag, "Got errors:" + errors);
                   return -1;
                 }
 
                 updateTriggers(null, System.currentTimeMillis(), null);
                 return 200;
               } else {
-                BoundlessKit.debugLog(TAG, "Could not send request.");
+                BoundlessKit.debugLog(tag, "Could not send request.");
                 return -1;
               }
             }

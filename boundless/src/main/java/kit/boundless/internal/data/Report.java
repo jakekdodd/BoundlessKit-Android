@@ -9,9 +9,9 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.api.BoundlessAPI;
-import kit.boundless.internal.data.storage.SQLReportedActionDataHelper;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.api.BoundlessApi;
+import kit.boundless.internal.data.storage.SqlReportedActionDataHelper;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import kit.boundless.internal.data.storage.contracts.ReportedActionContract;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,14 +24,14 @@ import org.json.JSONObject;
 class Report extends ContextWrapper implements Callable<Integer> {
 
   private static Report sharedInstance;
-  private final String TAG = "ReportSyncer";
+  private final String tag = "ReportSyncer";
   private final String preferencesName = "boundless.boundlesskit.synchronization.report";
   private final String sizeKey = "size";
   private final String sizeToSyncKey = "sizeToSync";
   private final String timerStartsAtKey = "timerStartsAt";
   private final String timerExpiresInKey = "timerExpiresIn";
   private final Object apiSyncLock = new Object();
-  private SQLiteDatabase sqlDB;
+  private SQLiteDatabase sqlDb;
   private SharedPreferences preferences;
   private int sizeToSync;
   private long timerStartsAt;
@@ -40,7 +40,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
 
   private Report(Context base) {
     super(base);
-    sqlDB = SQLiteDataStore.getInstance(base).getWritableDatabase();
+    sqlDb = SqliteDataStore.getInstance(base).getWritableDatabase();
     preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
     sizeToSync = preferences.getInt(sizeToSyncKey, 20);
     timerStartsAt = preferences.getLong(timerStartsAtKey, System.currentTimeMillis());
@@ -55,6 +55,8 @@ class Report extends ContextWrapper implements Callable<Integer> {
   }
 
   /**
+   * Indicates whether the sync should be triggered.
+   *
    * @return Whether a sync should be started
    */
   boolean isTriggered() {
@@ -68,7 +70,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
   }
 
   private boolean isSizeToSync() {
-    int count = SQLReportedActionDataHelper.count(sqlDB);
+    int count = SqlReportedActionDataHelper.count(sqlDb);
     boolean isSize = count >= sizeToSync;
     BoundlessKit.debugLog(
         "Report",
@@ -97,7 +99,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
   JSONObject jsonForTriggers() {
     JSONObject json = new JSONObject();
     try {
-      json.put(sizeKey, SQLReportedActionDataHelper.count(sqlDB));
+      json.put(sizeKey, SqlReportedActionDataHelper.count(sqlDb));
       json.put(sizeToSyncKey, sizeToSync);
       json.put(timerStartsAtKey, timerStartsAt);
       json.put(timerExpiresInKey, timerExpiresIn);
@@ -114,7 +116,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
    */
   void store(BoundlessAction action) {
     String metaData = (action.metaData == null) ? null : action.metaData.toString();
-    long rowId = SQLReportedActionDataHelper.insert(sqlDB, new ReportedActionContract(
+    long rowId = SqlReportedActionDataHelper.insert(sqlDb, new ReportedActionContract(
         0,
         action.actionId,
         action.cartridgeId,
@@ -123,33 +125,33 @@ class Report extends ContextWrapper implements Callable<Integer> {
         action.utc,
         action.timezoneOffset
     ));
-//        BoundlessKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
+    // BoundlessKit.debugLog("SQL Reported Actions", "Inserted into row " + rowId);
   }
 
   @Override
   public Integer call() throws Exception {
     if (syncInProgress) {
-      BoundlessKit.debugLog(TAG, "Report sync already happening");
+      BoundlessKit.debugLog(tag, "Report sync already happening");
       return 0;
     } else {
       synchronized (apiSyncLock) {
         if (syncInProgress) {
-          BoundlessKit.debugLog(TAG, "Report sync already happening");
+          BoundlessKit.debugLog(tag, "Report sync already happening");
           return 0;
         } else {
           try {
             syncInProgress = true;
-            BoundlessKit.debugLog(TAG, "Beginning reporter sync!");
+            BoundlessKit.debugLog(tag, "Beginning reporter sync!");
 
             final ArrayList<ReportedActionContract> sqlActions =
-                SQLReportedActionDataHelper.findAll(sqlDB);
+                SqlReportedActionDataHelper.findAll(sqlDb);
             if (sqlActions.size() == 0) {
-              BoundlessKit.debugLog(TAG, "No reported actions to be synced.");
+              BoundlessKit.debugLog(tag, "No reported actions to be synced.");
               updateTriggers(null, System.currentTimeMillis(), null);
               return 0;
             } else {
-              BoundlessKit.debugLog(TAG, sqlActions.size() + " reported actions to be synced.");
-              JSONObject apiResponse = BoundlessAPI.report(this, sqlActions);
+              BoundlessKit.debugLog(tag, sqlActions.size() + " reported actions to be synced.");
+              JSONObject apiResponse = BoundlessApi.report(this, sqlActions);
               if (apiResponse != null) {
                 for (int i = 0; i < sqlActions.size(); i++) {
                   remove(sqlActions.get(i));
@@ -157,14 +159,14 @@ class Report extends ContextWrapper implements Callable<Integer> {
 
                 JSONArray errors = apiResponse.optJSONArray("errors");
                 if (errors != null) {
-                  BoundlessKit.debugLog(TAG, "Got errors:" + errors);
+                  BoundlessKit.debugLog(tag, "Got errors:" + errors);
                   return -1;
                 }
 
                 updateTriggers(null, System.currentTimeMillis(), null);
                 return 200;
               } else {
-                BoundlessKit.debugLog(TAG, "Could not send request.");
+                BoundlessKit.debugLog(tag, "Could not send request.");
                 return -1;
               }
             }
@@ -203,7 +205,7 @@ class Report extends ContextWrapper implements Callable<Integer> {
   }
 
   void remove(ReportedActionContract action) {
-    SQLReportedActionDataHelper.delete(sqlDB, action);
+    SqlReportedActionDataHelper.delete(sqlDb, action);
   }
 
 }

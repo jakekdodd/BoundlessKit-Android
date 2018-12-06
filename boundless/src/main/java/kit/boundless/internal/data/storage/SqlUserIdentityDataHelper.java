@@ -7,16 +7,36 @@ import android.support.annotation.Nullable;
 import kit.boundless.BoundlessKit;
 import kit.boundless.internal.data.storage.contracts.UserIdentityContract;
 
-public class SQLUserIdentityDataHelper extends SQLDataHelper {
+/**
+ * The type Sql user identity data helper.
+ */
+public class SqlUserIdentityDataHelper extends SqlDataHelper {
 
+  /**
+   * Create table.
+   *
+   * @param db the db
+   */
   static void createTable(SQLiteDatabase db) {
     db.execSQL(UserIdentityContract.SQL_CREATE_TABLE);
   }
 
+  /**
+   * Drop table.
+   *
+   * @param db the db
+   */
   static void dropTable(SQLiteDatabase db) {
     db.execSQL(UserIdentityContract.SQL_DROP_TABLE);
   }
 
+  /**
+   * Insert long.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the long
+   */
   public static long insert(SQLiteDatabase db, UserIdentityContract item) {
     ContentValues values = new ContentValues();
     values.put(UserIdentityContract._ID, 0);
@@ -28,6 +48,13 @@ public class SQLUserIdentityDataHelper extends SQLDataHelper {
     return item.id;
   }
 
+  /**
+   * Update long.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the long
+   */
   public static long update(SQLiteDatabase db, UserIdentityContract item) {
     ContentValues values = new ContentValues();
     values.put(UserIdentityContract._ID, 0);
@@ -39,6 +66,12 @@ public class SQLUserIdentityDataHelper extends SQLDataHelper {
     return item.id;
   }
 
+  /**
+   * Delete int.
+   *
+   * @param db the db
+   * @return the int
+   */
   public static int delete(SQLiteDatabase db) {
     int numDeleted = db.delete(UserIdentityContract.TABLE_NAME, null, null);
     BoundlessKit.debugLog(
@@ -49,8 +82,14 @@ public class SQLUserIdentityDataHelper extends SQLDataHelper {
     return numDeleted;
   }
 
-  public static @Nullable
-  UserIdentityContract find(SQLiteDatabase db) {
+  /**
+   * Find user identity contract.
+   *
+   * @param db the db
+   * @return the user identity contract
+   */
+  @Nullable
+  public static UserIdentityContract find(SQLiteDatabase db) {
     UserIdentityContract result = null;
     Cursor cursor = null;
     try {

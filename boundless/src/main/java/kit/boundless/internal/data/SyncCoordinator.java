@@ -13,20 +13,19 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.api.BoundlessAPI;
+import kit.boundless.internal.api.BoundlessApi;
 
 /**
  * Created by cuddergambino on 8/4/16.
  */
-
 public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
 
   private static SyncCoordinator sharedInstance;
   private final String preferencesName = "boundless.boundlesskit.synchronization.synccoordinator";
-  private final String preferencesActionIDSet = "actionidset";
+  private final String preferencesActionIdSet = "actionidset";
   private final Object syncLock = new Object();
   private Telemetry telemetry;
-  private BoundlessAPI api;
+  private BoundlessApi api;
   private BoundlessUser user;
   private Boot boot;
   private Track track;
@@ -41,7 +40,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
   private SyncCoordinator(Context base) {
     super(base);
 
-    api = BoundlessAPI.getInstance(base);
+    api = BoundlessApi.getInstance(base);
     user = BoundlessUser.getSharedInstance(base);
     telemetry = Telemetry.getSharedInstance(base);
     boot = Boot.getSharedInstance(base);
@@ -50,7 +49,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     cartridges = new HashMap<>();
 
     preferences = getSharedPreferences(preferencesName, Context.MODE_PRIVATE);
-    Set<String> actionIds = preferences.getStringSet(preferencesActionIDSet, new HashSet<String>());
+    Set<String> actionIds = preferences.getStringSet(preferencesActionIdSet, new HashSet<String>());
     BoundlessKit.debugLog("SyncCoordinator", "Loading known actionsIDS...");
     for (String actionId : actionIds) {
       cartridges.put(actionId, new Cartridge(base, actionId));
@@ -72,6 +71,12 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     api.credentials.primaryIdentity = boot.externalId;
   }
 
+  /**
+   * Gets instance.
+   *
+   * @param context the context
+   * @return the instance
+   */
   public static SyncCoordinator getInstance(Context context) {
     if (sharedInstance == null) {
       sharedInstance = new SyncCoordinator(context);
@@ -79,6 +84,11 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     return sharedInstance;
   }
 
+  /**
+   * Map external id.
+   *
+   * @param externalId the external id
+   */
   public void mapExternalId(String externalId) {
     BoundlessKit.debugLog("SyncCoordinator", "Mapping externalID:" + externalId + "...");
     user.externalId = externalId;
@@ -88,13 +98,18 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
   }
 
   /**
-   * Checks which syncers have been triggered, and syncs them in an order
+   * Checks which syncers have been triggered, and syncs them in an order.
    * that allows time for the BoundlessAPI to generate fresh cartridges.
    */
   public void performSync() {
     myExecutor.submit(this);
   }
 
+  /**
+   * Gets user.
+   *
+   * @return the user
+   */
   public BoundlessUser getUser() {
     return user;
   }
@@ -140,7 +155,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
       if (cartridge == null) {
         cartridge = new Cartridge(this, actionId);
         cartridges.put(actionId, cartridge);
-        preferences.edit().putStringSet(preferencesActionIDSet, cartridges.keySet()).apply();
+        preferences.edit().putStringSet(preferencesActionIdSet, cartridges.keySet()).apply();
         BoundlessKit.debugLog("SyncCoordinator",
             "Created a cartridge for " + actionId + " for the first time!"
         );
@@ -330,7 +345,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
   }
 
   /**
-   * Erase the syncer triggers
+   * Erase the syncer triggers.
    */
   public void removeSyncers() {
     track.removeTriggers();
@@ -339,7 +354,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
       cartridge.removeTriggers();
     }
     cartridges.clear();
-    preferences.edit().remove(preferencesActionIDSet).apply();
+    preferences.edit().remove(preferencesActionIdSet).apply();
   }
 
 }

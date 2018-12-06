@@ -11,17 +11,33 @@ import kit.boundless.internal.data.storage.contracts.TrackedActionContract;
 /**
  * Created by cuddergambino on 8/9/16.
  */
+public class SqlTrackedActionDataHelper extends SqlDataHelper {
 
-public class SQLTrackedActionDataHelper extends SQLDataHelper {
-
+  /**
+   * Create table.
+   *
+   * @param db the db
+   */
   static void createTable(SQLiteDatabase db) {
     db.execSQL(TrackedActionContract.SQL_CREATE_TABLE);
   }
 
+  /**
+   * Drop table.
+   *
+   * @param db the db
+   */
   static void dropTable(SQLiteDatabase db) {
     db.execSQL(TrackedActionContract.SQL_DROP_TABLE);
   }
 
+  /**
+   * Insert long.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the long
+   */
   public static long insert(SQLiteDatabase db, TrackedActionContract item) {
     ContentValues values = new ContentValues();
     values.put(TrackedActionContract.COLUMNS_NAME_ACTIONNAME, item.actionId);
@@ -33,12 +49,25 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
     return item.id;
   }
 
+  /**
+   * Delete.
+   *
+   * @param db the db
+   * @param item the item
+   */
   public static void delete(SQLiteDatabase db, TrackedActionContract item) {
     String selection = TrackedActionContract._ID + " LIKE ? ";
     String[] args = {String.valueOf(item.id)};
     db.delete(TrackedActionContract.TABLE_NAME, selection, args);
   }
 
+  /**
+   * Find tracked action contract.
+   *
+   * @param db the db
+   * @param item the item
+   * @return the tracked action contract
+   */
   @Nullable
   public static TrackedActionContract find(SQLiteDatabase db, TrackedActionContract item) {
     TrackedActionContract result = null;
@@ -65,6 +94,12 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
     return result;
   }
 
+  /**
+   * Find all array list.
+   *
+   * @param db the db
+   * @return the array list
+   */
   public static ArrayList<TrackedActionContract> findAll(SQLiteDatabase db) {
     ArrayList<TrackedActionContract> actions = new ArrayList<>();
     Cursor cursor = null;
@@ -74,9 +109,6 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
         do {
           TrackedActionContract action = TrackedActionContract.fromCursor(cursor);
           actions.add(action);
-//                    BoundlessKit.debugLog("SQLTrackedActionDataHelper", "Found row:" + action
-// .id + " actionId:" + action.actionId + " metaData:" + action.metaData + " utc:" + action.utc +
-// " timezoneOffset:" + action.timezoneOffset);
         } while (cursor.moveToNext());
       }
     } finally {
@@ -87,6 +119,12 @@ public class SQLTrackedActionDataHelper extends SQLDataHelper {
     return actions;
   }
 
+  /**
+   * Count int.
+   *
+   * @param db the db
+   * @return the int
+   */
   public static int count(SQLiteDatabase db) {
     int result = 0;
     Cursor cursor = null;

@@ -6,8 +6,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import kit.boundless.BoundlessKit;
-import kit.boundless.internal.data.storage.SQLBoundlessExceptionDataHelper;
-import kit.boundless.internal.data.storage.SQLiteDataStore;
+import kit.boundless.internal.data.storage.SqlBoundlessExceptionDataHelper;
+import kit.boundless.internal.data.storage.SqliteDataStore;
 import kit.boundless.internal.data.storage.contracts.BoundlessExceptionContract;
 import org.json.JSONException;
 
@@ -17,7 +17,7 @@ import org.json.JSONException;
 
 class BoundlessException {
 
-  private static SQLiteDatabase sqlDB;
+  private static SQLiteDatabase sqlDb;
 
   private long utc;
   private long timezoneOffset;
@@ -50,8 +50,8 @@ class BoundlessException {
    * @param context Context
    */
   void store(Context context) {
-    if (sqlDB == null) {
-      sqlDB = SQLiteDataStore.getInstance(context).getWritableDatabase();
+    if (sqlDb == null) {
+      sqlDb = SqliteDataStore.getInstance(context).getWritableDatabase();
     }
 
     BoundlessExceptionContract exceptionContract = new BoundlessExceptionContract(0,
@@ -61,11 +61,11 @@ class BoundlessException {
         message,
         stackTrace
     );
-    long rowId = SQLBoundlessExceptionDataHelper.insert(sqlDB, exceptionContract);
+    long rowId = SqlBoundlessExceptionDataHelper.insert(sqlDb, exceptionContract);
 
-//        BoundlessKit.debugLog("BoundlessException", "Inserted into row " + rowId);
+    // BoundlessKit.debugLog("BoundlessException", "Inserted into row " + rowId);
     try {
-      BoundlessKit.debugLog("BoundlessException", exceptionContract.toJSON().toString(2));
+      BoundlessKit.debugLog("BoundlessException", exceptionContract.toJson().toString(2));
     } catch (JSONException e) {
       e.printStackTrace();
       Telemetry.storeException(e);

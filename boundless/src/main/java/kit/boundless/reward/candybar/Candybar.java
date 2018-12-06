@@ -53,12 +53,12 @@ public final class Candybar {
   /*
   Code handling Looper for animating
    */
-  private static final Handler sHandler;
+  private static final Handler S_HANDLER;
   private static final int MSG_SHOW = 0;
   private static final int MSG_DISMISS = 1;
 
   static {
-    sHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+    S_HANDLER = new Handler(Looper.getMainLooper(), new Handler.Callback() {
       @Override
       public boolean handleMessage(Message message) {
         switch (message.what) {
@@ -68,6 +68,7 @@ public final class Candybar {
           case MSG_DISMISS:
             ((Candybar) message.obj).hideView(message.arg1);
             return true;
+          default:
         }
         return false;
       }
@@ -84,12 +85,12 @@ public final class Candybar {
   private final CandybarManager.Callback mManagerCallback = new CandybarManager.Callback() {
     @Override
     public void show() {
-      sHandler.sendMessage(sHandler.obtainMessage(MSG_SHOW, Candybar.this));
+      S_HANDLER.sendMessage(S_HANDLER.obtainMessage(MSG_SHOW, Candybar.this));
     }
 
     @Override
     public void dismiss(int event) {
-      sHandler.sendMessage(sHandler.obtainMessage(MSG_DISMISS, event, 0, Candybar.this));
+      S_HANDLER.sendMessage(S_HANDLER.obtainMessage(MSG_DISMISS, event, 0, Candybar.this));
     }
   };
   private int mDuration;
@@ -177,7 +178,7 @@ public final class Candybar {
   }
 
   /**
-   * Sets the icon image used on either the left or right of the Candybar
+   * Sets the icon image used on either the left or right of the Candybar.
    *
    * @param drawable Drawable image to be used as icon
    * @param sizeDp Size of the icon. Set to -1 for original size.
@@ -189,7 +190,7 @@ public final class Candybar {
   }
 
   /**
-   * Sets the icon image used on either the left or right of the Candybar
+   * Sets the icon image used on either the left or right of the Candybar.
    *
    * @param drawable Drawable image to be used as icon
    * @param leftSide If true icon is on the left, if false the icon is on the right side.
@@ -274,9 +275,9 @@ public final class Candybar {
     return this;
   }
 
-    /*
-    Callback functionality. Use `candybar.setCallback(new Callback())` to set an event callback.
-     */
+  /*
+  Callback functionality. Use `candybar.setCallback(new Callback())` to set an event callback.
+   */
 
   /**
    * Gets text view.
@@ -435,7 +436,7 @@ public final class Candybar {
       @Override
       public void onViewDetachedFromWindow(View v) {
         if (isShown()) {
-          sHandler.post(new Runnable() {
+          S_HANDLER.post(new Runnable() {
             @Override
             public void run() {
               onViewHidden(Callback.DISMISS_EVENT_MANUAL);
@@ -554,7 +555,7 @@ public final class Candybar {
   /**
    * The type Callback.
    */
-  public static abstract class Callback {
+  public abstract static class Callback {
     /**
      * The constant DISMISS_EVENT_TAP.
      */

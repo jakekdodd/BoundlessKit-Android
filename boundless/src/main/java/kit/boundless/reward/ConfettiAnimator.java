@@ -17,8 +17,8 @@ import kit.boundless.reward.particle.ParticleSystem;
 import kit.boundless.reward.particle.initializers.AlphaInitializer;
 import kit.boundless.reward.particle.initializers.LifetimeInitializer;
 import kit.boundless.reward.particle.initializers.ScaleInitializer;
-import kit.boundless.reward.particle.initializers.XYAccelerationInitializer;
-import kit.boundless.reward.particle.modifiers.XYAccelerationModifier;
+import kit.boundless.reward.particle.initializers.XyAccelerationInitializer;
+import kit.boundless.reward.particle.modifiers.XyAccelerationModifier;
 
 /**
  * The type Confetti animator.
@@ -150,7 +150,7 @@ public class ConfettiAnimator extends BaseViewAnimator<ConfettiAnimator> {
             .addInitializer(new ScaleInitializer(scale - 0.5f * scaleRange,
                 scale + 0.5f * scaleRange
             ))
-            .addModifier(new XYAccelerationModifier(0,
+            .addModifier(new XyAccelerationModifier(0,
                 yInitialAcceleration,
                 0,
                 yFinalAcceleration,
@@ -187,7 +187,7 @@ public class ConfettiAnimator extends BaseViewAnimator<ConfettiAnimator> {
     showerParticleSystem =
         new ParticleSystem(target, content, lifetime).addInitializer(new LifetimeInitializer(
             lifetimeRange))
-            .addInitializer(new XYAccelerationInitializer(0, yAcceleration))
+            .addInitializer(new XyAccelerationInitializer(0, yAcceleration))
             .addInitializer(new ScaleInitializer(scale - 0.5f * scaleRange,
                 scale + 0.5f * scaleRange
             ))
@@ -234,7 +234,7 @@ public class ConfettiAnimator extends BaseViewAnimator<ConfettiAnimator> {
         new ParticleSystem(target, blurredContent, lifetime).addInitializer(new AlphaInitializer(76,
             38
         ))
-            .addInitializer(new XYAccelerationInitializer(0, yAcceleration))
+            .addInitializer(new XyAccelerationInitializer(0, yAcceleration))
             .addInitializer(new ScaleInitializer(scale - 0.5f * scaleRange,
                 scale + 0.5f * scaleRange
             ))

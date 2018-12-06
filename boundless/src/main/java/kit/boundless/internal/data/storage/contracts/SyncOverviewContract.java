@@ -11,18 +11,44 @@ import org.json.JSONObject;
 /**
  * Created by cuddergambino on 9/30/16.
  */
-
 public class SyncOverviewContract implements BaseColumns {
 
+  /**
+   * The constant TABLE_NAME.
+   */
   public static final String TABLE_NAME = "Sync_Overviews";
+  /**
+   * The constant COLUMNS_NAME_UTC.
+   */
   public static final String COLUMNS_NAME_UTC = "utc";
+  /**
+   * The constant COLUMNS_NAME_TIMEZONEOFFSET.
+   */
   public static final String COLUMNS_NAME_TIMEZONEOFFSET = "timezoneOffset";
+  /**
+   * The constant COLUMNS_NAME_TOTALSYNCTIME.
+   */
   public static final String COLUMNS_NAME_TOTALSYNCTIME = "totalSyncTime";
+  /**
+   * The constant COLUMNS_NAME_CAUSE.
+   */
   public static final String COLUMNS_NAME_CAUSE = "cause";
+  /**
+   * The constant COLUMNS_NAME_TRACK.
+   */
   public static final String COLUMNS_NAME_TRACK = "track";
+  /**
+   * The constant COLUMNS_NAME_REPORT.
+   */
   public static final String COLUMNS_NAME_REPORT = "report";
+  /**
+   * The constant COLUMNS_NAME_CARTRIDGES.
+   */
   public static final String COLUMNS_NAME_CARTRIDGES = "cartridges";
 
+  /**
+   * The constant SQL_CREATE_TABLE.
+   */
   public static final String SQL_CREATE_TABLE =
       "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" + _ID + " INTEGER PRIMARY KEY,"
           + COLUMNS_NAME_UTC + " INTEGER," + COLUMNS_NAME_TIMEZONEOFFSET + " INTEGER,"
@@ -30,17 +56,56 @@ public class SyncOverviewContract implements BaseColumns {
           + COLUMNS_NAME_TRACK + " TEXT," + COLUMNS_NAME_REPORT + " TEXT," + COLUMNS_NAME_CARTRIDGES
           + " TEXT" + " )";
 
+  /**
+   * The constant SQL_DROP_TABLE.
+   */
   public static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
+  /**
+   * The Id.
+   */
   public long id;
+  /**
+   * The Utc.
+   */
   public long utc;
+  /**
+   * The Timezone offset.
+   */
   public long timezoneOffset;
+  /**
+   * The Total sync time.
+   */
   public long totalSyncTime;
+  /**
+   * The Cause.
+   */
   public String cause;
+  /**
+   * The Track.
+   */
   public String track;
+  /**
+   * The Report.
+   */
   public String report;
+  /**
+   * The Cartridges.
+   */
   public String cartridges;
 
+  /**
+   * Instantiates a new Sync overview contract.
+   *
+   * @param id the id
+   * @param utc the utc
+   * @param timezoneOffset the timezone offset
+   * @param totalSyncTime the total sync time
+   * @param cause the cause
+   * @param track the track
+   * @param report the report
+   * @param cartridges the cartridges
+   */
   public SyncOverviewContract(
       long id,
       long utc,
@@ -60,6 +125,12 @@ public class SyncOverviewContract implements BaseColumns {
     this.cartridges = cartridges;
   }
 
+  /**
+   * From cursor sync overview contract.
+   *
+   * @param cursor the cursor
+   * @return the sync overview contract
+   */
   public static SyncOverviewContract fromCursor(Cursor cursor) {
     return new SyncOverviewContract(
         cursor.getLong(0),
@@ -73,7 +144,12 @@ public class SyncOverviewContract implements BaseColumns {
     );
   }
 
-  public JSONObject toJSON() {
+  /**
+   * To json json object.
+   *
+   * @return the json object
+   */
+  public JSONObject toJson() {
     JSONObject json = new JSONObject();
 
     try {
