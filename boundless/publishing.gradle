@@ -1,0 +1,74 @@
+apply plugin: 'nebula.maven-publish'
+apply plugin: 'com.github.dcendents.android-maven'
+
+apply plugin: 'nebula.nebula-bintray-publishing'
+
+ext {
+  bintrayOrg = 'boundless-ai'
+  bintrayRepo = 'boundless-java'
+
+  libraryDescription = '''\
+A wrapper for Boundless AI on Android. Includes out-of-the-box rewards to delight your users. 
+'''
+
+  gitUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android.git'
+  siteUrl = 'https://github.com/BoundlessAI/BoundlessKit-Android'
+}
+
+bintray {
+  user = System.getenv('BINTRAY_USER')
+  key = System.getenv('BINTRAY_KEY')
+
+  configurations = ['archives']
+  pkg {
+    repo = bintrayRepo
+    userOrg = bintrayOrg
+    name = project.name
+    desc = libraryDescription
+    websiteUrl = siteUrl
+    issueTrackerUrl = siteUrl
+    vcsUrl = gitUrl
+    licenses = ['MIT']
+    labels = ['boundless', 'sdk', 'android']
+
+    version {
+      name = project.version
+      vcsTag = project.version
+      desc = libraryDescription
+    }
+  }
+}
+
+install {
+  repositories.mavenInstaller {
+    pom {
+      project {
+        packaging 'aar'
+        name project.name
+        url siteUrl
+        licenses {
+          license {
+            name 'MIT License'
+            url 'https://opensource.org/licenses/MIT'
+          }
+        }
+        developers {
+          developer {
+            id 'boundlessai'
+            name 'Boundless Mind, Inc'
+            email 'android-support@boundless.ai'
+          }
+        }
+        scm {
+          connection siteUrl
+          developerConnection gitUrl
+          url siteUrl
+        }
+      }
+    }
+  }
+}
+
+nebulaRelease {
+  addReleaseBranchPattern 'project-cleanup'
+}
