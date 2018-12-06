@@ -1,6 +1,6 @@
 defaults: &defaults
   docker:
-    - image: circleci/openjdk:8-jdk
+    - image: circleci/android:api-28-node8-alpha
   working_directory: ~/repo
   environment:
     JVM_OPTS: -Xmx3200m
