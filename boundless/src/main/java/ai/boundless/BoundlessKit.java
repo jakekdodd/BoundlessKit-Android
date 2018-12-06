@@ -1,13 +1,13 @@
 package ai.boundless;
 
+import ai.boundless.internal.data.BoundlessAction;
+import ai.boundless.internal.data.BoundlessUser;
+import ai.boundless.internal.data.SyncCoordinator;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import ai.boundless.internal.data.BoundlessAction;
-import ai.boundless.internal.data.BoundlessUser;
-import ai.boundless.internal.data.SyncCoordinator;
 import org.json.JSONObject;
 
 /**

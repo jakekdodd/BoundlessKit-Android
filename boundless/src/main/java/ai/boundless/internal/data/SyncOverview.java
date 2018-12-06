@@ -3,13 +3,13 @@ package ai.boundless.internal.data;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
 import ai.boundless.BoundlessKit;
 import ai.boundless.internal.data.storage.SqlSyncOverviewDataHelper;
 import ai.boundless.internal.data.storage.SqliteDataStore;
 import ai.boundless.internal.data.storage.contracts.SyncOverviewContract;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

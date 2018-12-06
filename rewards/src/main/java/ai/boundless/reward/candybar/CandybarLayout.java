@@ -1,5 +1,6 @@
 package ai.boundless.reward.candybar;
 
+import ai.boundless.R;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import ai.boundless.R;
 
 /**
  * The type Candybar layout.

@@ -2,12 +2,12 @@ package ai.boundless.internal.data.storage;
 
 import java.util.ArrayList;
 
+import ai.boundless.BoundlessKit;
+import ai.boundless.internal.data.storage.contracts.ReportedActionContract;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
-import ai.boundless.BoundlessKit;
-import ai.boundless.internal.data.storage.contracts.ReportedActionContract;
 
 /**
  * Created by cuddergambino on 8/9/16.

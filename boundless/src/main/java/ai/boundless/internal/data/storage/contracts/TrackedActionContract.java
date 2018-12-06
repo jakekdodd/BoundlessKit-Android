@@ -1,9 +1,9 @@
 package ai.boundless.internal.data.storage.contracts;
 
+import ai.boundless.internal.data.Telemetry;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
-import ai.boundless.internal.data.Telemetry;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

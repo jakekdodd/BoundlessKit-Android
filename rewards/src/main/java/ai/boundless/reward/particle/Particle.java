@@ -2,11 +2,11 @@ package ai.boundless.reward.particle;
 
 import java.util.List;
 
+import ai.boundless.reward.particle.modifiers.ParticleModifier;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import ai.boundless.reward.particle.modifiers.ParticleModifier;
 
 /**
  * The type Particle.

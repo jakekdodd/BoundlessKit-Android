@@ -1,16 +1,16 @@
 package ai.boundless.reward;
 
+import ai.boundless.reward.particle.ParticleSystem;
+import ai.boundless.reward.particle.TextDrawable;
+import ai.boundless.reward.particle.initializers.LifetimeInitializer;
+import ai.boundless.reward.particle.initializers.XyAccelerationInitializer;
+import ai.boundless.reward.particle.modifiers.ScaleModifier;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
-import ai.boundless.reward.particle.ParticleSystem;
-import ai.boundless.reward.particle.TextDrawable;
-import ai.boundless.reward.particle.initializers.LifetimeInitializer;
-import ai.boundless.reward.particle.initializers.XyAccelerationInitializer;
-import ai.boundless.reward.particle.modifiers.ScaleModifier;
 
 /**
  * An emoji explosion animation that explodes or shoots emojis to delight and reinforce users.

@@ -1,11 +1,11 @@
 package ai.boundless.internal.data.storage;
 
+import ai.boundless.BoundlessKit;
+import ai.boundless.internal.data.storage.contracts.UserIdentityContract;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
-import ai.boundless.BoundlessKit;
-import ai.boundless.internal.data.storage.contracts.UserIdentityContract;
 
 /**
  * The type Sql user identity data helper.

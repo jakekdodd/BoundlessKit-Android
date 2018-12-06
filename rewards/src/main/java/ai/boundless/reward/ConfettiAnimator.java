@@ -5,13 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import android.animation.Animator;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.support.v4.graphics.ColorUtils;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AnticipateInterpolator;
 import ai.boundless.reward.particle.ConfettoDrawable;
 import ai.boundless.reward.particle.ParticleSystem;
 import ai.boundless.reward.particle.initializers.AlphaInitializer;
@@ -19,6 +12,13 @@ import ai.boundless.reward.particle.initializers.LifetimeInitializer;
 import ai.boundless.reward.particle.initializers.ScaleInitializer;
 import ai.boundless.reward.particle.initializers.XyAccelerationInitializer;
 import ai.boundless.reward.particle.modifiers.XyAccelerationModifier;
+import android.animation.Animator;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.support.v4.graphics.ColorUtils;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AnticipateInterpolator;
 
 /**
  * The type Confetti animator.
