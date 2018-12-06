@@ -6,5 +6,6 @@ package kit.boundless.internal.data.storage;
 
 abstract class SQLDataHelper {
 
-    SQLDataHelper() { }
+  SQLDataHelper() {
+  }
 }
