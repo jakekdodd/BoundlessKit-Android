@@ -1,6 +1,6 @@
 package ai.boundless.reward.candybar;
 
-import ai.boundless.R;
+import ai.boundless.reward.R;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;

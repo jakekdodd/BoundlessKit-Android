@@ -1,6 +1,6 @@
 package ai.boundless.reward;
 
-import ai.boundless.R;
+import ai.boundless.reward.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
