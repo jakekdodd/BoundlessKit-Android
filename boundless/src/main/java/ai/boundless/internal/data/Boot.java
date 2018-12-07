@@ -1,14 +1,13 @@
 package ai.boundless.internal.data;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.ReentrantLock;
 
 import ai.boundless.BoundlessKit;
 import ai.boundless.internal.api.BoundlessApi;
-import ai.boundless.internal.data.storage.SqliteDataStore;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,12 +18,15 @@ import org.json.JSONObject;
  */
 class Boot extends ContextWrapper implements Callable<Integer> {
 
+  private static final ReentrantLock LOCK = new ReentrantLock();
+
   private static final String INITIAL_BOOT_KEY = "initialBoot";
   private static final String VERSION_ID_KEY = "versionId";
   private static final String CONFIG_ID_KEY = "configId";
   private static final String REINFORCEMENT_ENABLED_KEY = "reinforcementEnabled";
   private static final String TRACKING_ENABLED_KEY = "trackingEnabled";
-  private static Boot sharedInstance;
+
+  private static volatile Boot sharedInstance;
   private final String tag = "BootSyncer";
   private final Object apiSyncLock = new Object();
   /**
@@ -75,15 +77,13 @@ class Boot extends ContextWrapper implements Callable<Integer> {
   @Nullable
   public String experimentGroup;
 
-  private SQLiteDatabase sqlDb;
-  private SharedPreferences preferences;
-  private Boolean syncInProgress = false;
+  private final SharedPreferences preferences;
+  private volatile boolean syncInProgress;
 
   private Boot(Context base) {
     super(base);
     didSync = false;
 
-    sqlDb = SqliteDataStore.getInstance(base).getWritableDatabase();
     preferences = getSharedPreferences(preferencesName(), Context.MODE_PRIVATE);
     initialBoot = preferences.getBoolean(INITIAL_BOOT_KEY, true);
     versionId = preferences.getString(VERSION_ID_KEY, null);
@@ -104,7 +104,15 @@ class Boot extends ContextWrapper implements Callable<Integer> {
    */
   static Boot getSharedInstance(Context base) {
     if (sharedInstance == null) {
-      sharedInstance = new Boot(base);
+      LOCK.lock();
+      try {
+        if (sharedInstance == null) {
+          sharedInstance = new Boot(base);
+        }
+      } finally {
+        LOCK.unlock();
+      }
+
     }
     return sharedInstance;
   }

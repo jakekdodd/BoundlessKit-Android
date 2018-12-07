@@ -16,23 +16,17 @@ public class BoundlessAction {
    */
   public String actionId;
 
-  /**
-   * The Cartridge id.
-   */
   @Nullable
-  public String cartridgeId = null;
+  String cartridgeId;
 
-  /**
-   * The Reinforcement decision.
-   */
   @Nullable
-  public String reinforcementDecision = null;
+  String reinforcementDecision;
 
   /**
    * The Meta data.
    */
   @Nullable
-  public JSONObject metaData = null;
+  public JSONObject metaData;
 
   /**
    * The Utc.
@@ -52,35 +46,10 @@ public class BoundlessAction {
    */
   public BoundlessAction(
       String actionId, @Nullable String reinforcementDecision, @Nullable JSONObject metaData) {
-    this(
-        actionId,
-        reinforcementDecision,
-        metaData,
-        System.currentTimeMillis(),
-        TimeZone.getDefault().getOffset(System.currentTimeMillis())
-    );
-  }
-
-  /**
-   * Instantiates a new Boundless action.
-   *
-   * @param actionId the action id
-   * @param reinforcementDecision the reinforcement decision
-   * @param metaData the meta data
-   * @param utc the utc
-   * @param timezoneOffset the timezone offset
-   */
-  public BoundlessAction(
-      String actionId,
-      @Nullable String reinforcementDecision,
-      @Nullable JSONObject metaData,
-      long utc,
-      long timezoneOffset) {
     this.actionId = actionId;
     this.reinforcementDecision = reinforcementDecision;
     this.metaData = metaData;
-    this.utc = utc;
-    this.timezoneOffset = timezoneOffset;
+    utc = System.currentTimeMillis();
+    timezoneOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis());
   }
-
 }
