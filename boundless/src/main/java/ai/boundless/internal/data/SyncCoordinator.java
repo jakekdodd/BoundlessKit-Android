@@ -35,7 +35,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
   private SharedPreferences preferences;
   private ExecutorService syncerExecutor = Executors.newSingleThreadExecutor();
   private ExecutorService myExecutor = Executors.newFixedThreadPool(3);
-  private Boolean syncInProgress = false;
+  private volatile boolean syncInProgress;
 
   private SyncCoordinator(Context base) {
     super(base);
@@ -145,11 +145,10 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
   /**
    * Finds the right cartridge for an action and returns a reinforcement decision.
    *
-   * @param context Context
    * @param actionId The action to retrieve a reinforcement decision for
    * @return A reinforcement decision
    */
-  public String removeReinforcementDecisionFor(Context context, String actionId) {
+  public String removeReinforcementDecisionFor(String actionId) {
     if (boot.reinforcementEnabled) {
       Cartridge cartridge = cartridges.get(actionId);
       if (cartridge == null) {
@@ -343,18 +342,4 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
     }
     api.credentials.primaryIdentity = boot.externalId;
   }
-
-  /**
-   * Erase the syncer triggers.
-   */
-  public void removeSyncers() {
-    track.removeTriggers();
-    report.removeTriggers();
-    for (Cartridge cartridge : cartridges.values()) {
-      cartridge.removeTriggers();
-    }
-    cartridges.clear();
-    preferences.edit().remove(preferencesActionIdSet).apply();
-  }
-
 }
