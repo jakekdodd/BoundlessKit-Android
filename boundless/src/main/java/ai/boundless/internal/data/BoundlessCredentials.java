@@ -29,7 +29,7 @@ public class BoundlessCredentials {
 
   private final String productionSecret;
 
-  private final String versionId;
+  String versionId;
 
   private final boolean inProduction;
 

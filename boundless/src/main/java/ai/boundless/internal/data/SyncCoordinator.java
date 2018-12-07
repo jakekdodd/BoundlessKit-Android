@@ -212,7 +212,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
                 beforeBoot();
 
                 apiCall = syncerExecutor.submit(boot);
-                if (BoundlessKit.debugMode) {
+                if (BoundlessKit.isInDebug()) {
                   while (!apiCall.isDone()) {
                     BoundlessKit.debugLog("SyncCoordinator",
                         "Waiting for boot syncer to be done..."
@@ -239,7 +239,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
               //
               if (trackShouldSync) {
                 apiCall = syncerExecutor.submit(track);
-                if (BoundlessKit.debugMode) {
+                if (BoundlessKit.isInDebug()) {
                   while (!apiCall.isDone()) {
                     BoundlessKit.debugLog("SyncCoordinator",
                         "Waiting for track syncer to be done..."
@@ -263,7 +263,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
               //
               if (reportShouldSync) {
                 apiCall = syncerExecutor.submit(report);
-                if (BoundlessKit.debugMode) {
+                if (BoundlessKit.isInDebug()) {
                   while (!apiCall.isDone()) {
                     BoundlessKit.debugLog("SyncCoordinator",
                         "Waiting for report syncer to be done..."
@@ -290,7 +290,7 @@ public class SyncCoordinator extends ContextWrapper implements Callable<Void> {
               for (Map.Entry<String, Cartridge> entry : cartridges.entrySet()) {
                 if (entry.getValue().isTriggered()) {
                   apiCall = syncerExecutor.submit(entry.getValue());
-                  if (BoundlessKit.debugMode) {
+                  if (BoundlessKit.isInDebug()) {
                     while (!apiCall.isDone()) {
                       BoundlessKit.debugLog("SyncCoordinator",
                           "Waiting for " + entry.getKey() + " cartridge refresh to be done..."
