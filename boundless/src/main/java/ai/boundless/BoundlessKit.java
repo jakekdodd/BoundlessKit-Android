@@ -1,5 +1,7 @@
 package ai.boundless;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import ai.boundless.internal.data.BoundlessAction;
 import ai.boundless.internal.data.BoundlessUser;
 import ai.boundless.internal.data.SyncCoordinator;
@@ -8,17 +10,16 @@ import android.content.ContextWrapper;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
 import org.json.JSONObject;
 
 /**
  * The type Boundless kit.
  */
 public class BoundlessKit extends ContextWrapper {
-  /**
-   * The constant debugMode.
-   */
-  public static boolean debugMode = false;
-  private static BoundlessKit sharedInstance = null;
+
+  private static volatile boolean debug;
+  private static BoundlessKit sharedInstance;
 
   // Manages local storage and api calls
   private SyncCoordinator syncCoordinator;
@@ -129,7 +130,7 @@ public class BoundlessKit extends ContextWrapper {
    * @param enable Used to set debug mode. `true` will enable, `false` will disable.
    */
   public static void enableDebugMode(boolean enable) {
-    debugMode = enable;
+    debug = enable;
   }
 
   /**
@@ -139,7 +140,7 @@ public class BoundlessKit extends ContextWrapper {
    * @param msg the msg
    */
   public static void debugLog(String tag, String msg) {
-    if (debugMode) {
+    if (debug) {
       Log.v("BoundlessKit", tag + ":" + msg);
     }
   }

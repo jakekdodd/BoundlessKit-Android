@@ -1,8 +1,8 @@
 package ai.boundless.internal.api;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import ai.boundless.BoundlessKit;
 import ai.boundless.internal.data.BoundlessCredentials;
@@ -185,7 +185,7 @@ public class BoundlessApi extends ContextWrapper {
    * @return The api response as JSON.
    */
   @Nullable
-  public static JSONObject track(Context context, ArrayList<TrackedActionContract> actions) {
+  public static JSONObject track(Context context, List<TrackedActionContract> actions) {
     try {
       JSONObject payload = new JSONObject();
 
@@ -211,7 +211,7 @@ public class BoundlessApi extends ContextWrapper {
    * @return The api response as JSON.
    */
   @Nullable
-  public static JSONObject report(Context context, ArrayList<ReportedActionContract> actions) {
+  public static JSONObject report(Context context, List<ReportedActionContract> actions) {
     try {
       JSONObject payload = new JSONObject();
       payload.put("reports", ReportedActionContract.valuesToJson(actions));
@@ -257,8 +257,8 @@ public class BoundlessApi extends ContextWrapper {
   @Nullable
   public static JSONObject sync(
       Context context,
-      ArrayList<SyncOverviewContract> syncOverviews,
-      ArrayList<BoundlessExceptionContract> exceptions) {
+      List<SyncOverviewContract> syncOverviews,
+      List<BoundlessExceptionContract> exceptions) {
     try {
       JSONObject payload = new JSONObject();
 

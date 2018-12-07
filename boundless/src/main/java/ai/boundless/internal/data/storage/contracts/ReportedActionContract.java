@@ -143,8 +143,8 @@ public final class ReportedActionContract implements BaseColumns {
    * @param actions the actions
    * @return the json array
    */
-  public static JSONArray valuesToJson(ArrayList<ReportedActionContract> actions) {
-    HashMap<String, HashMap<String, List<ReportedActionContract>>> actionCartridges =
+  public static JSONArray valuesToJson(List<ReportedActionContract> actions) {
+    Map<String, Map<String, List<ReportedActionContract>>> actionCartridges =
         new HashMap<>();
 
     for (ReportedActionContract action : actions) {
@@ -160,7 +160,7 @@ public final class ReportedActionContract implements BaseColumns {
 
     JSONArray reportsJson = new JSONArray();
     try {
-      for (Map.Entry<String, HashMap<String, List<ReportedActionContract>>> actionCartridge :
+      for (Map.Entry<String, Map<String, List<ReportedActionContract>>> actionCartridge :
           actionCartridges
           .entrySet()) {
         for (Map.Entry<String, List<ReportedActionContract>> cartridge : actionCartridge.getValue()
