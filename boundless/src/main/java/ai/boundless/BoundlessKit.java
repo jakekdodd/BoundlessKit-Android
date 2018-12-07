@@ -134,6 +134,15 @@ public class BoundlessKit extends ContextWrapper {
   }
 
   /**
+   * Indicates whether we're in debug mode.
+   *
+   * @return true if in debug mode
+   */
+  public static boolean isInDebug() {
+    return debug;
+  }
+
+  /**
    * Debug log.
    *
    * @param tag the tag
