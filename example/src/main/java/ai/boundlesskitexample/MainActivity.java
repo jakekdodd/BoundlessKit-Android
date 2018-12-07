@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         mHelper = new TaskDbHelper(MainActivity.this);
         mTaskListView = findViewById(R.id.list_todo);
         updateUI();
-        BoundlessKit.debugMode = true;
+        BoundlessKit.enableDebugMode(true);
 
 
         // convenience function to create confetti demo. Done here to avoid lag on UI thread
