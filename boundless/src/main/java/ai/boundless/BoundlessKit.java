@@ -1,7 +1,5 @@
 package ai.boundless;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import ai.boundless.internal.data.BoundlessAction;
 import ai.boundless.internal.data.BoundlessUser;
 import ai.boundless.internal.data.SyncCoordinator;
@@ -40,24 +38,22 @@ public class BoundlessKit extends ContextWrapper {
    * @param callback The callback to trigger when the reinforcement decision has been made. The
    *     reinforcement decision ids are configured on the Developer Dashboard.
    */
-  public static void reinforce(
-      final Context context,
-      final String actionId,
-      @Nullable final JSONObject metaData,
-      final ReinforcementCallback callback) {
-    AsyncTask<Void, Void, String> reinforcementTask = new AsyncTask<Void, Void, String>() {
+  public static void reinforce(final Context context, final String actionId,
+                               @Nullable final JSONObject metaData,
+                               final ReinforcementCallback callback) {
+    new AsyncTask<Void, Void, String>() {
       @Override
       protected String doInBackground(Void... voids) {
-        return BoundlessKit.getInstance(context)
+        return getInstance(context)
             .syncCoordinator
-            .removeReinforcementDecisionFor(context, actionId);
+            .removeReinforcementDecisionFor(actionId);
       }
 
       @Override
       protected void onPostExecute(String reinforcementDecision) {
         callback.onReinforcement(reinforcementDecision);
         BoundlessAction action = new BoundlessAction(actionId, reinforcementDecision, metaData);
-        BoundlessKit.getInstance(context).syncCoordinator.storeReportedAction(action);
+        getInstance(context).syncCoordinator.storeReportedAction(action);
       }
     }.execute();
   }
@@ -150,7 +146,7 @@ public class BoundlessKit extends ContextWrapper {
    */
   public static void debugLog(String tag, String msg) {
     if (debug) {
-      Log.v("BoundlessKit", tag + ":" + msg);
+      Log.v("BoundlessKit", tag + ':' + msg);
     }
   }
 
