@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import ai.boundless.BoundlessKit;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build.VERSION;
 import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,60 +18,25 @@ import org.json.JSONObject;
  */
 public class BoundlessCredentials {
 
-  /**
-   * The Client os.
-   */
-  final String clientOs = "Android";
-  /**
-   * The Client os version.
-   */
-  final int clientOsVersion = android.os.Build.VERSION.SDK_INT;
-  /**
-   * The Client build.
-   */
-  final String clientBuild;
-  /**
-   * The Client sdk version.
-   */
-  final String clientSdkVersion = "4.1.0";
+  private static final String CLIENT_OS = "Android";
+  private static final String CLIENT_SDK_VERSION = "4.1.0";
 
-  /**
-   * The App id.
-   */
-  final String appId;
-  /**
-   * The Development secret.
-   */
-  final String developmentSecret;
-  /**
-   * The Production secret.
-   */
-  final String productionSecret;
-  /**
-   * The Version id.
-   */
-  String versionId;
-  /**
-   * The In production.
-   */
-  boolean inProduction;
-  /**
-   * The Primary identity.
-   */
+  private final String clientBuild;
+
+  private final String appId;
+
+  private final String developmentSecret;
+
+  private final String productionSecret;
+
+  private final String versionId;
+
+  private final boolean inProduction;
+
   @Nullable
   String primaryIdentity;
 
-  /**
-   * Instantiates a new Boundless credentials.
-   *
-   * @param context the context
-   * @param appId the app id
-   * @param versionId the version id
-   * @param inProduction the in production
-   * @param developmentSecret the development secret
-   * @param productionSecret the production secret
-   */
-  public BoundlessCredentials(
+  private BoundlessCredentials(
       Context context,
       String appId,
       String versionId,
@@ -127,18 +93,11 @@ public class BoundlessCredentials {
       return null;
     }
 
-    return BoundlessCredentials.valueOf(context, resourceString);
+    return valueOf(context, resourceString);
   }
 
-  /**
-   * Extracts credentials from the given JSON. Credentials are obtained from dashboard.boundless.ai.
-   *
-   * @param context Context
-   * @param jsonString A JSON formatted string
-   * @return An object initiated with the values from file.
-   */
   @Nullable
-  public static BoundlessCredentials valueOf(Context context, String jsonString) {
+  private static BoundlessCredentials valueOf(Context context, String jsonString) {
     try {
       JSONObject jsonObject = new JSONObject(jsonString);
       String appId = jsonObject.getString("appID");
@@ -162,15 +121,6 @@ public class BoundlessCredentials {
   }
 
   /**
-   * Gets secret.
-   *
-   * @return the secret
-   */
-  String getSecret() {
-    return inProduction ? productionSecret : developmentSecret;
-  }
-
-  /**
    * As json object json object.
    *
    * @return the json object
@@ -179,10 +129,10 @@ public class BoundlessCredentials {
   public JSONObject asJsonObject() throws JSONException {
     JSONObject jsonObject = new JSONObject();
 
-    jsonObject.put("clientOS", clientOs);
-    jsonObject.put("clientOSVersion", clientOsVersion);
+    jsonObject.put("clientOS", CLIENT_OS);
+    jsonObject.put("clientOSVersion", VERSION.SDK_INT);
     jsonObject.put("clientBuild", clientBuild);
-    jsonObject.put("clientSDKVersion", clientSdkVersion);
+    jsonObject.put("clientSDKVersion", CLIENT_SDK_VERSION);
 
     jsonObject.put("appId", appId);
     jsonObject.put("versionId", versionId);
