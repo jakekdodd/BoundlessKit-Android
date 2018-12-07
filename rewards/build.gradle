@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 
+apply plugin: 'com.getkeepsafe.dexcount'
+
 apply from: '../gradle/checkstyle.gradle'
 apply from: '../gradle/publishing.gradle'
 
